@@ -1,10 +1,9 @@
-import abc
-import urllib
-import traceback
-from operator import itemgetter
+import abc, os, dateutil, sys, re, time
 from matplotlib import finance as matplotlib_finance
+import urllib2
 
 from rta.model import Quote
+from rta.configuration import config
 from rta.errors import UfException, Errors
 
 import logging
@@ -63,22 +62,40 @@ class YahooDAM(BaseDAM):
         
     def readQuotes(self, start, end):
         ''' read quotes from Yahoo Financial'''
+        ''' return a dataframe '''
         if self.symbol is None:
             LOG.debug('Symbol is None')
             return []
 
-        return matplotlib_finance.fetch_historical_yahoo(self.symbol, start, end)
+        return pandas.read_csv( 
+              matplotlib_finance.fetch_historical_yahoo(self.symbol, start, end), 
+              parse_dates=True, 
+              converters= { 'Date': dateutil.parser.parse } )
     
+    def importQuotes(self, importer, start, end, symbols = None):
+      '''
+        Imports data from yahoo finance between start and end date
+        You can pass symbols or it would take defualt config['symbols']
+        It will show time to import and rows count    
+      '''
       
-class BhavcopyDam(BaseDAM):
-  ''' BhavcopyDam: used to import qoutes from NSE. '''
-  
-  def readQuotes(self, start, end):
-    pass
-  
-  @classmethod
-  def importFromDirectory(dir):
-    if not dir:
-      return
-    for csv in os.listdir( os.path.abspath(dir) ):
-      df = pandas.read_csv( csv, parse_dates = True, converters= { 'date': dateutil.parser.parse } )
+      if not symbols:
+        symbols = config['symbols']
+      start_time, last_count, count = time.time(), 0, 0
+      
+      for symbol in symbols:
+        self.symbol = symbol
+        print "Importing {s} between {st}- {en}".format(s= symbol, st= start, en = end)
+        try:
+          for index, row in self.readQuotes(start, end).iterrows():
+            result = importer.add( symbol, row )
+            if result and result.success:
+              count += 1 
+          print '{list} imported. total rows: {rows}, time: {t} ms'.format(
+                    list=symbol, rows= ( count - last_count), t = time.time() - start_time )
+          
+          last_count = count
+          
+        except urllib2.HTTPError:
+          LOG.warning("Error occured while downloading csv from Yahoo for " + symbol )
+      

@@ -18,6 +18,7 @@ class Quote( mongokit.Document ):
         'date' : datetime.datetime, 
         'high': float,
         'close': float,
+        'finish': float,
         'open' : float,
         'low': float, 
         'volume': int,
@@ -25,9 +26,10 @@ class Quote( mongokit.Document ):
     
     required_fields = QUOTE_FIELDS
     
-    indexes = [
-      { 'fields': ['symbol', 'date'] }
-    ]
+    indexes = [ { 
+        'fields': ['symbol', 'date'],
+        'unique'  : True 
+      } ]
     
     def __repr__(self):
         ''' convert to string '''
@@ -51,7 +53,7 @@ def singleton(class_):
 
 
 DB_NAME = 'nse_eod'
-COL_NAME = 'qoutes'
+COL_NAME = 'quotes'
 
 @singleton
 class MongoDB(object):
@@ -60,10 +62,14 @@ class MongoDB(object):
       self.col = self._connection[DB_NAME][COL_NAME]
       self._connection.register([ Quote ])
       
+      mongo_index = self.col.Quote.generate_index(self.col.Quote.collection)
+      
   def add(self, symbol, series, force = False):
+      '''TODO: This thing can be done in more efficient way. read momngokit.insert '''
+     
       if not force:
         row = self.col.find_one({ 'symbol': symbol, 'date': series['Date'] } )
-        if not row:  
+        if not row:
           return self.insert(symbol, series)
       else:
         return self.insert(symbol, series)
@@ -75,9 +81,11 @@ class MongoDB(object):
              'open': series['Open'],
              'high': series['High'], 
              'low': series['Low'],
-             'close': series['Close'], 
+             'close': series['Adj Close'], 
+             'finish': series['Close'],
              'volume': series['Volume']
           } )
+          
     doc.save()
     tp = namedtuple('quote_result', ['success', 'doc'] )
     if isinstance( doc['_id'], ObjectId ):

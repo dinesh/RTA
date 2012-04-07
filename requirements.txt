@@ -1,0 +1,8 @@
+matplotlib
+numpy
+pandas
+mongokit
+python-dateutil
+Flask==0.8
+Flask-WTF
+Flask-Script

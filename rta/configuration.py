@@ -18,7 +18,7 @@ def getConfig(baseConfig = {}):
   default = {}
   root = default['root'] = os.path.dirname( os.path.dirname( os.path.abspath(__file__) ) )
   default['symbols'] = pandas.read_csv( os.path.join(root, 'data/companylist.csv') )['Symbol'].values
-  default['dbpath'] = os.path.join( root, 'data', 'rta_dev.hd5' )
+  default['dbname'] = 'nse_eod'
   return default
   
-config = getConfig()
+Config = getConfig()

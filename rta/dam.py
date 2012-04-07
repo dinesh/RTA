@@ -1,14 +1,6 @@
-import abc, os, dateutil, sys, re, time
-from matplotlib import finance as matplotlib_finance
-import urllib2
+import abc, re
+from rta.api import *
 
-from rta.model import Quote
-from rta.configuration import config
-from rta.errors import UfException, Errors
-
-import logging
-import pandas
-LOG = logging.getLogger()
 
 class BaseDAM(object):
     ''' base class for DAO '''
@@ -80,12 +72,19 @@ class YahooDAM(BaseDAM):
     def importQuotes(self, importer, start, end, symbols = None):
       '''
         Imports data from yahoo finance between start and end date
-        You can pass symbols or it would take defualt config['symbols']
+        You can pass symbols or it would take defualt Config['symbols']
         It will show time to import and rows count    
       '''
       
+      ''' 
+				+req 
+				a. Date importing can be much faster using mongodb upsert 
+				b. we can insert at bulk rather than iterating each row in dataframe
+				c. add better logging support
+			'''
+			
       if not symbols:
-        symbols = config['symbols']
+        symbols = Config['symbols']
       start_time, last_count, count = time.time(), 0, 0
       
       for symbol in symbols:

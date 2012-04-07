@@ -1,15 +1,12 @@
 
 import json, datetime
 from collections import namedtuple
-import numpy as np
 from pymongo.objectid import ObjectId
 
-# mongokit is minimal ORM fast based on execellent pymongo
-import mongokit
+from rta.api import *
 
-from rta.configuration import config
 
-QUOTE_FIELDS = ['symbol', 'date', 'open', 'high', 'low', 'close', 'volume']
+REQUIRED_QUOTE_FIELDS = ['symbol', 'date', 'open', 'high', 'low', 'close', 'volume']
 
 class Quote( mongokit.Document ):
     ''' qoute class '''
@@ -18,13 +15,13 @@ class Quote( mongokit.Document ):
         'date' : datetime.datetime, 
         'high': float,
         'close': float,
-        'finish': float,
+        'adj': float,
         'open' : float,
         'low': float, 
         'volume': int,
     }
     
-    required_fields = QUOTE_FIELDS
+    required_fields = REQUIRED_QUOTE_FIELDS
     
     indexes = [ { 
         'fields': ['symbol', 'date'],
@@ -52,7 +49,7 @@ def singleton(class_):
  return getinstance
 
 
-DB_NAME = 'nse_eod'
+DB_NAME = Config['dbname'] || 'nse_eod'
 COL_NAME = 'quotes'
 
 @singleton
@@ -81,8 +78,8 @@ class MongoDB(object):
              'open': series['Open'],
              'high': series['High'], 
              'low': series['Low'],
-             'close': series['Adj Close'], 
-             'finish': series['Close'],
+             'adj': series['Adj Close'], 
+             'close': series['Close'],
              'volume': series['Volume']
           } )
           

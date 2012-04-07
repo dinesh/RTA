@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>Shorty - {% block title %}RTA: Trading plateform {% endblock %}</title>
+    <!-- JavaScript -->
+    <script type="text/javascript" src="{{ JS }}/app.js"></script>
+    <!-- END JavaScript -->
+    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ CSS }}/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="{{ CSS }}/app.css" />
+    <!-- END CSS -->
+</head>
+
+<body>
+<div class="topbar">
+    <div class="fill">
+        <div class="container">
+            {% include 'header.html' %}
+        </div>
+    </div>
+</div>
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            <ul class="flashes">
+            {% for category, message in messages %}
+                <li class="flash" id="{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+    {% block body %}{% endblock %}
+    <footer>
+        {% include 'footer.html' %}
+    </footer>
+</div>
+</body>
+</html>

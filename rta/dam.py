@@ -1,6 +1,10 @@
 import abc, re
 from rta.api import *
 
+# logger
+import logging
+LOG = logging.getLogger()
+
 
 class BaseDAM(object):
     ''' base class for DAO '''

@@ -14,8 +14,10 @@ import mongokit # mongokit is minimal ORM fast based on execellent pymongo
 
 
 # rta packages
-from rta import indicators, Model
+from rta import indicators as Indicators 
+from rta import model as Model
 from rta.configuration import Config
+from rta.dam import YahooDAM
 from rta.errors import UfException, Errors
 
 

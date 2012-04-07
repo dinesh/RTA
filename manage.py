@@ -3,7 +3,7 @@
 
 from flask.ext.script import Command, Manager, Shell
 
-from rta import api as app
+from rta import api
 
 manager = Manager(app)
 

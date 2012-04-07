@@ -2,9 +2,9 @@
 import json, datetime
 from collections import namedtuple
 from pymongo.objectid import ObjectId
+import mongokit
 
-from rta.api import *
-
+from .configuration import Config
 
 REQUIRED_QUOTE_FIELDS = ['symbol', 'date', 'open', 'high', 'low', 'close', 'volume']
 
@@ -49,7 +49,10 @@ def singleton(class_):
  return getinstance
 
 
-DB_NAME = Config['dbname'] || 'nse_eod'
+DB_NAME = Config['dbname'] 
+if not DB_NAME:
+  DB_NAME =  'nse_eod'
+  
 COL_NAME = 'quotes'
 
 @singleton

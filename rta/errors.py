@@ -8,7 +8,7 @@ class Errors(object):
     FILE_NOT_EXIST = 2
     FILE_EXIST = 3
     UNDEFINED_METHOD = 4
-
+    
     NETWORK_ERROR = 100
     NETWORK_400_ERROR = 101
 
@@ -32,6 +32,9 @@ class Errors(object):
     TABLENAME_NOT_SET = 1300
     TABLENAME_ALREADY_SET = 1301
     INVALID_SAVER_NAME = 1302
+
+    # database
+    DB_EXECUTE = 1400
 
 class UfException(Exception):
 

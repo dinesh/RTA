@@ -1,7 +1,6 @@
 
 from datetime import date
-
-from helper import rta
+import helper
 from rta.api import *
 
 db = Model.MongoDB()

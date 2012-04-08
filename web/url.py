@@ -1,15 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from .views.home import homeController, IndexView, IndicatorView
+from .views.home import HomeController
 
-Routes = [
-    ((homeController, ''),
-        ('/', IndexView.as_view('index')),
-        ('/<indicator>', IndicatorView.as_view('redir')),
-    ),
-]
 
-def setup_routes(app, routes):
+def setup_routes(app):
   """
   Registers :class:`flask.Blueprint` instances and adds routes all at once.
 
@@ -24,19 +18,7 @@ def setup_routes(app, routes):
   :type routes: tuple.
   :returns: None
   """
-  if not route:
-    return
-    
-  for route in routes:
-      # endpoint: (blueprint_instance, url_prefix)
-      # rules: [('/route/', view_function), ...]
-      endpoint, rules = route[0], route[1:]
-      for pattern, view in rules:
-          if endpoint is None:
-              app.add_url_rule(pattern, view_func=view)
-          else:
-              endpoint[0].add_url_rule(pattern, view_func=view)
-      if endpoint is not None:
-          app.register_blueprint(endpoint[0], url_prefix=endpoint[1])
   
+  home = HomeController(app).setup().configure_routes()
+
   

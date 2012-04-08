@@ -2,14 +2,17 @@
         "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>Shorty - {% block title %}RTA: Trading plateform {% endblock %}</title>
+    <title>RTA - {% block title %} Trading plateform {% endblock %}</title>
     <!-- JavaScript -->
-    <script type="text/javascript" src="{{ JS }}/app.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename = 'js/jquery.min.js' ) }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename = 'js/bootstrap.min.js' ) }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename = 'js/app.js' ) }}"></script>
     <!-- END JavaScript -->
+    
     <!-- CSS -->
-    <link rel="stylesheet" type="text/css" href="{{ CSS }}/bootstrap.min.css" />
-    <link rel="stylesheet" type="text/css" href="{{ CSS }}/app.css" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'css/bootstrap.min.css' ) }}" />    
     <!-- END CSS -->
+    
 </head>
 
 <body>

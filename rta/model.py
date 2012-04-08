@@ -87,12 +87,21 @@ if not DB_NAME:
   
 COL_NAME = 'quotes'
 
+def db():
+  return MongoDB()
+  
+  
 @singleton
 class MongoDB(object):
   def __init__(self, mode = 'a'):
     self.__collection = self.__connection = None
     self.col = self.collection()
     mongo_index = self.col.Quote.generate_index(self.col.Quote.collection)
+  
+  
+  def reset(self):
+    self.__collection.drop_database( DB_NAME )
+    self.collection()
     
   def collection(self):
     if not self.__collection:

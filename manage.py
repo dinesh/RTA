@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask.ext.script import Command, Manager, Shell
+from flaskext.script import Command, Manager, Shell
 
 from rta import api
+from web import app
 
 manager = Manager(app)
 
@@ -13,12 +14,9 @@ class SyncDB(Command):
     Initializes the database tables.
     """
     def run(self):
-        from shorty import db
-        db.drop_all()
-        db.create_all()
-        db.session.commit()
-
-
+        db = api.Model.db()
+        db.reset()
+        
 class FixedShell(Shell):
     """
     Runs a Python shell inside Flask application context.

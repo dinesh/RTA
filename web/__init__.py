@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
 
 from flask import Flask
-
+import os
 from web import settings
 from .static import static_files
-from .url import setup_routing
+from .url import setup_routes
 
 # setup application
-app = Flask('rta')
+current_dir = os.path.dirname(__file__)
+app = Flask('rta', static_folder = os.path.join( current_dir, 'static') )
 app.config.from_object(settings)
 
 # register application views and blueprints
-from shorty.urls import Routes
-setup_routing(app, Routes)
+setup_routes(app)
 
-# register context processors
-app.context_processor(static_files)
+print app.url_map

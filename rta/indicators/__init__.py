@@ -1,19 +1,44 @@
 
-
-# Lazzy import for _tablib
 # you may need to modify arguements based on indicators
-# add decorators for cached properties
+# TODO: add decorators for cached properties
+# TODO: use __all__ for dynamic imports
 
-# may refer to https://github.com/mlamby/indicator
+# https://github.com/mrjbq7/ta-lib
 
-SUPPORTED_INDICATORS = [ 'SMA', 'EMA' ]
+SUPPORTED_INDICATORS = [ 'MIN', 'SMA', 'EMA' ]
 
-def _talib():
-  import TaLib
+  
+def print_help_and_exit(msg):
+  help = """
+    Unable to load talib module.
+    Please go to rta/src/talib and follow steps.
+    1. make generate
+    2. python setup.py build_ext --inplace
+    3. to test
+      $] nosetests
+      
+  """
+  print help
+  
+  print "Program Exit bc/ " + msg
+  
+  
+try:
+  from rta.src.talib import talib 
+except ImportError:
+  print_help_and_exit(sys.exec_info[1])
+  
+def MIN(*args):
+  return talib.MIN(*args)
   
 def SMA(*args):
-  _talib().TA_SMA(args)
+  return talib.SMA(*args)
 
 def EMA(*args):
-  _tablib().TA_EMA(args)
+  return tablib.EMA(args)
   
+def BBANDS(*args, **kwgs):
+  return talib.BBANDS(*args, **kwgs)
+  
+def DEMA(*args, **kwgs):
+  return talib.DEMA(*args, **kwgs)

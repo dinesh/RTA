@@ -42,3 +42,11 @@ def BBANDS(*args, **kwgs):
   
 def DEMA(*args, **kwgs):
   return talib.DEMA(*args, **kwgs)
+  
+  
+def CDL2CROWS(*args, **kwgs):
+  return talib.CDL2CROWS(*args, **kwgs)
+
+def CDL3BLACKCROWS(*args, **kwgs):
+  return talib.CDL3BLACKCROWS(*args, **kwgs)
+  

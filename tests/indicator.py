@@ -10,6 +10,9 @@ close = Model.Quote.series('3MINDIA', today - timedelta(days=100))['close']
 # test SMA
 print Indicators.SMA(close.values, 9)
 
+# test SMA
+#print Indicators.SMA(series)
+
 # test ADX
 print Indicators.ADX(close.values, close.values, close.values)
 
@@ -31,3 +34,9 @@ print Indicators.CDL3BLACKCROWS(close.values, close.values, close.values, close.
 
 # test DIRECTIONAL MOVEMENT INDEX 
 print Indicators.DX(close.values, close.values, close.values)
+# print Indicators.BBANDS( series, timeperiod=20,
+#                                  nbdevup=2.0, nbdevdn=2.0,
+#                                  matype= TaLib.MA_EMA )
+
+print Indicators.CDL2CROWS( series, series, series, series )                                 
+print Indicators.CDL3BLACKCROWS( series, series, series, series )                                 

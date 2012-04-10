@@ -61,6 +61,7 @@ def MIN(*args):
   
 def DEMA(*args, **kwgs):
   return talib.DEMA(*args, **kwgs)
+<<<<<<< HEAD
 
 def RSI(*args):                        #requires (real=(close)[, timeperiod=14])
   return talib.RSI(*args)
@@ -82,3 +83,13 @@ def STOCHRSI(*args):                     #requires (real(=close)[, timeperiod=14
 
 def WILLR(*args):                     #requires (high, low, close, [timeperiod=14])
   return talib.WILLR(*args)
+=======
+  
+  
+def CDL2CROWS(*args, **kwgs):
+  return talib.CDL2CROWS(*args, **kwgs)
+
+def CDL3BLACKCROWS(*args, **kwgs):
+  return talib.CDL3BLACKCROWS(*args, **kwgs)
+  
+>>>>>>> 391caad665d02aa3cb6342f20c31ca57f765530a

@@ -304,11 +304,13 @@ for f in functions:
             var = cleanup(var[:-2])
             if 'double' in arg:
                 vartype = 'np.float_t'
+                vardtype = 'numpy.float'
             elif 'int' in arg:
                 vartype = 'np.int_t'
+                vardtype = 'numpy.int'
             else:
                 assert False, args
-            print '    cdef np.ndarray[%s, ndim=1] %s = numpy.zeros(allocation)' % (vartype, var)
+            print '    cdef np.ndarray[%s, ndim=1] %s = numpy.zeros(allocation, %s)' % (vartype, var, vardtype)
 
         elif var.startswith('*'):
             var = cleanup(var[1:])

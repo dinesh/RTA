@@ -21,7 +21,7 @@ class Quote( mongokit.Document ):
         'adj': float,
         'open' : float,
         'low': float, 
-        'volume': int,
+        'volume': long,
     }
     
     required_fields = REQUIRED_QUOTE_FIELDS

@@ -5,5 +5,5 @@ def static_files():
     return dict(
         STATIC_ROOT = STATIC_ROOT,
         CSS = '%s/css' % STATIC_ROOT,
-        JS = '%s/js' % STATIC_ROOT,
+        JS = '%s/js' % STATIC_ROOT
     )

@@ -39,4 +39,4 @@ print Indicators.DX(close.values, close.values, close.values)
 #                                  matype= TaLib.MA_EMA )
 
 print Indicators.CDL2CROWS( series, series, series, series )                                 
-print Indicators.CDL3BLACKCROWS( series, series, series, series )                                 
+print Indicators.CDL2CROWS( series, series, series, series )                                 

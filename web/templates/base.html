@@ -4,25 +4,31 @@
 <head>
     <title>RTA - {% block title %} Trading plateform {% endblock %}</title>
     <!-- JavaScript -->
-    <script type="text/javascript" src="{{ url_for('static', filename = 'js/jquery.min.js' ) }}"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="{{
+      url_for('static', filename='js/jquery.min.js') }}">\x3C/script>')</script>
     <script type="text/javascript" src="{{ url_for('static', filename = 'js/bootstrap.min.js' ) }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename = 'js/app.js' ) }}"></script>
+    {% block javascript %} {% endblock %}
     <!-- END JavaScript -->
     
     <!-- CSS -->
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'css/bootstrap.min.css' ) }}" />    
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'css/app.css' ) }}" />    
+    {% block stylesheets %} {% endblock %}
     <!-- END CSS -->
     
 </head>
 
 <body>
-<div class="topbar">
-    <div class="fill">
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
         <div class="container">
             {% include 'header.html' %}
         </div>
     </div>
 </div>
+
 <div class="container">
     {% with messages = get_flashed_messages(with_categories=True) %}
         {% if messages %}
@@ -34,7 +40,7 @@
         {% endif %}
     {% endwith %}
     {% block body %}{% endblock %}
-    <footer>
+    <footer class='fotter'>
         {% include 'footer.html' %}
     </footer>
 </div>

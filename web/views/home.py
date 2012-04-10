@@ -1,9 +1,27 @@
 from flask import *
 from flask.views import MethodView, View
+from flaskext.wtf import Form, TextField, Required, SelectField
 
 import os
 current_dir = os.path.dirname( os.path.abspath(__name__))
+from rta import api as API
 
+class IndicatorForm(Form):
+  indicator = SelectField()
+  
+class HomeHelper(object):
+  def __init__( self, home ):
+    self.home = home
+    self.app = home.app
+  
+  def get_indicators(self):
+    d = API.ALL_INDICATORS
+    return dict((i, d[i]) for i in API.SUPPORTED_INDICATORS )
+    
+  def prepare_env(self):
+    self.app.jinja_env.globals['indicators'] = self.get_indicators()
+   
+  
 class HomeController(object):
   
   # templates, to override see get_template_overrides()
@@ -11,12 +29,16 @@ class HomeController(object):
       'index': 'home/index.html',
   }
   
-  def __init__(self, app, name = 'home', prefix = None):
+  def __init__(self, app, name = 'home', template_helper = HomeHelper , prefix = None):
     self.app = app
     self.blueprint = self.get_blueprint(name)
     self.url_prefix = prefix
     
-  
+    self.template_helper = template_helper(self)
+    self.template_helper.prepare_env()
+    
+    # print self.template_helper.get_indicators()
+    
   def get_blueprint(self, blueprint_name):
     return Blueprint(
         blueprint_name,
@@ -24,6 +46,8 @@ class HomeController(object):
         template_folder= os.path.join(current_dir, 'web', 'templates'),
     )
   
+  def indicators(self):
+    pass
   def get_urls(self):
       return (
           ('/', self.index),
@@ -46,7 +70,8 @@ class HomeController(object):
     )
     
   def index(self):
-      return render_template('home/index.html')
+    form = IndicatorForm()
+    return render_template('home/index.html', indicatorForm = form )
 
   
   def setup(self):

@@ -1,8 +1,11 @@
 html, body {
-  background-color: #fff;
+  background-color: #E3E9ED;
 }
 body {
   padding-top: 60px;
+  color: #444;
+  font-family: "PT Sans",Helvetica,Arial,Sans-Serif;
+  font-size: 10pt;
 }
 .container > footer p {
   text-align: center; /* center align it with the container */

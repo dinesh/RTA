@@ -38,5 +38,5 @@ print Indicators.DX(close.values, close.values, close.values)
 #                                  nbdevup=2.0, nbdevdn=2.0,
 #                                  matype= TaLib.MA_EMA )
 
-print Indicators.CDL2CROWS( series, series, series, series )                                 
-print Indicators.CDL2CROWS( series, series, series, series )                                 
+print Indicators.CDL2CROWS( close, close, close, close )                                 
+print Indicators.CDL2CROWS( close, close, close, close )                                 

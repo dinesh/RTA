@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from .views.home import HomeController
-
+from .views.api import Api
 
 def setup_routes(app):
   """
@@ -19,6 +18,6 @@ def setup_routes(app):
   :returns: None
   """
   
-  home = HomeController(app).setup().configure_routes()
+  home = Api(app).configure_routes()
 
   

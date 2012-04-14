@@ -16,7 +16,7 @@ import mongokit # mongokit is minimal ORM fast based on execellent pymongo
 # rta packages
 from rta import indicators as Indicators 
 from rta.indicators import talib as TaLib
-from rta.indicators import ALL_INDICATORS, SUPPORTED_INDICATORS
+from rta.indicators import ALL_INDICATORS, SUPPORTED_INDICATORS, LIST
 
 from rta import model as Model
 from rta.configuration import Config

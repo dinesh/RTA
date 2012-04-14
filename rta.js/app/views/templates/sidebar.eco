@@ -1,0 +1,19 @@
+
+<% for item in @items: %>
+  <li>
+    <h4>
+      <a href="indicator/sidebar/<%= item.get('id') %>"> <%= item.get('desc') %> </a>
+    </h4>
+    
+    <% if item.get('args').length: %>
+      <form class='form-inline'>
+        <% for option in item.get('args'): %>
+          <input class='input-small' placeholder='<%= option %>' type='text' />
+        <% end %>
+      </form>
+    <% end %>
+    
+    <input type='button' data-id="<%= item.get('id') %>" class='add btn btn-info' value='Add' />
+    
+  </li>
+<% end %>

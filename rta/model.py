@@ -30,7 +30,11 @@ class Quote( mongokit.Document ):
         'fields': ['symbol', 'tick'],
         'unique'  : True 
       } ]
-    
+      
+    @classmethod
+    def scope(_cls):
+     return MongoDB().collection()
+     
     def __repr__(self):
         ''' convert to string '''
         return json.dumps({"tick": self.tick,
@@ -43,7 +47,7 @@ class Quote( mongokit.Document ):
     
     # IMP: add caching behaviour some decorater stuff 
     @classmethod
-    def series(_cls, symbol, start=None, end=None, **kwgs):
+    def series(_cls, symbol, start=None, end=None, frame=True, **kwgs):
       '''
         The function returns dataframe with all of the field ( _repr_ fields )
         You can have the series out of dataframe by 
@@ -65,7 +69,11 @@ class Quote( mongokit.Document ):
         # print cursor.explain()
         
         ## IMP: it will load all rows into memory list( pymongocursor )
-        return pandas.DataFrame( list(cursor) ) 
+        if frame:
+          return pandas.DataFrame( list(cursor) ) 
+        else:
+          return list(cursor)
+          
       except:
         raise
         raise UfException( Errors.DB_EXECUTE, sys.exc_info()[0] )

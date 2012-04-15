@@ -60,14 +60,13 @@ class Quote( mongokit.Document ):
       try:
         mongo = MongoDB().collection()
         cursor = None
-        if start:
-          if end:
-            end = datetime.datetime.today()
-            cursor = mongo.find({ 'symbol': symbol, 'tick': { '$gte' : start, '$lte' : end  } }, fields = REQUIRED_QUOTE_FIELDS )
-          else:
-            cursor = mongo.find({ 'symbol': symbol, 'tick': { '$gte' : start } }, fields = REQUIRED_QUOTE_FIELDS )
-        else:
-          cursor = mongo.find({ 'symbol': symbol, 'tick': { '$gte' : start } }, fields= REQUIRED_QUOTE_FIELDS )
+        if not end:
+          end = datetime.datetime.today()
+        
+        cursor = mongo.find( { 
+                  'symbol': symbol, 
+                  'tick': { '$gte' : start, '$lte' : end } 
+                 }, fields = REQUIRED_QUOTE_FIELDS ).sort('tick')
         
         return pandas.DataFrame( list(cursor), index = [ x['tick'] for x in cursor.rewind() ] ) 
           

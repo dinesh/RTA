@@ -37,6 +37,7 @@ class SidebarView extends Backbone.View
           start: range.dataMin
           end: range.dataMax
         success: (data) ->
+          console.log data
           app.models.chart.addSeries indicator.get('name'), data.records,
             yAxis : 0
           

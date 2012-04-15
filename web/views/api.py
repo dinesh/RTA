@@ -111,14 +111,17 @@ class Api:
       start = datetime.datetime.fromtimestamp( int(start) / 1000)
     if end:
       end = datetime.datetime.fromtimestamp( int(end) / 1000 )
-      
+    
     price  = CoreApi.Model.Quote.series(symbol, start = start, end = end )
+    close  = price['close'].values
+    
     pd = CoreApi.pandas
-    if price[0:]:
-      pivot, series = getattr(CoreApi.Indicators, 'SMA').__call__(price['close'].values, timeperiod = period )
+    
+    if close.shape[0] > 0:
+      pivot, series = getattr(CoreApi.Indicators, 'SMA').__call__(close, timeperiod = period )
       return json.dumps({ 
           'records': pd.DataFrame( data = np.concatenate( 
-            [ np.zeros(pivot, dtype='int'), series ] ), 
+            [ np.array( close[:pivot] ), series ] ), 
             index = price.index).to_records().tolist()
           }, cls = JSONEncoder)
     else:
@@ -129,13 +132,15 @@ class Api:
     symbol   = symbol or request.args.get('symbol', False)
     fields   = request.args.get('fields', ['tick', 'open', 'high', 'low', 'close' ] )
     page     = request.args.get('page', 1)
-    per_page = request.args.get('per_page', 100)
+    per_page = request.args.get('per_page', 3 * 360)
     
     if symbol:
-      cursor = CoreApi.Model.Quote.scope().find( { 'symbol': symbol },  fields = fields + [ 'volume' ] )\
-                            .sort('tick')\
-                            .limit(per_page)\
-                            .skip( (page -1) * per_page ) 
+      cursor = CoreApi.Model.Quote.scope().find( { 
+                  'symbol': symbol 
+                }, fields = fields + [ 'volume' ] 
+                ).limit(per_page).skip( (page -1) * per_page ).sort('tick')
+                
+      print cursor.count()
       return json.dumps(dict( { 
         'records' : [ [ x[key] for key in fields ] for x in cursor ],
         'volume'  : [ [ x['tick'] , x['volume'] ] for x in cursor.rewind() ]

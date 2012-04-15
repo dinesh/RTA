@@ -98,6 +98,10 @@
           enabled: true
         },
         series: options.series || [],
+        xAxis: {
+          type: 'date',
+          zoomType: 'x'
+        },
         yAxis: [
           {
             title: {
@@ -117,16 +121,15 @@
     }
 
     StockChart.prototype.addSeries = function(name, series, options) {
-      var position, ss;
+      var position;
       position = options['position'] || 'overlay';
       this.items[position].push(name);
-      ss = this.handle.addSeries({
+      this.handle.addSeries({
         name: name,
         data: series,
         type: options['type'],
         yAxis: options['yAxis'] || 0
       });
-      ss.position = position;
       if (options['redraw']) this.handle.redraw();
       return this;
     };
@@ -137,27 +140,9 @@
 
     StockChart.prototype.rangeSelector = function() {
       return {
-        buttons: [
-          {
-            type: 'day',
-            count: 1,
-            text: '1D'
-          }, {
-            type: 'week',
-            count: 1,
-            text: '7D'
-          }, {
-            type: 'all',
-            count: 1,
-            text: 'All'
-          }
-        ]
+        selected: 1
       };
     };
-
-    StockChart.prototype.selected = 1;
-
-    StockChart.prototype.inputEnabled = false;
 
     return StockChart;
 
@@ -542,6 +527,7 @@
             end: range.dataMax
           },
           success: function(data) {
+            console.log(data);
             return app.models.chart.addSeries(indicator.get('name'), data.records, {
               yAxis: 0
             });
@@ -890,58 +876,6 @@ function');
   }
 }));
 (this.require.define({
-  "views/templates/header": function(exports, require, module) {
-    module.exports = function (__obj) {
-  if (!__obj) __obj = {};
-  var __out = [], __capture = function(callback) {
-    var out = __out, result;
-    __out = [];
-    callback.call(this);
-    result = __out.join('');
-    __out = out;
-    return __safe(result);
-  }, __sanitize = function(value) {
-    if (value && value.ecoSafe) {
-      return value;
-    } else if (typeof value !== 'undefined' && value != null) {
-      return __escape(value);
-    } else {
-      return '';
-    }
-  }, __safe, __objSafe = __obj.safe, __escape = __obj.escape;
-  __safe = __obj.safe = function(value) {
-    if (value && value.ecoSafe) {
-      return value;
-    } else {
-      if (!(typeof value !== 'undefined' && value != null)) value = '';
-      var result = new String(value);
-      result.ecoSafe = true;
-      return result;
-    }
-  };
-  if (!__escape) {
-    __escape = __obj.escape = function(value) {
-      return ('' + value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-    };
-  }
-  (function() {
-    (function() {
-    
-      __out.push('\n<div class=\'navbar navbar-fixed-top\'>\n  <div class=\'navbar-inner\'>\n    <div class=\'container\'>\n      <div class=\'nav-collapse\'>\n        <ul class=\'nav\'>\n          <li class=\'active\'> <a href=\'/\'> Home </a> </li>\n          <li> <a href=\'/\'> Compare </a> </li>\n        </ul>\n      </div>\n    </div>\n  </div>\n</div>\n    ');
-    
-    }).call(this);
-    
-  }).call(__obj);
-  __obj.safe = __objSafe, __obj.escape = __escape;
-  return __out.join('');
-}
-  }
-}));
-(this.require.define({
   "views/templates/home": function(exports, require, module) {
     module.exports = function (__obj) {
   if (!__obj) __obj = {};
@@ -984,6 +918,58 @@ function');
     (function() {
     
       __out.push('\n<div id=\'sidebar\' class=\'span\'>\n</div>\n\n<div id="panel" class="span">\n  <div class=\'page-title\'>\n    <div class=\'pull-right\' id=\'symbol-list\'>\n      \n    </div>\n    \n    <h2> Select the symbol </h2>\n  </div>\n  \n  <div id=\'chart\'> </div>\n</div>');
+    
+    }).call(this);
+    
+  }).call(__obj);
+  __obj.safe = __objSafe, __obj.escape = __escape;
+  return __out.join('');
+}
+  }
+}));
+(this.require.define({
+  "views/templates/header": function(exports, require, module) {
+    module.exports = function (__obj) {
+  if (!__obj) __obj = {};
+  var __out = [], __capture = function(callback) {
+    var out = __out, result;
+    __out = [];
+    callback.call(this);
+    result = __out.join('');
+    __out = out;
+    return __safe(result);
+  }, __sanitize = function(value) {
+    if (value && value.ecoSafe) {
+      return value;
+    } else if (typeof value !== 'undefined' && value != null) {
+      return __escape(value);
+    } else {
+      return '';
+    }
+  }, __safe, __objSafe = __obj.safe, __escape = __obj.escape;
+  __safe = __obj.safe = function(value) {
+    if (value && value.ecoSafe) {
+      return value;
+    } else {
+      if (!(typeof value !== 'undefined' && value != null)) value = '';
+      var result = new String(value);
+      result.ecoSafe = true;
+      return result;
+    }
+  };
+  if (!__escape) {
+    __escape = __obj.escape = function(value) {
+      return ('' + value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    };
+  }
+  (function() {
+    (function() {
+    
+      __out.push('\n<div class=\'navbar navbar-fixed-top\'>\n  <div class=\'navbar-inner\'>\n    <div class=\'container\'>\n      <div class=\'nav-collapse\'>\n        <ul class=\'nav\'>\n          <li class=\'active\'> <a href=\'/\'> Home </a> </li>\n          <li> <a href=\'/\'> Compare </a> </li>\n        </ul>\n      </div>\n    </div>\n  </div>\n</div>\n    ');
     
     }).call(this);
     

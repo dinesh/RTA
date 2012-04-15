@@ -25,6 +25,10 @@ class StockChart
       navigator: 
         enabled: true
       series: options.series || []
+      xAxis:
+        type: 'date'
+        zoomType: 'x'
+        
       yAxis: [ {  
         title:
           text: 'OHLC'
@@ -41,16 +45,12 @@ class StockChart
     position = options['position' ] || 'overlay'
     @items[position].push(name)
         
-    ss = @handle.addSeries
+    @handle.addSeries
       name: name,
       data: series
       type: options['type']
       yAxis: options['yAxis'] || 0
       
-      
-          
-    ss.position = position
-    
     if options['redraw']
       @handle.redraw()
       
@@ -60,13 +60,8 @@ class StockChart
 	  @handle.xAxis[0].getExtremes()
   
   rangeSelector: =>
-  	buttons : [
-  	  { type : 'day', count : 1, text : '1D'}, 
-  	  { type : 'week', count : 1, text : '7D'}, 
-      { type : 'all', count : 1, text : 'All' } ],
-		selected : 1,
-		inputEnabled : false
-	
+  	selected : 1,
+		
 	  
 	
 class ChartView extends Backbone.View
@@ -77,18 +72,18 @@ class ChartView extends Backbone.View
     
     
     $.getJSON url + '&callback=?', (data) =>
-    		 @stockchart = new StockChart @el, @model.get('id'),
-    		  series: [{
-    		    name: 'OHLV', 
-    		    data: data.records, 
-    		    type : 'candlestick',
-  		      }, {
-  		      name: 'Volume', 
-  		      data: data.volume
-    		    type : 'column'
-    		    yAxis: 1 }]
-    		    
-    		 app.models.chart = @stockchart
+      @stockchart = new StockChart @el, @model.get('id'),
+        series: [{
+          name: 'OHLV', 
+          data: data.records, 
+          type : 'candlestick',
+          }, {
+          name: 'Volume', 
+          data: data.volume
+          type : 'column'
+          yAxis: 1 }]
+    
+      app.models.chart = @stockchart
     		 
     @
   

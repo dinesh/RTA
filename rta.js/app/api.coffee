@@ -1,4 +1,6 @@
 
+# the basic class used for accessing data from python api
+# overrides the Backbone.sync to do jsonp requests
 
 class API 
   constructor: (options) ->

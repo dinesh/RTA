@@ -4043,7 +4043,8 @@ a:hover{color:#665248}
 #main .container #sidebar .list li input[type='text']{margin:3px 0}
 #main .container #sidebar .list li .add{margin-left:80%}
 #main .container #sidebar .list li form{clear:both;margin:5px 0}
-#main .container #panel{padding:20px;-webkit-border-radius:4px;-moz-border-radius:4px;border-radius:4px}
+#main .container #panel{padding:20px;width:70%;-webkit-border-radius:4px;-moz-border-radius:4px;border-radius:4px;}
+#main .container #panel .page-title{border-bottom:2px #eee solid}
 body,/* Headings */,h1,h2,h3,h4,h5{font-weight:normal;color:#222;clear:left}
 h1{font-size:5em;line-height:1.4;margin-bottom:.5em}
 h2{font-size:2em;line-height:1;margin-bottom:.5em}

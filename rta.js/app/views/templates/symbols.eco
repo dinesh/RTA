@@ -1,0 +1,7 @@
+
+<select>
+  <% for item in @items: %>
+    <option value="<%= item.get('id') %>"> <%= item.get('name') %> </option>
+  <% end %>
+</select>
+  

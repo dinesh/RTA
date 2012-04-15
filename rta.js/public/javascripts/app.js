@@ -48,6 +48,529 @@
     };
   }
 }).call(this);(this.require.define({
+  "views/chart": function(exports, require, module) {
+    (function() {
+  var ChartView,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  ChartView = (function(_super) {
+
+    __extends(ChartView, _super);
+
+    function ChartView() {
+      this.rangeSelector = __bind(this.rangeSelector, this);
+      this.render = __bind(this.render, this);
+      ChartView.__super__.constructor.apply(this, arguments);
+    }
+
+    ChartView.prototype.className = 'chart';
+
+    ChartView.prototype.render = function() {
+      var that, url,
+        _this = this;
+      url = [api.url, 'api/quotes', this.model.get('id') + '.json?'].join('/');
+      that = this;
+      $.getJSON(url + '&callback=?', function(data) {
+        var chart;
+        return chart = new Highcharts.StockChart({
+          chart: {
+            alignTicks: false,
+            renderTo: that.el,
+            title: {
+              text: _this.options.text || (_this.model.get('name') + ' stock price by day')
+            }
+          },
+          rangeSelector: _this.rangeSelector(),
+          series: [
+            {
+              name: 'OHLC',
+              type: _this.options['type'] || 'candlestick',
+              data: data.records,
+              tooltip: {
+                valueDecimals: 2
+              }
+            }, {
+              name: "Volume",
+              type: 'column',
+              data: data.volume
+            }
+          ]
+        });
+      });
+      return this;
+    };
+
+    ChartView.prototype.rangeSelector = function() {
+      return {
+        buttons: [
+          {
+            type: 'day',
+            count: 1,
+            text: '1D'
+          }, {
+            type: 'week',
+            count: 1,
+            text: '7D'
+          }, {
+            type: 'all',
+            count: 1,
+            text: 'All'
+          }
+        ]
+      };
+    };
+
+    ChartView.prototype.selected = 1;
+
+    ChartView.prototype.inputEnabled = false;
+
+    return ChartView;
+
+  })(Backbone.View);
+
+  module.exports = ChartView;
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "api": function(exports, require, module) {
+    (function() {
+  var API,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+  API = (function() {
+
+    function API(options) {
+      this.sync = __bind(this.sync, this);
+      this.setUrl = __bind(this.setUrl, this);      options || (options = {});
+      this.url = options['url'] || 'http://localhost:5000';
+    }
+
+    API.prototype.setUrl = function(url) {
+      return this.url = url;
+    };
+
+    API.prototype.sync = function(method, model, options) {
+      options.timeout = 10000;
+      options.dataType = "jsonp";
+      options.url = [this.url, options['url'] || model.url].join('/');
+      return Backbone.sync(method, model, options);
+    };
+
+    return API;
+
+  })();
+
+  module.exports = API;
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "helpers": function(exports, require, module) {
+    (function() {
+
+  exports.BrunchApplication = (function() {
+
+    function BrunchApplication() {
+      var _this = this;
+      $(function() {
+        _this.initialize(_this);
+        return Backbone.history.start();
+      });
+    }
+
+    BrunchApplication.prototype.initialize = function() {
+      return null;
+    };
+
+    return BrunchApplication;
+
+  })();
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "collections/indicators": function(exports, require, module) {
+    (function() {
+  var Indicators,
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  Indicators = (function(_super) {
+
+    __extends(Indicators, _super);
+
+    function Indicators() {
+      Indicators.__super__.constructor.apply(this, arguments);
+    }
+
+    Indicators.prototype.url = 'api/indicators';
+
+    Indicators.prototype.sync = api.sync;
+
+    Indicators.prototype.parse = function(json) {
+      return _.map(json.indicators, function(p) {
+        return p;
+      });
+    };
+
+    return Indicators;
+
+  })(Backbone.Collection);
+
+  module.exports = Indicators;
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "models/indicator": function(exports, require, module) {
+    (function() {
+  var Indicator,
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  Indicator = (function(_super) {
+
+    __extends(Indicator, _super);
+
+    function Indicator() {
+      Indicator.__super__.constructor.apply(this, arguments);
+    }
+
+    Indicator.prototype.url = 'api/indicator';
+
+    Indicator.prototype.sync = api.sync;
+
+    return Indicator;
+
+  })(Backbone.Model);
+
+  module.exports = Indicator;
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "models/Quoteset": function(exports, require, module) {
+    (function() {
+  var QuoteSet,
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  QuoteSet = (function(_super) {
+
+    __extends(QuoteSet, _super);
+
+    function QuoteSet() {
+      QuoteSet.__super__.constructor.apply(this, arguments);
+    }
+
+    return QuoteSet;
+
+  })(Backbone.Model);
+
+  module.exports = QuoteSet;
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "routers/main_router": function(exports, require, module) {
+    (function() {
+  var __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  exports.MainRouter = (function(_super) {
+
+    __extends(MainRouter, _super);
+
+    function MainRouter() {
+      MainRouter.__super__.constructor.apply(this, arguments);
+    }
+
+    MainRouter.prototype.routes = {
+      '': 'home'
+    };
+
+    MainRouter.prototype.home = function() {
+      return $('body #main').html(app.homeView.render().el);
+    };
+
+    return MainRouter;
+
+  })(Backbone.Router);
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "application": function(exports, require, module) {
+    (function() {
+  var API, BrunchApplication, HomeView, Indicator, Indicators, MainRouter, Symbol, Symbols,
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  API = require('api');
+
+  window.api = new API();
+
+  BrunchApplication = require('helpers').BrunchApplication;
+
+  MainRouter = require('routers/main_router').MainRouter;
+
+  HomeView = require('views/home').HomeView;
+
+  Indicator = require('models/indicator');
+
+  Indicators = require('collections/indicators');
+
+  Symbol = (function(_super) {
+
+    __extends(Symbol, _super);
+
+    function Symbol() {
+      Symbol.__super__.constructor.apply(this, arguments);
+    }
+
+    return Symbol;
+
+  })(Backbone.Model);
+
+  Symbols = (function(_super) {
+
+    __extends(Symbols, _super);
+
+    function Symbols() {
+      Symbols.__super__.constructor.apply(this, arguments);
+    }
+
+    Symbols.prototype.url = 'api/symbols.json';
+
+    Symbols.prototype.sync = api.sync;
+
+    Symbols.prototype.model = Symbol;
+
+    Symbols.prototype.parse = function(json) {
+      return _.map(json.records, function(p) {
+        return {
+          'name': '$' + p,
+          'id': p
+        };
+      });
+    };
+
+    return Symbols;
+
+  })(Backbone.Collection);
+
+  exports.Application = (function(_super) {
+
+    __extends(Application, _super);
+
+    function Application() {
+      Application.__super__.constructor.apply(this, arguments);
+    }
+
+    Application.prototype.initialize = function() {
+      this.router = new MainRouter;
+      this.homeView = new HomeView;
+      this.Indicators = new Indicators({
+        model: Indicator
+      });
+      this.Indicator = Indicator;
+      this.Symbol = Symbol;
+      return this.Symbols = new Symbols;
+    };
+
+    return Application;
+
+  })(BrunchApplication);
+
+  window.app = new exports.Application;
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "views/home": function(exports, require, module) {
+    (function() {
+  var ChartView, SidebarView, SymbolListView, sidebarTmpl, symbolTmpl,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  sidebarTmpl = require('views/templates/sidebar');
+
+  symbolTmpl = require('views/templates/symbols');
+
+  ChartView = require('views/chart');
+
+  SidebarView = (function(_super) {
+
+    __extends(SidebarView, _super);
+
+    function SidebarView() {
+      this.addIndicator = __bind(this.addIndicator, this);
+      this.render = __bind(this.render, this);
+      SidebarView.__super__.constructor.apply(this, arguments);
+    }
+
+    SidebarView.prototype.tagName = 'ul';
+
+    SidebarView.prototype.id = 'side-inds-list';
+
+    SidebarView.prototype.className = 'list';
+
+    SidebarView.prototype.events = {
+      'click .add': 'addIndicator'
+    };
+
+    SidebarView.prototype.initialize = function() {
+      SidebarView.__super__.initialize.call(this);
+      this.container = this.options.container;
+      return this.collection.bind('reset', this.render).fetch();
+    };
+
+    SidebarView.prototype.render = function() {
+      $(this.el).html(sidebarTmpl({
+        'items': this.collection.models
+      }));
+      this.container.html(this.el);
+      return this;
+    };
+
+    SidebarView.prototype.addIndicator = function(ev) {
+      var indicator, target;
+      target = this.$(ev.currentTarget);
+      return indicator = this.collection.get(target.data('id'));
+    };
+
+    return SidebarView;
+
+  })(Backbone.View);
+
+  SymbolListView = (function(_super) {
+
+    __extends(SymbolListView, _super);
+
+    function SymbolListView() {
+      this.render = __bind(this.render, this);
+      SymbolListView.__super__.constructor.apply(this, arguments);
+    }
+
+    SymbolListView.prototype.tagName = 'select';
+
+    SymbolListView.prototype.initialize = function() {
+      SymbolListView.__super__.initialize.call(this);
+      this.container = this.options.container;
+      return this.collection.bind('reset', this.render).fetch();
+    };
+
+    SymbolListView.prototype.render = function() {
+      $(this.el).html(symbolTmpl({
+        'items': this.collection.models
+      }));
+      this.container.append(this.el);
+      return this;
+    };
+
+    return SymbolListView;
+
+  })(Backbone.View);
+
+  exports.HomeView = (function(_super) {
+
+    __extends(HomeView, _super);
+
+    function HomeView() {
+      this.openChart = __bind(this.openChart, this);
+      this.render = __bind(this.render, this);
+      HomeView.__super__.constructor.apply(this, arguments);
+    }
+
+    HomeView.prototype.className = 'container';
+
+    HomeView.prototype.events = {
+      'change #symbol-list select': 'openChart'
+    };
+
+    HomeView.prototype.render = function() {
+      $(this.el).html(require('./templates/home'));
+      this.subviews = [
+        new SidebarView({
+          'collection': app.Indicators,
+          'container': this.$('#sidebar')
+        }), new SymbolListView({
+          'collection': app.Symbols,
+          'container': this.$('#symbol-list')
+        })
+      ];
+      return this;
+    };
+
+    HomeView.prototype.openChart = function(ev) {
+      var model;
+      model = app.Symbols.get(this.$(ev.currentTarget).val());
+      this.currentChart = new ChartView({
+        'model': model,
+        'el': this.$('#chart').get(0)
+      });
+      this.subviews.push(this.currentChart.render());
+      return this;
+    };
+
+    return HomeView;
+
+  })(Backbone.View);
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "views/spinner": function(exports, require, module) {
+    (function() {
+
+  app.ui.spinner = {
+    show: function(message) {
+      this.ensureElement();
+      message = message || "Loading";
+      return this.el.stop(true, true).fadeIn('fast');
+    },
+    hide: function() {
+      this.ensureElement();
+      return this.el.stop(true, true).fadeOut('fast', function() {
+        return $(this).css({
+          display: 'none'
+        });
+      });
+    },
+    ensureElement: function() {
+      return this.el || (this.el = $('#spinner'));
+    }
+  };
+
+  _.bindAll(app.ui.spinner, 'show', 'hide');
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
   "views/view": function(exports, require, module) {
     (function() {
   var Subscriber, View, utils,
@@ -269,291 +792,6 @@ function');
   }
 }));
 (this.require.define({
-  "api": function(exports, require, module) {
-    (function() {
-  var API,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-
-  API = (function() {
-
-    function API(options) {
-      this.sync = __bind(this.sync, this);
-      this.setUrl = __bind(this.setUrl, this);      options || (options = {});
-      this.url = options['url'] || 'http://localhost:5000';
-    }
-
-    API.prototype.setUrl = function(url) {
-      return this.url = url;
-    };
-
-    API.prototype.sync = function(method, model, options) {
-      options.timeout = 10000;
-      options.dataType = "jsonp";
-      options.url = [this.url, options['url'] || model.url].join('/');
-      return Backbone.sync(method, model, options);
-    };
-
-    return API;
-
-  })();
-
-  module.exports = API;
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
-  "helpers": function(exports, require, module) {
-    (function() {
-
-  exports.BrunchApplication = (function() {
-
-    function BrunchApplication() {
-      var _this = this;
-      $(function() {
-        _this.initialize(_this);
-        return Backbone.history.start();
-      });
-    }
-
-    BrunchApplication.prototype.initialize = function() {
-      return null;
-    };
-
-    return BrunchApplication;
-
-  })();
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
-  "collections/indicators": function(exports, require, module) {
-    (function() {
-  var Indicators,
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  Indicators = (function(_super) {
-
-    __extends(Indicators, _super);
-
-    function Indicators() {
-      Indicators.__super__.constructor.apply(this, arguments);
-    }
-
-    Indicators.prototype.url = 'api/indicators';
-
-    Indicators.prototype.sync = api.sync;
-
-    Indicators.prototype.parse = function(json) {
-      return _.map(json.indicators, function(p) {
-        return p;
-      });
-    };
-
-    return Indicators;
-
-  })(Backbone.Collection);
-
-  module.exports = Indicators;
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
-  "models/indicator": function(exports, require, module) {
-    (function() {
-  var Indicator,
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  Indicator = (function(_super) {
-
-    __extends(Indicator, _super);
-
-    function Indicator() {
-      Indicator.__super__.constructor.apply(this, arguments);
-    }
-
-    Indicator.prototype.url = 'api/indicator';
-
-    Indicator.prototype.sync = api.sync;
-
-    return Indicator;
-
-  })(Backbone.Model);
-
-  module.exports = Indicator;
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
-  "routers/main_router": function(exports, require, module) {
-    (function() {
-  var __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  exports.MainRouter = (function(_super) {
-
-    __extends(MainRouter, _super);
-
-    function MainRouter() {
-      MainRouter.__super__.constructor.apply(this, arguments);
-    }
-
-    MainRouter.prototype.routes = {
-      '': 'home'
-    };
-
-    MainRouter.prototype.home = function() {
-      return $('body #main').html(app.homeView.render().el);
-    };
-
-    return MainRouter;
-
-  })(Backbone.Router);
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
-  "views/home": function(exports, require, module) {
-    (function() {
-  var SidebarView, sidebarTmpl,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  sidebarTmpl = require('views/templates/sidebar');
-
-  SidebarView = (function(_super) {
-
-    __extends(SidebarView, _super);
-
-    function SidebarView() {
-      this.addIndicator = __bind(this.addIndicator, this);
-      this.render = __bind(this.render, this);
-      SidebarView.__super__.constructor.apply(this, arguments);
-    }
-
-    SidebarView.prototype.tagName = 'ul';
-
-    SidebarView.prototype.id = 'side-inds-list';
-
-    SidebarView.prototype.className = 'list';
-
-    SidebarView.prototype.events = {
-      'click .add': 'addIndicator'
-    };
-
-    SidebarView.prototype.initialize = function() {
-      SidebarView.__super__.initialize.call(this);
-      this.container = this.options.container;
-      return this.collection.bind('reset', this.render).fetch();
-    };
-
-    SidebarView.prototype.render = function() {
-      $(this.el).html(sidebarTmpl({
-        'items': this.collection.models
-      }));
-      this.container.append(this.el);
-      return this;
-    };
-
-    SidebarView.prototype.addIndicator = function(ev) {
-      var indicator, target;
-      target = this.$(ev.currentTarget);
-      return indicator = this.collection.get(target.data('id'));
-    };
-
-    return SidebarView;
-
-  })(Backbone.View);
-
-  exports.HomeView = (function(_super) {
-
-    __extends(HomeView, _super);
-
-    function HomeView() {
-      this.render = __bind(this.render, this);
-      HomeView.__super__.constructor.apply(this, arguments);
-    }
-
-    HomeView.prototype.className = 'container';
-
-    HomeView.prototype.render = function() {
-      $(this.el).html(require('./templates/home'));
-      new SidebarView({
-        'collection': app.Indicators,
-        'container': this.$('#sidebar')
-      });
-      return this;
-    };
-
-    return HomeView;
-
-  })(Backbone.View);
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
-  "application": function(exports, require, module) {
-    (function() {
-  var API, BrunchApplication, HomeView, Indicator, Indicators, MainRouter,
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  API = require('api');
-
-  window.api = new API();
-
-  BrunchApplication = require('helpers').BrunchApplication;
-
-  MainRouter = require('routers/main_router').MainRouter;
-
-  HomeView = require('views/home').HomeView;
-
-  Indicator = require('models/indicator');
-
-  Indicators = require('collections/indicators');
-
-  exports.Application = (function(_super) {
-
-    __extends(Application, _super);
-
-    function Application() {
-      Application.__super__.constructor.apply(this, arguments);
-    }
-
-    Application.prototype.initialize = function() {
-      this.router = new MainRouter;
-      this.homeView = new HomeView;
-      this.Indicators = new Indicators({
-        model: Indicator
-      });
-      return this.Indicator = Indicator;
-    };
-
-    return Application;
-
-  })(BrunchApplication);
-
-  window.app = new exports.Application;
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
   "views/templates/header": function(exports, require, module) {
     module.exports = function (__obj) {
   if (!__obj) __obj = {};
@@ -647,7 +885,7 @@ function');
   (function() {
     (function() {
     
-      __out.push('\n<div id=\'sidebar\' class=\'span\'>\n</div>\n\n<div id="panel" class="span">\n\n</div>');
+      __out.push('\n<div id=\'sidebar\' class=\'span\'>\n</div>\n\n<div id="panel" class="span">\n  <div class=\'page-title\'>\n    <div class=\'pull-right\' id=\'symbol-list\'>\n      \n    </div>\n    \n    <h2> Select the symbol </h2>\n  </div>\n  \n  <div id=\'chart\'> </div>\n</div>');
     
     }).call(this);
     
@@ -735,137 +973,67 @@ function');
   }
 }));
 (this.require.define({
-  "views/chart": function(exports, require, module) {
-    (function() {
-  var ChartView,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  ChartView = (function(_super) {
-
-    __extends(ChartView, _super);
-
-    ChartView.prototype.className = 'chart';
-
-    function ChartView() {
-      this.rangeSelector = __bind(this.rangeSelector, this);
-      this.render = __bind(this.render, this);      this.symbol = this.options.symbol;
+  "views/templates/symbols": function(exports, require, module) {
+    module.exports = function (__obj) {
+  if (!__obj) __obj = {};
+  var __out = [], __capture = function(callback) {
+    var out = __out, result;
+    __out = [];
+    callback.call(this);
+    result = __out.join('');
+    __out = out;
+    return __safe(result);
+  }, __sanitize = function(value) {
+    if (value && value.ecoSafe) {
+      return value;
+    } else if (typeof value !== 'undefined' && value != null) {
+      return __escape(value);
+    } else {
+      return '';
     }
-
-    ChartView.prototype.render = function() {
-      var url,
-        _this = this;
-      url = [api.url, '/qoutes/' + this.symbol + '.json?fields=open,high,close,low,ticker'].join('/');
-      return $.getJSON(url + '&callback=?', function(data) {
-        var chart;
-        return chart = new Highcharts.StockChart({
-          chart: {
-            renderTo: _this.el
-          },
-          title: {
-            text: _this.options.text || 'AAPL stock price by minute',
-            rangeSelector: _this.rangeSelector()
-          },
-          series: [
-            {
-              name: _this.options['symbol'],
-              type: _this.options['type'] || 'candlestick',
-              data: data.records,
-              tooltip: {
-                valueDecimals: 2
-              }
-            }
-          ]
-        });
-      });
-    };
-
-    ChartView.prototype.rangeSelector = function() {
-      return {
-        buttons: [
-          {
-            type: 'hour',
-            count: 1,
-            text: '1h'
-          }, {
-            type: 'day',
-            count: 1,
-            text: '1D'
-          }, {
-            type: 'all',
-            count: 1,
-            text: 'All'
-          }
-        ]
-      };
-    };
-
-    ChartView.prototype.selected = 1;
-
-    ChartView.prototype.inputEnabled = false;
-
-    return ChartView;
-
-  })(Backbone.View);
-
-  module.exports = ChartView;
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
-  "views/spinner": function(exports, require, module) {
-    (function() {
-
-  app.ui.spinner = {
-    show: function(message) {
-      this.ensureElement();
-      message = message || "Loading";
-      return this.el.stop(true, true).fadeIn('fast');
-    },
-    hide: function() {
-      this.ensureElement();
-      return this.el.stop(true, true).fadeOut('fast', function() {
-        return $(this).css({
-          display: 'none'
-        });
-      });
-    },
-    ensureElement: function() {
-      return this.el || (this.el = $('#spinner'));
+  }, __safe, __objSafe = __obj.safe, __escape = __obj.escape;
+  __safe = __obj.safe = function(value) {
+    if (value && value.ecoSafe) {
+      return value;
+    } else {
+      if (!(typeof value !== 'undefined' && value != null)) value = '';
+      var result = new String(value);
+      result.ecoSafe = true;
+      return result;
     }
   };
-
-  _.bindAll(app.ui.spinner, 'show', 'hide');
-
-}).call(this);
-
+  if (!__escape) {
+    __escape = __obj.escape = function(value) {
+      return ('' + value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    };
   }
-}));
-(this.require.define({
-  "models/Quoteset": function(exports, require, module) {
+  (function() {
     (function() {
-  var QuoteSet,
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  QuoteSet = (function(_super) {
-
-    __extends(QuoteSet, _super);
-
-    function QuoteSet() {
-      QuoteSet.__super__.constructor.apply(this, arguments);
-    }
-
-    return QuoteSet;
-
-  })(Backbone.Model);
-
-  module.exports = QuoteSet;
-
-}).call(this);
-
+      var item, _i, _len, _ref;
+    
+      __out.push('\n<select>\n  ');
+    
+      _ref = this.items;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        item = _ref[_i];
+        __out.push('\n    <option value="');
+        __out.push(__sanitize(item.get('id')));
+        __out.push('"> ');
+        __out.push(__sanitize(item.get('name')));
+        __out.push(' </option>\n  ');
+      }
+    
+      __out.push('\n</select>\n  ');
+    
+    }).call(this);
+    
+  }).call(__obj);
+  __obj.safe = __objSafe, __obj.escape = __escape;
+  return __out.join('');
+}
   }
 }));

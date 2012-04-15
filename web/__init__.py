@@ -14,4 +14,3 @@ app.config.from_object(settings)
 # register application views and blueprints
 setup_routes(app)
 
-print app.url_map

@@ -21,7 +21,7 @@ class Quote( mongokit.Document ):
         'adj': float,
         'open' : float,
         'low': float, 
-        'volume': long,
+        'volume': int,
     }
     
     required_fields = REQUIRED_QUOTE_FIELDS
@@ -133,7 +133,7 @@ class MongoDB(object):
                   
   def insert(self, symbol, series):
     _quote = self.col.Quote
-    dict =  { 'symbol': symbol, 
+    data =  { 'symbol': symbol, 
              'tick': series['Date'], 
              'open': series['Open'],
              'high': series['High'], 
@@ -142,7 +142,8 @@ class MongoDB(object):
              'close': series['Close'],
              'volume': series['Volume']
           }
-    doc = self.col.Quote( dict )
+    doc = self.col.Quote( data )
+    print data
     doc.save()
     tp = namedtuple('quote_result', ['success', 'doc'] )
     if isinstance( doc['_id'], ObjectId ):

@@ -26,6 +26,7 @@ exports.config =
           'vendor/scripts/highstock/highstock.js',
           'vendor/scripts/highstock/theme/*.js',
           'vendor/scripts/highstock/modules/*.js',
+          # 'vendor/scripts/crossfilter.js',
         ]
 
     stylesheets:

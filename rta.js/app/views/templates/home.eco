@@ -3,5 +3,13 @@
 </div>
 
 <div id="panel" class="span">
-
+  <div class='page-title'>
+    <div class='pull-right' id='symbol-list'>
+      
+    </div>
+    
+    <h2> Select the symbol </h2>
+  </div>
+  
+  <div id='chart'> </div>
 </div>

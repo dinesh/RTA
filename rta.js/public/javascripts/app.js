@@ -50,59 +50,92 @@
 }).call(this);(this.require.define({
   "views/chart": function(exports, require, module) {
     (function() {
-  var ChartView,
+  var ChartView, HEIGHTS, MARGIN, OV_HEIGHT, PS_HEIGHT, StockChart,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
-  ChartView = (function(_super) {
+  HEIGHTS = {
+    'overlay': 500,
+    'top': 100,
+    'bottom': 100,
+    'margin': 10
+  };
 
-    __extends(ChartView, _super);
+  OV_HEIGHT = HEIGHTS['overlay'];
 
-    function ChartView() {
+  PS_HEIGHT = HEIGHTS['top'];
+
+  MARGIN = HEIGHTS['margin'];
+
+  StockChart = (function() {
+
+    function StockChart(el, title, options) {
+      this.el = el;
+      this.title = title;
       this.rangeSelector = __bind(this.rangeSelector, this);
-      this.render = __bind(this.render, this);
-      ChartView.__super__.constructor.apply(this, arguments);
+      this.dateRange = __bind(this.dateRange, this);
+      this.addSeries = __bind(this.addSeries, this);
+      $(this.el).css({
+        'min-height': '600px'
+      });
+      this.options = options || {};
+      this.items = {
+        'overlay': [],
+        'top': [],
+        'bottom': []
+      };
+      this.handle = new Highcharts.StockChart({
+        chart: {
+          alignTicks: false,
+          renderTo: this.el
+        },
+        title: {
+          text: this.title
+        },
+        rangeSelector: this.rangeSelector(),
+        navigator: {
+          enabled: true
+        },
+        series: options.series || [],
+        yAxis: [
+          {
+            title: {
+              text: 'OHLC'
+            },
+            height: 300
+          }, {
+            title: {
+              text: 'Volume'
+            },
+            height: 100,
+            top: 400,
+            offset: 0
+          }
+        ]
+      });
     }
 
-    ChartView.prototype.className = 'chart';
-
-    ChartView.prototype.render = function() {
-      var that, url,
-        _this = this;
-      url = [api.url, 'api/quotes', this.model.get('id') + '.json?'].join('/');
-      that = this;
-      $.getJSON(url + '&callback=?', function(data) {
-        var chart;
-        return chart = new Highcharts.StockChart({
-          chart: {
-            alignTicks: false,
-            renderTo: that.el,
-            title: {
-              text: _this.options.text || (_this.model.get('name') + ' stock price by day')
-            }
-          },
-          rangeSelector: _this.rangeSelector(),
-          series: [
-            {
-              name: 'OHLC',
-              type: _this.options['type'] || 'candlestick',
-              data: data.records,
-              tooltip: {
-                valueDecimals: 2
-              }
-            }, {
-              name: "Volume",
-              type: 'column',
-              data: data.volume
-            }
-          ]
-        });
+    StockChart.prototype.addSeries = function(name, series, options) {
+      var position, ss;
+      position = options['position'] || 'overlay';
+      this.items[position].push(name);
+      ss = this.handle.addSeries({
+        name: name,
+        data: series,
+        type: options['type'],
+        yAxis: options['yAxis'] || 0
       });
+      ss.position = position;
+      if (options['redraw']) this.handle.redraw();
       return this;
     };
 
-    ChartView.prototype.rangeSelector = function() {
+    StockChart.prototype.dateRange = function() {
+      return this.handle.xAxis[0].getExtremes();
+    };
+
+    StockChart.prototype.rangeSelector = function() {
       return {
         buttons: [
           {
@@ -122,9 +155,48 @@
       };
     };
 
-    ChartView.prototype.selected = 1;
+    StockChart.prototype.selected = 1;
 
-    ChartView.prototype.inputEnabled = false;
+    StockChart.prototype.inputEnabled = false;
+
+    return StockChart;
+
+  })();
+
+  ChartView = (function(_super) {
+
+    __extends(ChartView, _super);
+
+    function ChartView() {
+      this.render = __bind(this.render, this);
+      ChartView.__super__.constructor.apply(this, arguments);
+    }
+
+    ChartView.prototype.className = 'chart';
+
+    ChartView.prototype.render = function() {
+      var url,
+        _this = this;
+      url = [api.url, 'api/quotes', this.model.get('id') + '.json?'].join('/');
+      $.getJSON(url + '&callback=?', function(data) {
+        _this.stockchart = new StockChart(_this.el, _this.model.get('id'), {
+          series: [
+            {
+              name: 'OHLV',
+              data: data.records,
+              type: 'candlestick'
+            }, {
+              name: 'Volume',
+              data: data.volume,
+              type: 'column',
+              yAxis: 1
+            }
+          ]
+        });
+        return app.models.chart = _this.stockchart;
+      });
+      return this;
+    };
 
     return ChartView;
 
@@ -305,7 +377,7 @@
     };
 
     MainRouter.prototype.home = function() {
-      return $('body #main').html(app.homeView.render().el);
+      return $('body #main').html((app.ui.homeview = app.homeView.render()).el);
     };
 
     return MainRouter;
@@ -392,7 +464,8 @@
       });
       this.Indicator = Indicator;
       this.Symbol = Symbol;
-      return this.Symbols = new Symbols;
+      this.Symbols = new Symbols;
+      return this.ui = this.models = {};
     };
 
     return Application;
@@ -454,9 +527,29 @@
     };
 
     SidebarView.prototype.addIndicator = function(ev) {
-      var indicator, target;
-      target = this.$(ev.currentTarget);
-      return indicator = this.collection.get(target.data('id'));
+      var indicator, range, symbol, target, url;
+      if ((symbol = app.ui.companyDp.selectedValue()) && app.models.chart) {
+        range = app.models.chart.dateRange();
+        console.log(symbol);
+        target = this.$(ev.currentTarget);
+        indicator = this.collection.get(target.data('id'));
+        url = [api.url, indicator.url(), symbol, 'series.json'].join('/');
+        return $.ajax({
+          url: url,
+          dataType: 'jsonp',
+          data: {
+            start: range.dataMin,
+            end: range.dataMax
+          },
+          success: function(data) {
+            return app.models.chart.addSeries(indicator.get('name'), data.records, {
+              yAxis: 0
+            });
+          }
+        });
+      } else {
+        return alert('No Symbol selected.');
+      }
     };
 
     return SidebarView;
@@ -468,6 +561,7 @@
     __extends(SymbolListView, _super);
 
     function SymbolListView() {
+      this.selectedValue = __bind(this.selectedValue, this);
       this.render = __bind(this.render, this);
       SymbolListView.__super__.constructor.apply(this, arguments);
     }
@@ -486,6 +580,10 @@
       }));
       this.container.append(this.el);
       return this;
+    };
+
+    SymbolListView.prototype.selectedValue = function() {
+      return $(this.el).val();
     };
 
     return SymbolListView;
@@ -514,7 +612,7 @@
         new SidebarView({
           'collection': app.Indicators,
           'container': this.$('#sidebar')
-        }), new SymbolListView({
+        }), app.ui.companyDp = new SymbolListView({
           'collection': app.Symbols,
           'container': this.$('#symbol-list')
         })

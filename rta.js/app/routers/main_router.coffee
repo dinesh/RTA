@@ -4,4 +4,4 @@ class exports.MainRouter extends Backbone.Router
     '': 'home'
   
   home: ->
-    $('body #main').html app.homeView.render().el
+    $('body #main').html ( app.ui.homeview = app.homeView.render() ).el

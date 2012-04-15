@@ -1,8 +1,9 @@
 from flask import *
 from flask.views import MethodView, View
 from functools import wraps
-import datetime, time, operator, calendar
+import datetime, time, operator, calendar, random
 from pymongo.objectid import ObjectId
+import numpy as np
 
 json = None
 try:
@@ -73,7 +74,7 @@ class Api:
     routes = [ 
           ( (self.app, self.prefix),
                   ('/indicators', self.get_indicators ),
-                  ('/indicators/std', self.get_indicators),
+                  ('/indicators/<indicator>/<symbol>/series.json', self.get_indicator_series ),
                   ('/quotes/<symbol>.json', self.get_quotes),
                   ('/symbols.json', self.get_symbols),
           ),
@@ -101,6 +102,29 @@ class Api:
     return json.dumps({ 'indicators': data[:10] })
   
   @support_jsonp
+  def get_indicator_series(self, indicator, symbol):
+    start  = request.args.get('start')
+    end    = request.args.get('end')
+    period = random.randint(10,50)
+    args   = request.args.get('params', [])
+    if start:
+      start = datetime.datetime.fromtimestamp( int(start) / 1000)
+    if end:
+      end = datetime.datetime.fromtimestamp( int(end) / 1000 )
+      
+    price  = CoreApi.Model.Quote.series(symbol, start = start, end = end )
+    pd = CoreApi.pandas
+    if price[0:]:
+      pivot, series = getattr(CoreApi.Indicators, 'SMA').__call__(price['close'].values, timeperiod = period )
+      return json.dumps({ 
+          'records': pd.DataFrame( data = np.concatenate( 
+            [ np.zeros(pivot, dtype='int'), series ] ), 
+            index = price.index).to_records().tolist()
+          }, cls = JSONEncoder)
+    else:
+      return json.dumps({ 'records' : []})
+    
+  @support_jsonp
   def get_quotes(self, symbol):
     symbol   = symbol or request.args.get('symbol', False)
     fields   = request.args.get('fields', ['tick', 'open', 'high', 'low', 'close' ] )
@@ -108,13 +132,13 @@ class Api:
     per_page = request.args.get('per_page', 100)
     
     if symbol:
-      cursor = CoreApi.Model.Quote.scope().find( { 'symbol': symbol },  fields = fields)\
+      cursor = CoreApi.Model.Quote.scope().find( { 'symbol': symbol },  fields = fields + [ 'volume' ] )\
                             .sort('tick')\
                             .limit(per_page)\
                             .skip( (page -1) * per_page ) 
       return json.dumps(dict( { 
         'records' : [ [ x[key] for key in fields ] for x in cursor ],
-        'volume'  : [ [ x['tick'] , x['volume'] ] for x in cursor ]
+        'volume'  : [ [ x['tick'] , x['volume'] ] for x in cursor.rewind() ]
       }), cls = JSONEncoder)
       
     else:

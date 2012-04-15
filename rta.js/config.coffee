@@ -24,8 +24,8 @@ exports.config =
           'vendor/scripts/underscore-1.3.1.js',
           'vendor/scripts/backbone-0.9.1.js',
           'vendor/scripts/highstock/highstock.js',
-          'vendor/scripts/highstock/theme/*.js',
-          'vendor/scripts/highstock/modules/*.js',
+          # 'vendor/scripts/highstock/theme/*.js',
+          # 'vendor/scripts/highstock/modules/*.js',
           # 'vendor/scripts/crossfilter.js',
         ]
 

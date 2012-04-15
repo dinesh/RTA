@@ -23,9 +23,26 @@ class SidebarView extends Backbone.View
     @
   
   addIndicator: (ev) =>
-    target = this.$(ev.currentTarget)
-    indicator = @collection.get( target.data('id') )
-
+    if ( symbol = app.ui.companyDp.selectedValue() ) and app.models.chart
+      range = app.models.chart.dateRange()
+      console.log symbol
+      target = this.$(ev.currentTarget)
+      indicator = @collection.get( target.data('id') )
+      url = [ api.url, indicator.url(), symbol, 'series.json' ].join('/')
+      
+      $.ajax 
+        url: url
+        dataType: 'jsonp',
+        data:
+          start: range.dataMin
+          end: range.dataMax
+        success: (data) ->
+          app.models.chart.addSeries indicator.get('name'), data.records,
+            yAxis : 0
+          
+    else
+      alert('No Symbol selected.')
+       
 class SymbolListView extends Backbone.View
   tagName: 'select'
   
@@ -38,6 +55,9 @@ class SymbolListView extends Backbone.View
     $(@el).html( symbolTmpl( 'items' : @collection.models ))
     @container.append( @el )  
     @
+  
+  selectedValue: =>
+    $(@el).val()
     
 class exports.HomeView extends Backbone.View
   
@@ -49,13 +69,14 @@ class exports.HomeView extends Backbone.View
     $(@el).html require('./templates/home')
     @subviews = [
       new SidebarView( 'collection': app.Indicators, 'container': @.$('#sidebar') ) 
-      new SymbolListView( 'collection': app.Symbols, 'container': @.$('#symbol-list') )
+      app.ui.companyDp = new SymbolListView( 'collection': app.Symbols, 'container': @.$('#symbol-list') )
     ]
     @
   
   openChart: (ev) =>
     model = app.Symbols.get( @.$(ev.currentTarget).val() )
     @currentChart = new ChartView( 'model': model, 'el' : @.$('#chart').get(0) )
+    # app.ui.chartview = @currentChart
     @subviews.push( @currentChart.render() )
     @
       

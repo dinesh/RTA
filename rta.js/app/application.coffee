@@ -33,4 +33,7 @@ class exports.Application extends BrunchApplication
     @Symbol = Symbol
     @Symbols = new Symbols
     
+    @ui = @models = {}
+    
 window.app = new exports.Application
+

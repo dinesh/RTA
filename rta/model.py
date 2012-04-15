@@ -55,24 +55,21 @@ class Quote( mongokit.Document ):
           >> Quote.series( symbol = '3MINDIA' )['close']
         
       '''
+      print start, end
       
       try:
         mongo = MongoDB().collection()
+        cursor = None
         if start:
-          if not end:
+          if end:
             end = datetime.datetime.today()
             cursor = mongo.find({ 'symbol': symbol, 'tick': { '$gte' : start, '$lte' : end  } }, fields = REQUIRED_QUOTE_FIELDS )
+          else:
+            cursor = mongo.find({ 'symbol': symbol, 'tick': { '$gte' : start } }, fields = REQUIRED_QUOTE_FIELDS )
         else:
           cursor = mongo.find({ 'symbol': symbol, 'tick': { '$gte' : start } }, fields= REQUIRED_QUOTE_FIELDS )
         
-        print cursor.count()
-        # print cursor.explain()
-        
-        ## IMP: it will load all rows into memory list( pymongocursor )
-        if frame:
-          return pandas.DataFrame( list(cursor) ) 
-        else:
-          return list(cursor)
+        return pandas.DataFrame( list(cursor), index = [ x['tick'] for x in cursor.rewind() ] ) 
           
       except:
         raise

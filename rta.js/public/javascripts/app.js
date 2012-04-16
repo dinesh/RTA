@@ -512,12 +512,21 @@
     };
 
     SidebarView.prototype.addIndicator = function(ev) {
-      var indicator, range, symbol, target, url;
+      var indicator, range, symbol, target, unfilled, url;
+      target = this.$(ev.currentTarget);
+      indicator = this.collection.get(target.data('id'));
+      unfilled = _.map(indicator.get('args'), function(opt) {
+        var name, val;
+        name = "" + (indicator.get('id')) + "[" + opt + "]";
+        val = $("[name='" + name + "']").val();
+        return _.isEmpty(val);
+      });
+      if (unfilled && false) {
+        $(target).closest('li').addClass('alert alert-error');
+        return false;
+      }
       if ((symbol = app.ui.companyDp.selectedValue()) && app.models.chart) {
         range = app.models.chart.dateRange();
-        console.log(symbol);
-        target = this.$(ev.currentTarget);
-        indicator = this.collection.get(target.data('id'));
         url = [api.url, indicator.url(), symbol, 'series.json'].join('/');
         return $.ajax({
           url: url,
@@ -876,58 +885,6 @@ function');
   }
 }));
 (this.require.define({
-  "views/templates/home": function(exports, require, module) {
-    module.exports = function (__obj) {
-  if (!__obj) __obj = {};
-  var __out = [], __capture = function(callback) {
-    var out = __out, result;
-    __out = [];
-    callback.call(this);
-    result = __out.join('');
-    __out = out;
-    return __safe(result);
-  }, __sanitize = function(value) {
-    if (value && value.ecoSafe) {
-      return value;
-    } else if (typeof value !== 'undefined' && value != null) {
-      return __escape(value);
-    } else {
-      return '';
-    }
-  }, __safe, __objSafe = __obj.safe, __escape = __obj.escape;
-  __safe = __obj.safe = function(value) {
-    if (value && value.ecoSafe) {
-      return value;
-    } else {
-      if (!(typeof value !== 'undefined' && value != null)) value = '';
-      var result = new String(value);
-      result.ecoSafe = true;
-      return result;
-    }
-  };
-  if (!__escape) {
-    __escape = __obj.escape = function(value) {
-      return ('' + value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-    };
-  }
-  (function() {
-    (function() {
-    
-      __out.push('\n<div id=\'sidebar\' class=\'span\'>\n</div>\n\n<div id="panel" class="span">\n  <div class=\'page-title\'>\n    <div class=\'pull-right\' id=\'symbol-list\'>\n      \n    </div>\n    \n    <h2> Select the symbol </h2>\n  </div>\n  \n  <div id=\'chart\'> </div>\n</div>');
-    
-    }).call(this);
-    
-  }).call(__obj);
-  __obj.safe = __objSafe, __obj.escape = __escape;
-  return __out.join('');
-}
-  }
-}));
-(this.require.define({
   "views/templates/header": function(exports, require, module) {
     module.exports = function (__obj) {
   if (!__obj) __obj = {};
@@ -970,6 +927,58 @@ function');
     (function() {
     
       __out.push('\n<div class=\'navbar navbar-fixed-top\'>\n  <div class=\'navbar-inner\'>\n    <div class=\'container\'>\n      <div class=\'nav-collapse\'>\n        <ul class=\'nav\'>\n          <li class=\'active\'> <a href=\'/\'> Home </a> </li>\n          <li> <a href=\'/\'> Compare </a> </li>\n        </ul>\n      </div>\n    </div>\n  </div>\n</div>\n    ');
+    
+    }).call(this);
+    
+  }).call(__obj);
+  __obj.safe = __objSafe, __obj.escape = __escape;
+  return __out.join('');
+}
+  }
+}));
+(this.require.define({
+  "views/templates/home": function(exports, require, module) {
+    module.exports = function (__obj) {
+  if (!__obj) __obj = {};
+  var __out = [], __capture = function(callback) {
+    var out = __out, result;
+    __out = [];
+    callback.call(this);
+    result = __out.join('');
+    __out = out;
+    return __safe(result);
+  }, __sanitize = function(value) {
+    if (value && value.ecoSafe) {
+      return value;
+    } else if (typeof value !== 'undefined' && value != null) {
+      return __escape(value);
+    } else {
+      return '';
+    }
+  }, __safe, __objSafe = __obj.safe, __escape = __obj.escape;
+  __safe = __obj.safe = function(value) {
+    if (value && value.ecoSafe) {
+      return value;
+    } else {
+      if (!(typeof value !== 'undefined' && value != null)) value = '';
+      var result = new String(value);
+      result.ecoSafe = true;
+      return result;
+    }
+  };
+  if (!__escape) {
+    __escape = __obj.escape = function(value) {
+      return ('' + value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    };
+  }
+  (function() {
+    (function() {
+    
+      __out.push('\n<div id=\'sidebar\' class=\'span\'>\n</div>\n\n<div id="panel" class="span">\n  <div class=\'page-title\'>\n    <div class=\'pull-right\' id=\'symbol-list\'>\n      \n    </div>\n    \n    <h2> Select the symbol </h2>\n  </div>\n  \n  <div id=\'chart\'> </div>\n</div>');
     
     }).call(this);
     
@@ -1039,7 +1048,11 @@ function');
             option = _ref2[_j];
             __out.push('\n          <input class=\'input-small\' placeholder=\'');
             __out.push(__sanitize(option));
-            __out.push('\' type=\'text\' />\n        ');
+            __out.push('\' type=\'text\' \n            name="');
+            __out.push(__sanitize(item.get('id')));
+            __out.push('[');
+            __out.push(__sanitize(option));
+            __out.push(']" />\n            \n        ');
           }
           __out.push('\n      </form>\n    ');
         }

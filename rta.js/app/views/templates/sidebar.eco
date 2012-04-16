@@ -8,7 +8,9 @@
     <% if item.get('args').length: %>
       <form class='form-inline'>
         <% for option in item.get('args'): %>
-          <input class='input-small' placeholder='<%= option %>' type='text' />
+          <input class='input-small' placeholder='<%= option %>' type='text' 
+            name="<%= item.get('id') %>[<%= option  %>]" />
+            
         <% end %>
       </form>
     <% end %>

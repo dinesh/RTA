@@ -23,11 +23,21 @@ class SidebarView extends Backbone.View
     @
   
   addIndicator: (ev) =>
+    target = this.$(ev.currentTarget)
+    indicator = @collection.get( target.data('id') )
+    
+    unfilled = _.map indicator.get('args'), (opt) ->
+      name = "#{indicator.get('id')}[#{ opt }]"
+      val = $("[name='" + name +  "']" ).val() 
+      _.isEmpty(val)
+    
+      
+    if unfilled and false
+      $(target).closest('li').addClass('alert alert-error')
+      return false
+      
     if ( symbol = app.ui.companyDp.selectedValue() ) and app.models.chart
       range = app.models.chart.dateRange()
-      console.log symbol
-      target = this.$(ev.currentTarget)
-      indicator = @collection.get( target.data('id') )
       url = [ api.url, indicator.url(), symbol, 'series.json' ].join('/')
       
       $.ajax 

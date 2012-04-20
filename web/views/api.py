@@ -98,27 +98,32 @@ class Api:
         
   @support_jsonp  
   def get_indicators(self):
-    data = [ v for k, v in CoreApi.Indicators.LIST.items() ]
-    return json.dumps({ 'indicators': data[:10] })
+    __list, data = CoreApi.Indicators.LIST, list()
+    for func in CoreApi.Configuration.indicator_by_rating(5):
+      data.append( __list[func.strip()] )
+      
+    return json.dumps({ 'indicators': data })
   
   @support_jsonp
   def get_indicator_series(self, indicator, symbol):
     start  = request.args.get('start')
     end    = request.args.get('end')
-    period = random.randint(10,50)
-    args   = request.args.get('params', [])
+    args   = request.args.get('params', {})
+    
+    # dividing by zero here b/c javascript returns time in ms
     if start:
       start = datetime.datetime.fromtimestamp( int(start) / 1000)
     if end:
       end = datetime.datetime.fromtimestamp( int(end) / 1000 )
     
     price  = CoreApi.Model.Quote.series(symbol, start = start, end = end )
-    close  = price['close'].values
     
     pd = CoreApi.pandas
     
-    if close.shape[0] > 0:
-      pivot, series = getattr(CoreApi.Indicators, 'SMA').__call__(close, timeperiod = period )
+    if price.shape[0] > 0:
+      res = CoreApi.Indicators.calculate(price, indicator, request.args)
+      return json.dumps({ 'records': res }, cls = JSONEncoder )
+      
       return json.dumps({ 
           'records': pd.DataFrame( data = np.concatenate( 
             [ np.array( close[:pivot] ), series ] ), 

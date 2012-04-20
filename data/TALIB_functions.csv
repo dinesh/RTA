@@ -1,0 +1,132 @@
+Function,Usage,Description,Example,Requirement,Category,Specific Category
+AD,TALIB(AD),Accumulation Distribution,TALIB(AD),3,Indicator,Market Strength Indicators
+ADOSC,"TALIB(ADOSC, FAST_PERIOD, SLOW_PERIOD)",Accumulation Distribution Oscillator,"TALIB(ADOSC, 3, 10)",2,Indicator,Momentum Indicators
+ADX,"TALIB(ADX, PERIOD)",Directional Movement - Average Index,"TALIB(ADX, 14)",5,Indicator,Trend Indicators
+ADXR,"TALIB(ADXR, PERIOD)",Directional Movement - Average Index Rating,"TALIB(ADXR, 14)",5,Indicator,Trend Indicators
+APO,"TALIB(APO, INPUT_ARRAY, FAST_PERIOD, SLOW_PERIOD)",Price Oscillator - Absolute,"TALIB(APO, Close, 12, 26)",1,Indicator,Momentum Indicators
+AROON,"TALIB(AROON, PERIOD)",Aroon,"TALIB(AROON, 14)",1,Indicator,
+AROONOSC ,"TALIB(AROONOSC, PERIOD)",Aroon Oscillator,"TALIB(AROONOSC, 14)",1,Indicator,
+ATR ,"TALIB(ATR, PERIOD)",Average True Range,"TALIB(ATR, 14)",2,Indicator,Volatility Indicators
+AVGPRICE ,TALIB(AVGPRICE),Average Price,TALIB(AVGPRICE),5,Indicator,Price Adjustment
+BBANDS ,"TALIB(BBANDS, INPUT_ARRAY, PERIOD, DEVIATIONS_UP, DEVIATIONS_DOWN, PLOT#)",Bollinger Bands. PLOT# is an integer that specifies 1 of 3 plots available. Plot #1 is the upper band. Plot #2 is the middle band. Plot #3 is the lower band.,"TALIB(BBANDS, Close, 5, 2, 2, 1)",5,Indicator,Volatility Indicators
+BOP ,TALIB(BOP),Balance Of Power,TALIB(BOP),1,Indicator,
+CCI ,"TALIB(CCI, PERIOD)",Commodity Channel Index,"TALIB(CCI, 14)",5,Indicator,
+CDL2CROWS ,TALIB(CDL2CROWS),Two Crows,TALIB(CDL2CROWS),5,Candlestick,
+CDL3BLACKCROWS ,TALIB(CDL3BLACKCROWS),Three Black Crows,TALIB(CDL3BLACKCROWS),5,Candlestick,
+CDL3INSIDE ,TALIB(CDL3INSIDE),Three Inside Up/Down,TALIB(CDL3INSIDE),4,Candlestick,
+CDL3LINESTRIKE ,TALIB(CDL3LINESTRIKE),Three-Line Strike,TALIB(CDL3LINESTRIKE),3,Candlestick,
+CDL3OUTSIDE ,TALIB(CDL3OUTSIDE),Three Outside Up/Down,TALIB(CDL3OUTSIDE),3,Candlestick,
+CDL3STARSINSOUTH ,TALIB(CDL3STARSINSOUTH),Three Stars In The South,TALIB(CDL3STARSINSOUTH),3,Candlestick,
+CDL3WHITESOLDIERS ,TALIB(CDL3WHITESOLDIERS),Three Advancing White Soldiers,TALIB(CDL3WHITESOLDIERS),5,Candlestick,
+CDLABANDONEDBABY ,"TALIB(CDLABANDONEDBABY, PENETRATION)",Abandoned Baby PENETRATION is the percentage of penetration of a candle within another candle,"TALIB(CDLABANDONEDBABY, 0.3)",3,Candlestick,
+CDLADVANCEBLOCK ,TALIB(CDLADVANCEBLOCK),Advance Block,TALIB(CDLADVANCEBLOCK),3,Candlestick,
+CDLBELTHOLD ,TALIB(CDLBELTHOLD),Belt Hold,TALIB(CDLBELTHOLD),3,Candlestick,
+CDLBREAKAWAY ,TALIB(CDLBREAKAWAY),Breakaway,TALIB(CDLBREAKAWAY),4,Candlestick,
+CDLCLOSINGMARUBOZU ,TALIB(CDLCLOSINGMARUBOZU),Closing Marubozu,TALIB(CDLCLOSINGMARUBOZU),3,Candlestick,
+CDLCONCEALBABYSWALL ,TALIB(CDLCONCEALBABYSWALL),Concealing Baby Swallow,TALIB(CDLCONCEALBABYSWALL),3,Candlestick,
+CDLCOUNTERATTACK ,TALIB(CDLCOUNTERATTACK),Counterattack,TALIB(CDLCOUNTERATTACK),3,Candlestick,
+CDLDARKCLOUDCOVER ,"TALIB(CDLDARKCLOUDCOVER, PENETRATION)",Dark Cloud Cover PENETRATION is the percentage of penetration of a candle within another candle,"TALIB(CDLDARKCLOUDCOVER, 0.5)",5,Candlestick,
+CDLDOJI ,TALIB(CDLDOJI),Doji,TALIB(CDLDOJI),5,Candlestick,
+CDLDOJISTAR ,TALIB(CDLDOJISTAR),Doji Star,TALIB(CDLDOJISTAR),5,Candlestick,
+CDLDRAGONFLYDOJI ,TALIB(CDLDRAGONFLYDOJI),Dragonfly Doji,TALIB(CDLDRAGONFLYDOJI),5,Candlestick,
+CDLENGULFING ,TALIB(CDLENGULFING),Engulfing Pattern,TALIB(CDLENGULFING),5,Candlestick,
+CDLEVENINGDOJISTAR ,"TALIB(CDLEVENINGDOJISTAR, PENETRATION)",Evening Doji Star PENETRATION is the percentage of penetration of a candle within another candle,"TALIB(CDLEVENINGDOJISTAR, 0.3)",5,Candlestick,
+CDLEVENINGSTAR ,"TALIB(CDLEVENINGSTAR, PENETRATION)",Evening Star PENETRATION is the percentage of penetration of a candle within another candle,"TALIB(CDLEVENINGSTAR, 0.3)",5,Candlestick,
+CDLGAPSIDESIDEWHITE ,TALIB(CDLGAPSIDESIDEWHITE),Up/Down-Gap Side-By-Side White Lines,TALIB(CDLGAPSIDESIDEWHITE),4,Candlestick,
+CDLGRAVESTONEDOJI ,TALIB(CDLGRAVESTONEDOJI),Gravestone Doji,TALIB(CDLGRAVESTONEDOJI),5,Candlestick,
+CDLHAMMER ,TALIB(CDLHAMMER),Hammer,TALIB(CDLHAMMER),5,Candlestick,
+CDLHANGINGMAN ,TALIB(CDLHANGINGMAN),Hanging Man,TALIB(CDLHANGINGMAN),5,Candlestick,
+CDLHARAMI ,TALIB(CDLHARAMI),Harami Pattern,TALIB(CDLHARAMI),5,Candlestick,
+CDLHARAMICROSS ,TALIB(CDLHARAMICROSS),Harami Cross Pattern,TALIB(CDLHARAMICROSS),5,Candlestick,
+CDLHIGHWAVE ,TALIB(CDLHIGHWAVE),High Wave Candle,TALIB(CDLHIGHWAVE),3,Candlestick,
+CDLHIKKAKE ,TALIB(CDLHIKKAKE),Hikkake Pattern,TALIB(CDLHIKKAKE),3,Candlestick,
+CDLHIKKAKEMOD ,TALIB(CDLHIKKAKEMOD),Modified Hikkake Pattern,TALIB(CDLHIKKAKEMOD),3,Candlestick,
+CDLHOMINGPIGEON ,TALIB(CDLHOMINGPIGEON),Homing Pigeon,TALIB(CDLHOMINGPIGEON),3,Candlestick,
+CDLIDENTICAL3CROWS ,TALIB(CDLIDENTICAL3CROWS),Identical Three Crows,TALIB(CDLIDENTICAL3CROWS),4,Candlestick,
+CDLINNECK ,TALIB(CDLINNECK),In-Neck Pattern,TALIB(CDLINNECK),3,Candlestick,
+CDLINVERTEDHAMMER ,TALIB(CDLINVERTEDHAMMER),Inverted Hammer,TALIB(CDLINVERTEDHAMMER),5,Candlestick,
+CDLKICKING ,TALIB(CDLKICKING),Kicking,TALIB(CDLKICKING),3,Candlestick,
+CDLKICKINGBYLENGTH ,TALIB(CDLKICKINGBYLENGTH),Kicking - Bull/Bear Determined By The Longer Marubozu,TALIB(CDLKICKINGBYLENGTH),3,Candlestick,
+CDLLADDERBOTTOM ,TALIB(CDLLADDERBOTTOM),Ladder Bottom,TALIB(CDLLADDERBOTTOM),3,Candlestick,
+CDLLONGLEGGEDDOJI ,TALIB(CDLLONGLEGGEDDOJI),Long Legged Doji,TALIB(CDLLONGLEGGEDDOJI),4,Candlestick,
+CDLLONGLINE ,TALIB(CDLLONGLINE),Long Line Candle,TALIB(CDLLONGLINE),3,Candlestick,
+CDLMARUBOZU ,TALIB(CDLMARUBOZU),Marubozu,TALIB(CDLMARUBOZU),3,Candlestick,
+CDLMATCHINGLOW ,TALIB(CDLMATCHINGLOW),Matching Low,TALIB(CDLMATCHINGLOW),3,Candlestick,
+CDLMATHOLD ,"TALIB(CDLMATHOLD, PENETRATION)",Mat Hold PENETRATION is the percentage of penetration of a candle within another candle,"TALIB(CDLMATHOLD, 0.5)",3,Candlestick,
+CDLMORNINGDOJISTAR ,"TALIB(CDLMORNINGDOJISTAR, PENETARTION)",Morning Doji Star PENETRATION is the percentage of penetration of a candle within another candle,"TALIB(CDLMORNINGDOJISTAR, 0.3)",5,Candlestick,
+CDLMORNINGSTAR ,"TALIB(CDLMORNINGSTAR, PENETRATION)",Morning Star PENETRATION is the percentage of penetration of a candle within another candle,"TALIB(CDLMORNINGSTAR, 0.3)",5,Candlestick,
+CDLONNECK ,TALIB(CDLONNECK),On-Neck Pattern,TALIB(CDLONNECK),4,Candlestick,
+CDLPIERCING ,TALIB(CDLPIERCING),Piercing Pattern,TALIB(CDLPIERCING),5,Candlestick,
+CDLRICKSHAWMAN ,TALIB(CDLRICKSHAWMAN),Rickshaw Man,TALIB(CDLRICKSHAWMAN),3,Candlestick,
+CDLRISEFALL3METHODS ,TALIB(CDLRISEFALL3METHODS),Rising/Falling Three Methods,TALIB(CDLRISEFALL3METHODS),4,Candlestick,
+CDLSEPARATINGLINES ,TALIB(CDLSEPARATINGLINES),Separating Lines,TALIB(CDLSEPARATINGLINES),3,Candlestick,
+CDLSHOOTINGSTAR ,TALIB(CDLSHOOTINGSTAR),Shooting Star,TALIB(CDLSHOOTINGSTAR),5,Candlestick,
+CDLSHORTLINE ,TALIB(CDLSHORTLINE),Short Line Candle,TALIB(CDLSHORTLINE),3,Candlestick,
+CDLSPINNINGTOP ,TALIB(CDLSPINNINGTOP),Spinning Top,TALIB(CDLSPINNINGTOP),5,Candlestick,
+CDLSTALLEDPATTERN ,TALIB(CDLSTALLEDPATTERN),Stalled Pattern,TALIB(CDLSTALLEDPATTERN),3,Candlestick,
+CDLSTICKSANDWICH ,TALIB(CDLSTICKSANDWICH),Stick Sandwich,TALIB(CDLSTICKSANDWICH),4,Candlestick,
+CDLTAKURI ,TALIB(CDLTAKURI),Takuri (Dragonfly Doji With Very Long Lower Shadow),TALIB(CDLTAKURI),3,Candlestick,
+CDLTASUKIGAP ,TALIB(CDLTASUKIGAP),Tasuki Gap,TALIB(CDLTASUKIGAP),3,Candlestick,
+CDLTHRUSTING ,TALIB(CDLTHRUSTING),Thrusting Pattern,TALIB(CDLTHRUSTING),3,Candlestick,
+CDLTRISTAR ,TALIB(CDLTRISTAR),Tristar Pattern,TALIB(CDLTRISTAR),4,Candlestick,
+CDLUNIQUE3RIVER ,TALIB(CDLUNIQUE3RIVER),Unique Three River,TALIB(CDLUNIQUE3RIVER),4,Candlestick,
+CDLUPSIDEGAP2CROWS ,TALIB(CDLUPSIDEGAP2CROWS),Upside Gap Two Crows,TALIB(CDLUPSIDEGAP2CROWS),4,Candlestick,
+CDLXSIDEGAP3METHODS ,TALIB(CDLXSIDEGAP3METHODS),Upside/Downside Gap Three Methods,TALIB(CDLXSIDEGAP3METHODS),4,Candlestick,
+CMO ,"TALIB(CMO, INPUT_ARRAY, PERIOD)",Chande Momentum Oscillator,"TALIB(CMO, Close, 14)",3,Indicator,Trend Indicators
+CORREL ,"TALIB(CORREL, INPUT_ARRAY, INPUT_ARRAY, PERIOD)",Pearson Product Momentum Corr. Coef.,"TALIB(CORREL, Close, Close, 30)",2,Indicator,
+DEMA ,"TALIB(DEMA, INPUT_ARRAY, PERIOD)",Double Exponential Moving Average,"TALIB(DEMA, Close, 30)",3,Indicator,Moving Average
+DX ,"TALIB(DX, PERIOD)",Directional Movement - Index,"TALIB(DX, 14)",5,Indicator,Trend Indicators
+EMA ,"TALIB(EMA, INPUT_ARRAY, PERIOD)",Exponential Moving Average,"TALIB(EMA, Close, 14)",5,Indicator,Moving Average
+HT_DCPERIOD ,"TALIB(HT_DCPERIOD, INPUT_ARRAY)",Hilbert Transform - Dominant Cycle Period,"TALIB(HT_DCPERIOD, Close)",2,Indicator,
+HT_DCPHASE ,"TALIB(HT_DCPHASE, INPUT_ARRAY)",Hilbert Transform - Dominant Cycle Phase,"TALIB(HT_DCPHASE, Close)",2,Indicator,
+HT_PHASOR ,"TALIB(HT_PHASOR, INPUT_ARRAY)",Hilbert Transform - In-Phase Indicator,"TALIB(HT_PHASOR, Close)",2,Indicator,
+HT_SINE ,"TALIB(HT_SINE, INPUT_ARRAY)",Hilbert Transform - Sinewave Indicator,"TALIB(HT_SINE, Close)",2,Indicator,
+HT_TRENDLINE ,"TALIB(HT_TRENDLINE, INPUT_ARRAY)",Hilbert Transform - Instataneous Trendline,"TALIB(HT_TRENDLINE, Close)",5,Indicator,Trend Indicators
+HT_TRENDMODE ,"TALIB(HT_TRENDMODE, INPUT_ARRAY)",Hilbert Transform - Market Mode,"TALIB(HT_TRENDMODE, Close)",4,Indicator,Trend Indicators
+KAMA ,"TALIB(KAMA, INPUT_ARRAY, PERIOD)",Kaufman's Adaptive Moving Average,"TALIB(KAMA, Close, 30)",2,Indicator,Moving Average
+LINEARREG ,"TALIB(LINEARREG, INPUT_ARRAY, PERIOD)",Linear Regression,"TALIB(LINEARREG, Close, 14)",3,Indicator,Trend Indicators
+LINEARREG_ANGLE ,"TALIB(LINEARREG_ANGLE, INPUT_ARRAY, PERIOD)",Linear Regression Angle,"TALIB(LINEARREG_ANGLE, Close, 14)",3,Indicator,Trend Indicators
+LINEARREG_INTERCEPT ,"TALIB(LINEARREG_INTERCEPT, INPUT_ARRAY, PERIOD)",Linear Regression Intercept,"TALIB(LINEARREG_INTERCEPT, Close, 14)",3,Indicator,Trend Indicators
+LINEARREG_SLOPE ,"TALIB(LINEARREG_SLOPE, INPUT_ARRAY, PERIOD)",Linear Regression Slope,"TALIB(LINEARREG_SLOPE, Close, 14)",3,Indicator,Trend Indicators
+MACD ,"TALIB(MACD, INPUT_ARRAY, FAST_PERIOD, SLOW_PERIOD, TRIGGER_PERIOD, PLOT)",Moving Average Convergence Divergence PLOT is an integer that specifies 1 of 3 plots available. Plot #1 is the MACD. Plot #2 is the trigger. Plot #3 is the oscillator.,"TALIB(MACDClose, 12, 26, 9, 1)",5,Indicator,MACD
+MACDEXT ,"TALIB(MACDEXT, INPUT_ARRAY, FAST_PERIOD, SLOW_PERIOD, TRIGGER_PERIOD, PLOT)",Moving Average Convergence Divergence (Extended parameters) PLOT is an integer that specifies 1 of 3 plots available. Plot #1 is the MACD. Plot #2 is the trigger. Plot #3 is the oscillator.,"TALIB(MACDEXT, Close, 12, 26, 9, 1)",4,Indicator,MACD
+MACDFIX ,"TALIB(MACDFIX, INPUT_ARRAY, TRIGGER_PERIOD, PLOT)",Moving Average Convergence Divergence Fixed PLOT is an integer that specifies 1 of 3 plots available. Plot #1 is the MACD. Plot #2 is the trigger. Plot #3 is the oscillator.,"TALIB(MACDFIX, Close, 9, 1)",4,Indicator,MACD
+MAMA ,"TALIB(MAMA, INPUT_ARRAY, FAST_LIMIT, SLOW_LIMIT)",MESA Adaptive Moving Average,"TALIB(MAMA, Close, 0.5, 0.05)",3,Indicator,Moving Average
+MAX ,"TALIB(MAX, INPUT_ARRAY, PERIOD)",Maximum,"TALIB(MAX, Close, 30)",5,Indicator,Price Adjustment
+MEDPRICE ,TALIB(MEDPRICE),Median Price,TALIB(MEDPRICE),4,Indicator,Price Adjustment
+MFI ,"TALIB(MFI, PERIOD)",Money Flow Index,"TALIB(MFI, 14)",4,Indicator,Market Strength Indicators
+MIDPOINT ,"TALIB(MIDPOINT, INPUT_ARRAY, PERIOD)",Mid Point,"TALIB(MIDPOINT, Close, 14)",4,Indicator,
+MIDPRICE ,"TALIB(MIDPRICE, PERIOD)",Mid Price,"TALIB(MIDPRICE, 14)",4,Indicator,Price Adjustment
+MIN ,"TALIB(MIN, INPUT_ARRAY, PERIOD)",Minumum,"TALIB(MIN, Close, 30)",5,Indicator,Price Adjustment
+MINUS_DI ,"TALIB(MINUS_DI, 14)",Directional Indicator - (-DI),"TALIB(MINUS_DI, 14)",5,Indicator,Trend Indicators
+MINUS_DM ,"TALIB(MINUS_DM, 14)",Directional Movement - (-DM),"TALIB(MINUS_DM, 14)",5,Indicator,Trend Indicators
+MOM ,"TALIB(MOM, INPUT_ARRAY, PERIOD)",Momentum,"TALIB(MOM, Close, 14)",5,Indicator,Trend Indicators
+NATR ,"TALIB(NATR, PERIOD)",Normalized Average True Range,"TALIB(NATR, 14)",3,Indicator,Volatility Indicators
+OBV ,"TALIB(OBV, INPUT_ARRAY)",On Balance Volume,"TALIB(OBV, Close)",3,Indicator,
+PLUS_DI ,"TALIB(PLUS_DI, PERIOD)",Directional Indicator - (+DI),"TALIB(PLUS_DI, 14)",5,Indicator,Trend Indicators
+PLUS_DM ,"TALIB(PLUS_DM, PERIOD)",Directional Movement - (+DM),"TALIB(PLUS_DM, 14)",5,Indicator,Trend Indicators
+PPO ,"TALIB(PPO, INPUT_ARRAY, FAST_PERIOD, SLOW_PERIOD)",Price Oscillator Percentage,"TALIB(PPO, Close, 12, 26)",4,Indicator,Market Strength Indicators
+ROC ,"TALIB(ROC, INPUT_ARRAY, PERIOD)",Rate Of Change: ((price/prevprice)-1)*100,"TALIB(ROC, Close, 10)",4,Indicator,Momentum Indicators
+ROCP ,"TALIB(ROCP, INPUT_ARRAY, PERIOD)",Rate Of Change: (price-prevprice)/prevprice,"TALIB(ROCP, Close, 10)",4,Indicator,Momentum Indicators
+ROCR ,"TALIB(ROCR, INPUT_ARRAY, PERIOD)",Rate Of Change: (price/prevprice),"TALIB(ROCR, Close, 10)",4,Indicator,Momentum Indicators
+ROCR100 ,"TALIB(ROCR100, INPUT_ARRAY, PERIOD)",Rate Of Change: (price/prevprice)*100,"TALIB(ROCR100, Close, 10)",3,Indicator,Momentum Indicators
+RSI ,"TALIB(RSI, INPUT_ARRAY, PERIOD)",Relative Strength Index,"TALIB(RSI, Close, 14)",5,Indicator,Momentum Indicators
+SAR ,"TALIB(SAR, ACCELERATION_FACTOR, AF_MAXIMUM)",Parabolic SAR,"TALIB(SAR, 0.02, 0.2)",4,Indicator,Trend Indicators
+SAREXT ,"TALIB(SAREXT, START_VALUE, OFFSET_ON_REVERSE, AF_INIT_LONG, AF_LONG, AF_MAX_LONG, AF_INIT_SHORT, AF_SHORT, AF_MAX_SHORT)",Parabolic SAR Extended,"TALIB(SAREXT, 0, 0, 0.02, 0.02, 0.2, 0.02, 0.02, 0.2)",3,Indicator,Trend Indicators
+SMA ,"TALIB(SMA, INPUT_ARRAY, PERIOD)",Simple Moving Average,"TALIB(SMA, Close, 30)",5,Indicator,Moving Average
+STDDEV ,"TALIB(STDDEV, INPUT_ARRAY, PERIOD, DEVIATIONS)",Standard Deviation,"TALIB(STDDEV, Close, 5, 1)",5,Indicator,Volatility Indicators
+STOCH ,"TALIB(STOCH, FASTK_PERIOD, SLOWK_PERIOD, SLOWD_PERIOD)",Stochastic Oscillator Slow,"TALIB(STOCH, 5, 3, 3)",5,Indicator,Momentum Indicators
+STOCHF ,"TALIB(STOCHF, FASTK_PERIOD, FASTD_PERIOD)",Stochastic Oscillator Fast,"TALIB(STOCHF, 5, 3)",5,Indicator,Momentum Indicators
+STOCHRSI ,"TALIB(STOCHRSI, INPUT_ARRAY, PERIOD, FASTK_PERIOD, FASTD_PERIOD)",Stochastic RSI,"TALIB(STOCHRSI, Close, 14, 5, 3)",5,Indicator,Momentum Indicators
+T3 ,"TALIB(T3, INPUT_ARRAY, PERIOD, VOLUME_FACTOR)",T3,"TALIB(T3, Close, 5, 0.7)",2,Indicator,
+TEMA,"TALIB(TEMA, INPUT_ARRAY, PERIOD)",Triple Exponential Moving Average,"TALIB(TEMA, Close, 30)",4,Indicator,Moving averages
+TRANGE,TALIB(TRANGE),True Range,TALIB(TRANGE),4,Indicator,Price Adjustment
+TRIMA,"TALIB(TRIMA, INPUT_ARRAY, PERIOD)",Triangular Moving Average,"TALIB(TRIMA, Close, 30)",4,Indicator,Volatility Indicators
+TRIX,"TALIB(TRIX, INPUT_ARRAY, PERIOD)",TRIX,"TALIB(TRIX, Close, 30)",3,Indicator,
+TSF,"TALIB(TSF, INPUT_ARRAY, PERIOD)",Time Series Forcast,"TALIB(TSF, Close, 14)",3,Indicator,Trend Indicators
+TYPPRICE,TALIB(TYPPRICE),Typical Price,TALIB(TYPPRICE),4,Indicator,Price Adjustment
+ULTOSC,"TALIB(ULTOSC, SHORT_PERIOD, MEDIUM_PERIOD, LONG_PERIOD)",Ultimate Oscillator,"TALIB(ULTOSC, 7, 14, 28)",3,Indicator,Momentum Indicators
+VAR,"TALIB(VAR, INPUT_ARRAY, PERIOD, DEVIATIONS)",Variance,"TALIB(VAR, Close, 5, 1)",4,Indicator,
+WCLPRICE,TALIB(WCLPRICE),Weighted Close,TALIB(WCLPRICE),4,Indicator,Price Adjustment
+WILLR ,"TALIB(WILLR, PERIOD)",William's %R,"TALIB(WILLR, 14)",5,Indicator,Momentum Indicators
+WMA ,"TALIB(WMA, INPUT_ARRAY, PERIOD)",Weighted Moving Average,"TALIB(WMA, Close, 30) ",4,Indicator,Moving Average

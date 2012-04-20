@@ -18,8 +18,10 @@ from rta import indicators as Indicators
 from rta.indicators import talib as TaLib
 from rta.indicators import ALL_INDICATORS, SUPPORTED_INDICATORS, LIST
 
+
 from rta import model as Model
 from rta.configuration import Config
+from rta import configuration as Configuration
 from rta.dam import YahooDAM
 from rta.errors import UfException, Errors
 

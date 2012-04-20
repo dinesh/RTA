@@ -293,6 +293,7 @@
   "models/indicator": function(exports, require, module) {
     (function() {
   var Indicator,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
@@ -301,12 +302,17 @@
     __extends(Indicator, _super);
 
     function Indicator() {
+      this.fullname = __bind(this.fullname, this);
       Indicator.__super__.constructor.apply(this, arguments);
     }
 
     Indicator.prototype.url = 'api/indicator';
 
     Indicator.prototype.sync = api.sync;
+
+    Indicator.prototype.fullname = function() {
+      return "" + (get('id')) + " - " + (get('desc'));
+    };
 
     return Indicator;
 
@@ -512,33 +518,44 @@
     };
 
     SidebarView.prototype.addIndicator = function(ev) {
-      var indicator, range, symbol, target, unfilled, url;
+      var data, indicator, indicator_options, range, symbol, target, unfilled, url;
       target = this.$(ev.currentTarget);
       indicator = this.collection.get(target.data('id'));
-      unfilled = _.map(indicator.get('args'), function(opt) {
-        var name, val;
+      indicator_options = _.map(indicator.get('args'), function(opt) {
+        var elem, name;
         name = "" + (indicator.get('id')) + "[" + opt + "]";
-        val = $("[name='" + name + "']").val();
-        return _.isEmpty(val);
+        elem = $("[name='" + name + "']");
+        return [opt, elem];
       });
-      if (unfilled && false) {
+      console.log(indicator_options);
+      unfilled = _.any(indicator_options, function(p) {
+        return _.isEmpty(p[1].val());
+      });
+      if (unfilled) {
         $(target).closest('li').addClass('alert alert-error');
         return false;
       }
       if ((symbol = app.ui.companyDp.selectedValue()) && app.models.chart) {
         range = app.models.chart.dateRange();
         url = [api.url, indicator.url(), symbol, 'series.json'].join('/');
+        data = {
+          start: range.dataMin,
+          end: range.dataMax
+        };
+        _.each(indicator_options, function(e) {
+          return data[e[0]] = e[1].val();
+        });
         return $.ajax({
           url: url,
           dataType: 'jsonp',
-          data: {
-            start: range.dataMin,
-            end: range.dataMax
-          },
+          data: data,
           success: function(data) {
-            console.log(data);
-            return app.models.chart.addSeries(indicator.get('name'), data.records, {
-              yAxis: 0
+            return _.each(data.records, function(ts) {
+              console.log(ts.name);
+              console.log(ts.series);
+              return app.models.chart.addSeries(ts.name, data.series, {
+                yAxis: 0
+              });
             });
           }
         });
@@ -1029,7 +1046,7 @@ function');
   }
   (function() {
     (function() {
-      var item, option, _i, _j, _len, _len2, _ref, _ref2;
+      var item, ma, matypes, option, _i, _j, _k, _len, _len2, _len3, _ref, _ref2;
     
       __out.push('\n');
     
@@ -1039,6 +1056,8 @@ function');
         __out.push('\n  <li>\n    <h4>\n      <a href="indicator/sidebar/');
         __out.push(__sanitize(item.get('id')));
         __out.push('"> ');
+        __out.push(__sanitize(item.get('id')));
+        __out.push(' - ');
         __out.push(__sanitize(item.get('desc')));
         __out.push(' </a>\n    </h4>\n    \n    ');
         if (item.get('args').length) {
@@ -1046,13 +1065,34 @@ function');
           _ref2 = item.get('args');
           for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
             option = _ref2[_j];
-            __out.push('\n          <input class=\'input-small\' placeholder=\'');
-            __out.push(__sanitize(option));
-            __out.push('\' type=\'text\' \n            name="');
-            __out.push(__sanitize(item.get('id')));
-            __out.push('[');
-            __out.push(__sanitize(option));
-            __out.push(']" />\n            \n        ');
+            __out.push('\n          ');
+            if (option === 'matype') {
+              __out.push('\n            <select name="');
+              __out.push(__sanitize(item.get('id')));
+              __out.push('[');
+              __out.push(__sanitize(option));
+              __out.push(']" class=\'input-small\'>\n            ');
+              matypes = ['MA_SMA', 'MA_EMA', 'MA_WMA', 'MA_DEMA', 'MA_TEMA', 'MA_TRIMA', 'MA_KAMA', 'MA_MAMA', 'MA_T3'];
+              __out.push('\n            ');
+              for (_k = 0, _len3 = matypes.length; _k < _len3; _k++) {
+                ma = matypes[_k];
+                __out.push('\n              <option value="');
+                __out.push(__sanitize(_.indexOf(matypes, ma)));
+                __out.push('"> ');
+                __out.push(__sanitize(ma));
+                __out.push(' </option>\n            ');
+              }
+              __out.push('\n            </select>\n          ');
+            } else {
+              __out.push('\n                <input class=\'input-small\' placeholder=\'');
+              __out.push(__sanitize(option));
+              __out.push('\' type=\'text\' \n                  name="');
+              __out.push(__sanitize(item.get('id')));
+              __out.push('[');
+              __out.push(__sanitize(option));
+              __out.push(']" /> \n          ');
+            }
+            __out.push('\n        ');
           }
           __out.push('\n      </form>\n    ');
         }

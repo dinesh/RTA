@@ -26,13 +26,17 @@ class SidebarView extends Backbone.View
     target = this.$(ev.currentTarget)
     indicator = @collection.get( target.data('id') )
     
-    unfilled = _.map indicator.get('args'), (opt) ->
+    indicator_options = _.map indicator.get('args'), (opt) ->
       name = "#{indicator.get('id')}[#{ opt }]"
-      val = $("[name='" + name +  "']" ).val() 
-      _.isEmpty(val)
-    
+      elem = $("[name='" + name +  "']" )
+      [ opt, elem ]
       
-    if unfilled and false
+    console.log indicator_options
+    
+    unfilled = _.any(indicator_options, (p) -> _.isEmpty(p[1].val() ) )
+    
+    
+    if unfilled 
       $(target).closest('li').addClass('alert alert-error')
       return false
       
@@ -40,16 +44,22 @@ class SidebarView extends Backbone.View
       range = app.models.chart.dateRange()
       url = [ api.url, indicator.url(), symbol, 'series.json' ].join('/')
       
+      data = 
+        start: range.dataMin
+        end: range.dataMax
+      
+      _.each(indicator_options, (e) -> data[ e[0]] = e[1].val() )
+        
       $.ajax 
         url: url
         dataType: 'jsonp',
-        data:
-          start: range.dataMin
-          end: range.dataMax
+        data: data
         success: (data) ->
-          console.log data
-          app.models.chart.addSeries indicator.get('name'), data.records,
-            yAxis : 0
+          _.each data.records, (ts) ->
+            console.log ts.name
+            console.log ts.series
+            app.models.chart.addSeries ts.name, data.series,
+              yAxis : 0
           
     else
       alert('No Symbol selected.')

@@ -2,15 +2,23 @@
 <% for item in @items: %>
   <li>
     <h4>
-      <a href="indicator/sidebar/<%= item.get('id') %>"> <%= item.get('desc') %> </a>
+      <a href="indicator/sidebar/<%= item.get('id') %>"> <%= item.get('id') %> - <%= item.get('desc') %> </a>
     </h4>
     
     <% if item.get('args').length: %>
       <form class='form-inline'>
         <% for option in item.get('args'): %>
-          <input class='input-small' placeholder='<%= option %>' type='text' 
-            name="<%= item.get('id') %>[<%= option  %>]" />
-            
+          <% if option == 'matype': %>
+            <select name="<%= item.get('id') %>[<%= option %>]" class='input-small'>
+            <% matypes = [ 'MA_SMA', 'MA_EMA', 'MA_WMA', 'MA_DEMA', 'MA_TEMA', 'MA_TRIMA', 'MA_KAMA','MA_MAMA', 'MA_T3'] %>
+            <% for ma in matypes: %>
+              <option value="<%= _.indexOf( matypes, ma) %>"> <%= ma %> </option>
+            <% end %>
+            </select>
+          <% else: %>
+                <input class='input-small' placeholder='<%= option %>' type='text' 
+                  name="<%= item.get('id') %>[<%= option  %>]" /> 
+          <% end %>
         <% end %>
       </form>
     <% end %>

@@ -11861,1184 +11861,7 @@ i.sort(function(a,b){return a-b});c=i[La(e/2)];return e*c/(b-a)};d.postProcessTi
 k.max,o;o=b.hoverPoints;var r=d.closestPointRange,j=(j-a)/(d.translationSlope*(d.ordinalSlope||r)),u={ordinalPositions:d.getExtendedPositions()},v,r=d.lin2val,s=d.val2lin;if(u.ordinalPositions){if(Ga(j)>1)o&&q(o,function(a){a.setState()}),j<0?(o=u,u=d.ordinalPositions?d:u):o=d.ordinalPositions?d:u,v=u.ordinalPositions,i>v[v.length-1]&&v.push(i),o=r.apply(o,[s.apply(o,[m,!0])+j,!0]),j=r.apply(u,[s.apply(u,[l,!0])+j,!0]),o>wa(k.dataMin,m)&&j<O(i,l)&&d.setExtremes(o,j,!0,!1),b.mouseDownX=a,W(b.container,
 {cursor:"move"})}else h=!0}else h=!0;h&&e.apply(b,arguments)}}};C.getSegments=function(){var a=this,d,e=a.options.gapSize;b.apply(a);if(a.xAxis.options.ordinal&&e)d=a.segments,q(d,function(b,g){for(var h=b.length-1;h--;)b[h+1].x-b[h].x>a.xAxis.closestPointRange*e&&d.splice(g+1,0,b.splice(h+1,b.length-h))})}})();G(Highcharts,{Chart:ec,dateFormat:Bb,pathAnim:Xb,getOptions:function(){return ja},hasBidiBug:bd,numberFormat:Zb,Point:ab,Color:oa,Renderer:Sb,SVGRenderer:Eb,VMLRenderer:mb,CanVGRenderer:xc,
 seriesTypes:ma,setOptions:function(a){hc=I(hc,a.xAxis);tc=I(tc,a.yAxis);a.xAxis=a.yAxis=D;ja=I(ja,a);Gc();return ja},Series:ia,addEvent:X,removeEvent:ua,createElement:da,discardElement:Nb,css:W,each:q,extend:G,map:Kb,merge:I,pick:r,splat:zb,extendClass:ea,placeBox:Fc,product:"Highstock",version:"1.1.5"})})();
-(function(exports){
-crossfilter.version = "1.0.2";
-function crossfilter_identity(d) {
-  return d;
-}
-crossfilter.permute = permute;
-
-function permute(array, index) {
-  for (var i = 0, n = index.length, copy = new Array(n); i < n; ++i) {
-    copy[i] = array[index[i]];
-  }
-  return copy;
-}
-var bisect = crossfilter.bisect = bisect_by(crossfilter_identity);
-
-bisect.by = bisect_by;
-
-function bisect_by(f) {
-
-  // Locate the insertion point for x in a to maintain sorted order. The
-  // arguments lo and hi may be used to specify a subset of the array which
-  // should be considered; by default the entire array is used. If x is already
-  // present in a, the insertion point will be before (to the left of) any
-  // existing entries. The return value is suitable for use as the first
-  // argument to `array.splice` assuming that a is already sorted.
-  //
-  // The returned insertion point i partitions the array a into two halves so
-  // that all v < x for v in a[lo:i] for the left side and all v >= x for v in
-  // a[i:hi] for the right side.
-  function bisectLeft(a, x, lo, hi) {
-    while (lo < hi) {
-      var mid = lo + hi >> 1;
-      if (f(a[mid]) < x) lo = mid + 1;
-      else hi = mid;
-    }
-    return lo;
-  }
-
-  // Similar to bisectLeft, but returns an insertion point which comes after (to
-  // the right of) any existing entries of x in a.
-  //
-  // The returned insertion point i partitions the array into two halves so that
-  // all v <= x for v in a[lo:i] for the left side and all v > x for v in
-  // a[i:hi] for the right side.
-  function bisectRight(a, x, lo, hi) {
-    while (lo < hi) {
-      var mid = lo + hi >> 1;
-      if (x < f(a[mid])) hi = mid;
-      else lo = mid + 1;
-    }
-    return lo;
-  }
-
-  bisectRight.right = bisectRight;
-  bisectRight.left = bisectLeft;
-  return bisectRight;
-}
-var heap = crossfilter.heap = heap_by(crossfilter_identity);
-
-heap.by = heap_by;
-
-function heap_by(f) {
-
-  // Builds a binary heap within the specified array a[lo:hi]. The heap has the
-  // property such that the parent a[lo+i] is always less than or equal to its
-  // two children: a[lo+2*i+1] and a[lo+2*i+2].
-  function heap(a, lo, hi) {
-    var n = hi - lo,
-        i = (n >>> 1) + 1;
-    while (--i > 0) sift(a, i, n, lo);
-    return a;
-  }
-
-  // Sorts the specified array a[lo:hi] in descending order, assuming it is
-  // already a heap.
-  function sort(a, lo, hi) {
-    var n = hi - lo,
-        t;
-    while (--n > 0) t = a[lo], a[lo] = a[lo + n], a[lo + n] = t, sift(a, 1, n, lo);
-    return a;
-  }
-
-  // Sifts the element a[lo+i-1] down the heap, where the heap is the contiguous
-  // slice of array a[lo:lo+n]. This method can also be used to update the heap
-  // incrementally, without incurring the full cost of reconstructing the heap.
-  function sift(a, i, n, lo) {
-    var d = a[--lo + i],
-        x = f(d),
-        child;
-    while ((child = i << 1) <= n) {
-      if (child < n && f(a[lo + child]) > f(a[lo + child + 1])) child++;
-      if (x <= f(a[lo + child])) break;
-      a[lo + i] = a[lo + child];
-      i = child;
-    }
-    a[lo + i] = d;
-  }
-
-  heap.sort = sort;
-  return heap;
-}
-var heapselect = crossfilter.heapselect = heapselect_by(crossfilter_identity);
-
-heapselect.by = heapselect_by;
-
-function heapselect_by(f) {
-  var heap = heap_by(f);
-
-  // Returns a new array containing the top k elements in the array a[lo:hi].
-  // The returned array is not sorted, but maintains the heap property. If k is
-  // greater than hi - lo, then fewer than k elements will be returned. The
-  // order of elements in a is unchanged by this operation.
-  function heapselect(a, lo, hi, k) {
-    var queue = new Array(k = Math.min(hi - lo, k)),
-        min,
-        i,
-        x,
-        d;
-
-    for (i = 0; i < k; ++i) queue[i] = a[lo++];
-    heap(queue, 0, k);
-
-    if (lo < hi) {
-      min = f(queue[0]);
-      do {
-        if (x = f(d = a[lo]) > min) {
-          queue[0] = d;
-          min = f(heap(queue, 0, k)[0]);
-        }
-      } while (++lo < hi);
-    }
-
-    return queue;
-  }
-
-  return heapselect;
-}
-var insertionsort = crossfilter.insertionsort = insertionsort_by(crossfilter_identity);
-
-insertionsort.by = insertionsort_by;
-
-function insertionsort_by(f) {
-
-  function insertionsort(a, lo, hi) {
-    for (var i = lo + 1; i < hi; ++i) {
-      for (var j = i, t = a[i], x = f(t); j > lo && f(a[j - 1]) > x; --j) {
-        a[j] = a[j - 1];
-      }
-      a[j] = t;
-    }
-    return a;
-  }
-
-  return insertionsort;
-}
-// Algorithm designed by Vladimir Yaroslavskiy.
-// Implementation based on the Dart project; see lib/dart/LICENSE for details.
-
-var quicksort = crossfilter.quicksort = quicksort_by(crossfilter_identity);
-
-quicksort.by = quicksort_by;
-
-function quicksort_by(f) {
-  var insertionsort = insertionsort_by(f);
-
-  function sort(a, lo, hi) {
-    return (hi - lo < quicksort_sizeThreshold
-        ? insertionsort
-        : quicksort)(a, lo, hi);
-  }
-
-  function quicksort(a, lo, hi) {
-
-    // Compute the two pivots by looking at 5 elements.
-    var sixth = (hi - lo) / 6 | 0,
-        i1 = lo + sixth,
-        i5 = hi - 1 - sixth,
-        i3 = lo + hi - 1 >> 1,  // The midpoint.
-        i2 = i3 - sixth,
-        i4 = i3 + sixth;
-
-    var e1 = a[i1], x1 = f(e1),
-        e2 = a[i2], x2 = f(e2),
-        e3 = a[i3], x3 = f(e3),
-        e4 = a[i4], x4 = f(e4),
-        e5 = a[i5], x5 = f(e5);
-
-    // Sort the selected 5 elements using a sorting network.
-    if (x1 > x2) t = e1, e1 = e2, e2 = t, t = x1, x1 = x2, x2 = t;
-    if (x4 > x5) t = e4, e4 = e5, e5 = t, t = x4, x4 = x5, x5 = t;
-    if (x1 > x3) t = e1, e1 = e3, e3 = t, t = x1, x1 = x3, x3 = t;
-    if (x2 > x3) t = e2, e2 = e3, e3 = t, t = x2, x2 = x3, x3 = t;
-    if (x1 > x4) t = e1, e1 = e4, e4 = t, t = x1, x1 = x4, x4 = t;
-    if (x3 > x4) t = e3, e3 = e4, e4 = t, t = x3, x3 = x4, x4 = t;
-    if (x2 > x5) t = e2, e2 = e5, e5 = t, t = x2, x2 = x5, x5 = t;
-    if (x2 > x3) t = e2, e2 = e3, e3 = t, t = x2, x2 = x3, x3 = t;
-    if (x4 > x5) t = e4, e4 = e5, e5 = t, t = x4, x4 = x5, x5 = t;
-
-    var pivot1 = e2, pivotValue1 = x2,
-        pivot2 = e4, pivotValue2 = x4;
-
-    // e2 and e4 have been saved in the pivot variables. They will be written
-    // back, once the partitioning is finished.
-    a[i1] = e1;
-    a[i2] = a[lo];
-    a[i3] = e3;
-    a[i4] = a[hi - 1];
-    a[i5] = e5;
-
-    var less = lo + 1,   // First element in the middle partition.
-        great = hi - 2;  // Last element in the middle partition.
-
-    // Note that for value comparison, <, <=, >= and > coerce to a primitive via
-    // Object.prototype.valueOf; == and === do not, so in order to be consistent
-    // with natural order (such as for Date objects), we must do two compares.
-    var pivotsEqual = pivotValue1 <= pivotValue2 && pivotValue1 >= pivotValue2;
-    if (pivotsEqual) {
-
-      // Degenerated case where the partitioning becomes a dutch national flag
-      // problem.
-      //
-      // [ |  < pivot  | == pivot | unpartitioned | > pivot  | ]
-      //  ^             ^          ^             ^            ^
-      // left         less         k           great         right
-      //
-      // a[left] and a[right] are undefined and are filled after the
-      // partitioning.
-      //
-      // Invariants:
-      //   1) for x in ]left, less[ : x < pivot.
-      //   2) for x in [less, k[ : x == pivot.
-      //   3) for x in ]great, right[ : x > pivot.
-      for (var k = less; k <= great; ++k) {
-        var ek = a[k], xk = f(ek);
-        if (xk < pivotValue1) {
-          if (k !== less) {
-            a[k] = a[less];
-            a[less] = ek;
-          }
-          ++less;
-        } else if (xk > pivotValue1) {
-
-          // Find the first element <= pivot in the range [k - 1, great] and
-          // put [:ek:] there. We know that such an element must exist:
-          // When k == less, then el3 (which is equal to pivot) lies in the
-          // interval. Otherwise a[k - 1] == pivot and the search stops at k-1.
-          // Note that in the latter case invariant 2 will be violated for a
-          // short amount of time. The invariant will be restored when the
-          // pivots are put into their final positions.
-          while (true) {
-            var greatValue = f(a[great]);
-            if (greatValue > pivotValue1) {
-              great--;
-              // This is the only location in the while-loop where a new
-              // iteration is started.
-              continue;
-            } else if (greatValue < pivotValue1) {
-              // Triple exchange.
-              a[k] = a[less];
-              a[less++] = a[great];
-              a[great--] = ek;
-              break;
-            } else {
-              a[k] = a[great];
-              a[great--] = ek;
-              // Note: if great < k then we will exit the outer loop and fix
-              // invariant 2 (which we just violated).
-              break;
-            }
-          }
-        }
-      }
-    } else {
-
-      // We partition the list into three parts:
-      //  1. < pivot1
-      //  2. >= pivot1 && <= pivot2
-      //  3. > pivot2
-      //
-      // During the loop we have:
-      // [ | < pivot1 | >= pivot1 && <= pivot2 | unpartitioned  | > pivot2  | ]
-      //  ^            ^                        ^              ^             ^
-      // left         less                     k              great        right
-      //
-      // a[left] and a[right] are undefined and are filled after the
-      // partitioning.
-      //
-      // Invariants:
-      //   1. for x in ]left, less[ : x < pivot1
-      //   2. for x in [less, k[ : pivot1 <= x && x <= pivot2
-      //   3. for x in ]great, right[ : x > pivot2
-      for (var k = less; k <= great; k++) {
-        var ek = a[k], xk = f(ek);
-        if (xk < pivotValue1) {
-          if (k !== less) {
-            a[k] = a[less];
-            a[less] = ek;
-          }
-          ++less;
-        } else {
-          if (xk > pivotValue2) {
-            while (true) {
-              var greatValue = f(a[great]);
-              if (greatValue > pivotValue2) {
-                great--;
-                if (great < k) break;
-                // This is the only location inside the loop where a new
-                // iteration is started.
-                continue;
-              } else {
-                // a[great] <= pivot2.
-                if (greatValue < pivotValue1) {
-                  // Triple exchange.
-                  a[k] = a[less];
-                  a[less++] = a[great];
-                  a[great--] = ek;
-                } else {
-                  // a[great] >= pivot1.
-                  a[k] = a[great];
-                  a[great--] = ek;
-                }
-                break;
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // Move pivots into their final positions.
-    // We shrunk the list from both sides (a[left] and a[right] have
-    // meaningless values in them) and now we move elements from the first
-    // and third partition into these locations so that we can store the
-    // pivots.
-    a[lo] = a[less - 1];
-    a[less - 1] = pivot1;
-    a[hi - 1] = a[great + 1];
-    a[great + 1] = pivot2;
-
-    // The list is now partitioned into three partitions:
-    // [ < pivot1   | >= pivot1 && <= pivot2   |  > pivot2   ]
-    //  ^            ^                        ^             ^
-    // left         less                     great        right
-
-    // Recursive descent. (Don't include the pivot values.)
-    sort(a, lo, less - 1);
-    sort(a, great + 2, hi);
-
-    if (pivotsEqual) {
-      // All elements in the second partition are equal to the pivot. No
-      // need to sort them.
-      return a;
-    }
-
-    // In theory it should be enough to call _doSort recursively on the second
-    // partition.
-    // The Android source however removes the pivot elements from the recursive
-    // call if the second partition is too large (more than 2/3 of the list).
-    if (less < i1 && great > i5) {
-      var lessValue, greatValue;
-      while ((lessValue = f(a[less])) <= pivotValue1 && lessValue >= pivotValue1) ++less;
-      while ((greatValue = f(a[great])) <= pivotValue2 && greatValue >= pivotValue2) --great;
-
-      // Copy paste of the previous 3-way partitioning with adaptions.
-      //
-      // We partition the list into three parts:
-      //  1. == pivot1
-      //  2. > pivot1 && < pivot2
-      //  3. == pivot2
-      //
-      // During the loop we have:
-      // [ == pivot1 | > pivot1 && < pivot2 | unpartitioned  | == pivot2 ]
-      //              ^                      ^              ^
-      //            less                     k              great
-      //
-      // Invariants:
-      //   1. for x in [ *, less[ : x == pivot1
-      //   2. for x in [less, k[ : pivot1 < x && x < pivot2
-      //   3. for x in ]great, * ] : x == pivot2
-      for (var k = less; k <= great; k++) {
-        var ek = a[k], xk = f(ek);
-        if (xk <= pivotValue1 && xk >= pivotValue1) {
-          if (k !== less) {
-            a[k] = a[less];
-            a[less] = ek;
-          }
-          less++;
-        } else {
-          if (xk <= pivotValue2 && xk >= pivotValue2) {
-            while (true) {
-              var greatValue = f(a[great]);
-              if (greatValue <= pivotValue2 && greatValue >= pivotValue2) {
-                great--;
-                if (great < k) break;
-                // This is the only location inside the loop where a new
-                // iteration is started.
-                continue;
-              } else {
-                // a[great] < pivot2.
-                if (greatValue < pivotValue1) {
-                  // Triple exchange.
-                  a[k] = a[less];
-                  a[less++] = a[great];
-                  a[great--] = ek;
-                } else {
-                  // a[great] == pivot1.
-                  a[k] = a[great];
-                  a[great--] = ek;
-                }
-                break;
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // The second partition has now been cleared of pivot elements and looks
-    // as follows:
-    // [  *  |  > pivot1 && < pivot2  | * ]
-    //        ^                      ^
-    //       less                  great
-    // Sort the second partition using recursive descent.
-
-    // The second partition looks as follows:
-    // [  *  |  >= pivot1 && <= pivot2  | * ]
-    //        ^                        ^
-    //       less                    great
-    // Simply sort it by recursive descent.
-
-    return sort(a, less, great + 1);
-  }
-
-  return sort;
-}
-
-var quicksort_sizeThreshold = 32;
-var crossfilter_array8 = crossfilter_arrayUntyped,
-    crossfilter_array16 = crossfilter_arrayUntyped,
-    crossfilter_array32 = crossfilter_arrayUntyped,
-    crossfilter_arrayLengthen = crossfilter_identity,
-    crossfilter_arrayWiden = crossfilter_identity;
-
-if (typeof Uint8Array !== "undefined") {
-  crossfilter_array8 = function(n) { return new Uint8Array(n); };
-  crossfilter_array16 = function(n) { return new Uint16Array(n); };
-  crossfilter_array32 = function(n) { return new Uint32Array(n); };
-
-  crossfilter_arrayLengthen = function(array, length) {
-    var copy = new array.constructor(length);
-    copy.set(array);
-    return copy;
-  };
-
-  crossfilter_arrayWiden = function(array, width) {
-    var copy;
-    switch (width) {
-      case 16: copy = crossfilter_array16(array.length); break;
-      case 32: copy = crossfilter_array32(array.length); break;
-      default: throw new Error("invalid array width!");
-    }
-    copy.set(array);
-    return copy;
-  };
-}
-
-function crossfilter_arrayUntyped(n) {
-  return new Array(n);
-}
-function crossfilter_filterExact(bisect, value) {
-  return function(values) {
-    var n = values.length;
-    return [bisect.left(values, value, 0, n), bisect.right(values, value, 0, n)];
-  };
-}
-
-function crossfilter_filterRange(bisect, range) {
-  var min = range[0],
-      max = range[1];
-  return function(values) {
-    var n = values.length;
-    return [bisect.left(values, min, 0, n), bisect.left(values, max, 0, n)];
-  };
-}
-
-function crossfilter_filterAll(values) {
-  return [0, values.length];
-}
-function crossfilter_null() {
-  return null;
-}
-function crossfilter_zero() {
-  return 0;
-}
-function crossfilter_reduceIncrement(p) {
-  return p + 1;
-}
-
-function crossfilter_reduceDecrement(p) {
-  return p - 1;
-}
-
-function crossfilter_reduceAdd(f) {
-  return function(p, v) {
-    return p + +f(v);
-  };
-}
-
-function crossfilter_reduceSubtract(f) {
-  return function(p, v) {
-    return p - f(v);
-  };
-}
-exports.crossfilter = crossfilter;
-
-function crossfilter() {
-  var crossfilter = {
-    add: add,
-    dimension: dimension,
-    groupAll: groupAll,
-    size: size
-  };
-
-  var data = [], // the records
-      n = 0, // the number of records; data.length
-      m = 0, // number of dimensions in use
-      M = 8, // number of dimensions that can fit in `filters`
-      filters = crossfilter_array8(0), // M bits per record; 1 is filtered out
-      filterListeners = [], // when the filters change
-      dataListeners = []; // when data is added
-
-  // Adds the specified new records to this crossfilter.
-  function add(newData) {
-    var n0 = n,
-        n1 = newData.length;
-
-    // If there's actually new data to add…
-    // Merge the new data into the existing data.
-    // Lengthen the filter bitset to handle the new records.
-    // Notify listeners (dimensions and groups) that new data is available.
-    if (n1) {
-      data = data.concat(newData);
-      filters = crossfilter_arrayLengthen(filters, n += n1);
-      dataListeners.forEach(function(l) { l(newData, n0, n1); });
-    }
-
-    return crossfilter;
-  }
-
-  // Adds a new dimension with the specified value accessor function.
-  function dimension(value) {
-    var dimension = {
-      filter: filter,
-      filterExact: filterExact,
-      filterRange: filterRange,
-      filterAll: filterAll,
-      top: top,
-      group: group,
-      groupAll: groupAll
-    };
-
-    var one = 1 << m++, // bit mask, e.g., 00001000
-        zero = ~one, // inverted one, e.g., 11110111
-        values, // sorted, cached array
-        index, // value rank ↦ object id
-        newValues, // temporary array storing newly-added values
-        newIndex, // temporary array storing newly-added index
-        sort = quicksort_by(function(i) { return newValues[i]; }),
-        refilter = crossfilter_filterAll, // for recomputing filter
-        indexListeners = [], // when data is added
-        lo0 = 0,
-        hi0 = 0;
-
-    // Updating a dimension is a two-stage process. First, we must update the
-    // associated filters for the newly-added records. Once all dimensions have
-    // updated their filters, the groups are notified to update.
-    dataListeners.unshift(preAdd);
-    dataListeners.push(postAdd);
-
-    // Incorporate any existing data into this dimension, and make sure that the
-    // filter bitset is wide enough to handle the new dimension.
-    if (m > M) filters = crossfilter_arrayWiden(filters, M <<= 1);
-    preAdd(data, 0, n);
-    postAdd(data, 0, n);
-
-    // Incorporates the specified new records into this dimension.
-    // This function is responsible for updating filters, values, and index.
-    function preAdd(newData, n0, n1) {
-
-      // Permute new values into natural order using a sorted index.
-      newValues = newData.map(value);
-      newIndex = sort(crossfilter_range(n1), 0, n1);
-      newValues = permute(newValues, newIndex);
-
-      // Bisect newValues to determine which new records are selected.
-      var bounds = refilter(newValues), lo1 = bounds[0], hi1 = bounds[1], i;
-      for (i = 0; i < lo1; ++i) filters[newIndex[i] + n0] |= one;
-      for (i = hi1; i < n1; ++i) filters[newIndex[i] + n0] |= one;
-
-      // If this dimension previously had no data, then we don't need to do the
-      // more expensive merge operation; use the new values and index as-is.
-      if (!n0) {
-        values = newValues;
-        index = newIndex;
-        lo0 = lo1;
-        hi0 = hi1;
-        return;
-      }
-
-      var oldValues = values,
-          oldIndex = index,
-          i0 = 0,
-          i1 = 0;
-
-      // Otherwise, create new arrays into which to merge new and old.
-      values = new Array(n);
-      index = crossfilter_index(n, n);
-
-      // Merge the old and new sorted values, and old and new index.
-      for (i = 0; i0 < n0 && i1 < n1; ++i) {
-        if (oldValues[i0] < newValues[i1]) {
-          values[i] = oldValues[i0];
-          index[i] = oldIndex[i0++];
-        } else {
-          values[i] = newValues[i1];
-          index[i] = newIndex[i1++] + n0;
-        }
-      }
-
-      // Add any remaining old values.
-      for (; i0 < n0; ++i0, ++i) {
-        values[i] = oldValues[i0];
-        index[i] = oldIndex[i0];
-      }
-
-      // Add any remaining new values.
-      for (; i1 < n1; ++i1, ++i) {
-        values[i] = newValues[i1];
-        index[i] = newIndex[i1] + n0;
-      }
-
-      // Bisect again to recompute lo0 and hi0.
-      bounds = refilter(values), lo0 = bounds[0], hi0 = bounds[1];
-    }
-
-    // When all filters have updated, notify index listeners of the new values.
-    function postAdd(newData, n0, n1) {
-      indexListeners.forEach(function(l) { l(newValues, newIndex, n0, n1); });
-      newValues = newIndex = null;
-    }
-
-    // Updates the selected values based on the specified bounds [lo, hi].
-    // This implementation is used by all the public filter methods.
-    function filterIndex(bounds) {
-      var i,
-          j,
-          k,
-          lo1 = bounds[0],
-          hi1 = bounds[1],
-          added = [],
-          removed = [];
-
-      // Fast incremental update based on previous lo index.
-      if (lo1 < lo0) {
-        for (i = lo1, j = Math.min(lo0, hi1); i < j; ++i) {
-          filters[k = index[i]] ^= one;
-          added.push(k);
-        }
-      } else if (lo1 > lo0) {
-        for (i = lo0, j = Math.min(lo1, hi0); i < j; ++i) {
-          filters[k = index[i]] ^= one;
-          removed.push(k);
-        }
-      }
-
-      // Fast incremental update based on previous hi index.
-      if (hi1 > hi0) {
-        for (i = Math.max(lo1, hi0), j = hi1; i < j; ++i) {
-          filters[k = index[i]] ^= one;
-          added.push(k);
-        }
-      } else if (hi1 < hi0) {
-        for (i = Math.max(lo0, hi1), j = hi0; i < j; ++i) {
-          filters[k = index[i]] ^= one;
-          removed.push(k);
-        }
-      }
-
-      lo0 = lo1;
-      hi0 = hi1;
-      filterListeners.forEach(function(l) { l(one, added, removed); });
-      return dimension;
-    }
-
-    // Filters this dimension using the specified range, value, or null.
-    // If the range is null, this is equivalent to filterAll.
-    // If the range is an array, this is equivalent to filterRange.
-    // Otherwise, this is equivalent to filterExact.
-    function filter(range) {
-      return range == null
-          ? filterAll() : Array.isArray(range)
-          ? filterRange(range)
-          : filterExact(range);
-    }
-
-    // Filters this dimension to select the exact value.
-    function filterExact(value) {
-      return filterIndex((refilter = crossfilter_filterExact(bisect, value))(values));
-    }
-
-    // Filters this dimension to select the specified range [lo, hi].
-    // The lower bound is inclusive, and the upper bound is exclusive.
-    function filterRange(range) {
-      return filterIndex((refilter = crossfilter_filterRange(bisect, range))(values));
-    }
-
-    // Clears any filters on this dimension.
-    function filterAll() {
-      return filterIndex((refilter = crossfilter_filterAll)(values));
-    }
-
-    // Returns the top K selected records, based on this dimension's order.
-    // Note: observes this dimension's filter, unlike group and groupAll.
-    function top(k) {
-      var array = [],
-          i = hi0,
-          j;
-
-      while (--i >= lo0 && k > 0) {
-        if (!filters[j = index[i]]) {
-          array.push(data[j]);
-          --k;
-        }
-      }
-
-      return array;
-    }
-
-    // Adds a new group to this dimension, using the specified key function.
-    function group(key) {
-      var group = {
-        top: top,
-        all: all,
-        reduce: reduce,
-        reduceCount: reduceCount,
-        reduceSum: reduceSum,
-        order: order,
-        orderNatural: orderNatural,
-        size: size
-      };
-
-      var groups, // array of {key, value}
-          groupIndex, // object id ↦ group id
-          groupWidth = 8,
-          groupCapacity = crossfilter_capacity(groupWidth),
-          k = 0, // cardinality
-          select,
-          heap,
-          reduceAdd,
-          reduceRemove,
-          reduceInitial,
-          update = crossfilter_null,
-          reset = crossfilter_null,
-          resetNeeded = true;
-
-      if (arguments.length < 1) key = crossfilter_identity;
-
-      // The group listens to the crossfilter for when any dimension changes, so
-      // that it can update the associated reduce values. It must also listen to
-      // the parent dimension for when data is added, and compute new keys.
-      filterListeners.push(update);
-      indexListeners.push(add);
-
-      // Incorporate any existing data into the grouping.
-      add(values, index, 0, n);
-
-      // Incorporates the specified new values into this group.
-      // This function is responsible for updating groups and groupIndex.
-      function add(newValues, newIndex, n0, n1) {
-        var oldGroups = groups,
-            reIndex = crossfilter_index(k, groupCapacity),
-            add = reduceAdd,
-            initial = reduceInitial,
-            k0 = k, // old cardinality
-            i0 = 0, // index of old group
-            i1 = 0, // index of new record
-            j, // object id
-            g0, // old group
-            x0, // old key
-            x1, // new key
-            g, // group to add
-            x; // key of group to add
-
-        // If a reset is needed, we don't need to update the reduce values.
-        if (resetNeeded) add = initial = crossfilter_null;
-
-        // Reset the new groups (k is a lower bound).
-        // Also, make sure that groupIndex exists and is long enough.
-        groups = new Array(k), k = 0;
-        groupIndex = k0 > 1 ? crossfilter_arrayLengthen(groupIndex, n) : crossfilter_index(n, groupCapacity);
-
-        // Get the first old key (x0 of g0), if it exists.
-        if (k0) x0 = (g0 = oldGroups[0]).key;
-
-        // Find the first new key (x1), skipping NaN keys.
-        while (i1 < n1 && !((x1 = key(newValues[i1])) >= x1)) ++i1;
-
-        // While new keys remain…
-        while (i1 < n1) {
-
-          // Determine the lesser of the two current keys; new and old.
-          // If there are no old keys remaining, then always add the new key.
-          if (g0 && x0 <= x1) {
-            g = g0, x = x0;
-
-            // Record the new index of the old group.
-            reIndex[i0] = k;
-
-            // Retrieve the next old key.
-            if (g0 = oldGroups[++i0]) x0 = g0.key;
-          } else {
-            g = {key: x1, value: initial()}, x = x1;
-          }
-
-          // Add the lesser group.
-          groups[k] = g;
-
-          // Add any selected records belonging to the added group, while
-          // advancing the new key and populating the associated group index.
-          while (!(x1 > x)) {
-            groupIndex[j = newIndex[i1] + n0] = k;
-            if (!(filters[j] & zero)) g.value = add(g.value, data[j]);
-            if (++i1 >= n1) break;
-            x1 = key(newValues[i1]);
-          }
-
-          groupIncrement();
-        }
-
-        // Add any remaining old groups that were greater than all new keys.
-        // No incremental reduce is needed; these groups have no new records.
-        // Also record the new index of the old group.
-        while (i0 < k0) {
-          groups[reIndex[i0] = k] = oldGroups[i0++];
-          groupIncrement();
-        }
-
-        // If we added any new groups before any old groups,
-        // update the group index of all the old records.
-        if (k > i0) for (i0 = 0; i0 < n0; ++i0) {
-          groupIndex[i0] = reIndex[groupIndex[i0]];
-        }
-
-        // Modify the update and reset behavior based on the cardinality.
-        // If the cardinality is less than or equal to one, then the groupIndex
-        // is not needed. If the cardinality is zero, then there are no records
-        // and therefore no groups to update or reset. Note that we also must
-        // change the registered listener to point to the new method.
-        j = filterListeners.indexOf(update);
-        if (k > 1) {
-          update = updateMany;
-          reset = resetMany;
-        } else {
-          if (k === 1) {
-            update = updateOne;
-            reset = resetOne;
-          } else {
-            update = crossfilter_null;
-            reset = crossfilter_null;
-          }
-          groupIndex = null;
-        }
-        filterListeners[j] = update;
-
-        // Count the number of added groups,
-        // and widen the group index as needed.
-        function groupIncrement() {
-          if (++k === groupCapacity) {
-            reIndex = crossfilter_arrayWiden(reIndex, groupWidth <<= 1);
-            groupIndex = crossfilter_arrayWiden(groupIndex, groupWidth);
-            groupCapacity = crossfilter_capacity(groupWidth);
-          }
-        }
-      }
-
-      // Reduces the specified selected or deselected records.
-      // This function is only used when the cardinality is greater than 1.
-      function updateMany(filterOne, added, removed) {
-        if (filterOne === one || resetNeeded) return;
-
-        var i,
-            k,
-            n;
-
-        // Add the added values.
-        for (i = 0, n = added.length; i < n; ++i) {
-          if (!(filters[k = added[i]] & zero)) {
-            g = groups[groupIndex[k]];
-            g.value = reduceAdd(g.value, data[k]);
-          }
-        }
-
-        // Remove the removed values.
-        for (i = 0, n = removed.length; i < n; ++i) {
-          if ((filters[k = removed[i]] & zero) === filterOne) {
-            g = groups[groupIndex[k]];
-            g.value = reduceRemove(g.value, data[k]);
-          }
-        }
-      }
-
-      // Reduces the specified selected or deselected records.
-      // This function is only used when the cardinality is 1.
-      function updateOne(filterOne, added, removed) {
-        if (filterOne === one || resetNeeded) return;
-
-        var i,
-            k,
-            n,
-            g = groups[0];
-
-        // Add the added values.
-        for (i = 0, n = added.length; i < n; ++i) {
-          if (!(filters[k = added[i]] & zero)) {
-            g.value = reduceAdd(g.value, data[k]);
-          }
-        }
-
-        // Remove the removed values.
-        for (i = 0, n = removed.length; i < n; ++i) {
-          if ((filters[k = removed[i]] & zero) === filterOne) {
-            g.value = reduceRemove(g.value, data[k]);
-          }
-        }
-      }
-
-      // Recomputes the group reduce values from scratch.
-      // This function is only used when the cardinality is greater than 1.
-      function resetMany() {
-        var i,
-            g;
-
-        // Reset all group values.
-        for (i = 0; i < k; ++i) {
-          groups[i].value = reduceInitial();
-        }
-
-        // Add any selected records.
-        for (i = 0; i < n; ++i) {
-          if (!(filters[i] & zero)) {
-            g = groups[groupIndex[i]];
-            g.value = reduceAdd(g.value, data[i]);
-          }
-        }
-      }
-
-      // Recomputes the group reduce values from scratch.
-      // This function is only used when the cardinality is 1.
-      function resetOne() {
-        var i,
-            g = groups[0];
-
-        // Reset the singleton group values.
-        g.value = reduceInitial();
-
-        // Add any selected records.
-        for (i = 0; i < n; ++i) {
-          if (!(filters[i] & zero)) {
-            g.value = reduceAdd(g.value, data[i]);
-          }
-        }
-      }
-
-      // Returns the array of group values, in the dimension's natural order.
-      function all() {
-        if (resetNeeded) reset(), resetNeeded = false;
-        return groups;
-      }
-
-      // Returns a new array containing the top K group values, in reduce order.
-      function top(k) {
-        var top = select(all(), 0, groups.length, k);
-        return heap.sort(top, 0, top.length);
-      }
-
-      // Sets the reduce behavior for this group to use the specified functions.
-      // This method lazily recomputes the reduce values, waiting until needed.
-      function reduce(add, remove, initial) {
-        reduceAdd = add;
-        reduceRemove = remove;
-        reduceInitial = initial;
-        resetNeeded = true;
-        return group;
-      }
-
-      // A convenience method for reducing by count.
-      function reduceCount() {
-        return reduce(crossfilter_reduceIncrement, crossfilter_reduceDecrement, crossfilter_zero);
-      }
-
-      // A convenience method for reducing by sum(value).
-      function reduceSum(value) {
-        return reduce(crossfilter_reduceAdd(value), crossfilter_reduceSubtract(value), crossfilter_zero);
-      }
-
-      // Sets the reduce order, using the specified accessor.
-      function order(value) {
-        select = heapselect_by(valueOf);
-        heap = heap_by(valueOf);
-        function valueOf(d) { return value(d.value); }
-        return group;
-      }
-
-      // A convenience method for natural ordering by reduce value.
-      function orderNatural() {
-        return order(crossfilter_identity);
-      }
-
-      // Returns the cardinality of this group, irrespective of any filters.
-      function size() {
-        return k;
-      }
-
-      return reduceCount().orderNatural();
-    }
-
-    // A convenience function for generating a singleton group.
-    function groupAll() {
-      var g = group(crossfilter_null), all = g.all;
-      delete g.all;
-      delete g.top;
-      delete g.order;
-      delete g.orderNatural;
-      delete g.size;
-      g.value = function() { return all()[0].value; };
-      return g;
-    }
-
-    return dimension;
-  }
-
-  // A convenience method for groupAll on a dummy dimension.
-  // This implementation can be optimized since it is always cardinality 1.
-  function groupAll() {
-    var group = {
-      reduce: reduce,
-      reduceCount: reduceCount,
-      reduceSum: reduceSum,
-      value: value
-    };
-
-    var reduceValue,
-        reduceAdd,
-        reduceRemove,
-        reduceInitial,
-        resetNeeded = true;
-
-    // The group listens to the crossfilter for when any dimension changes, so
-    // that it can update the reduce value. It must also listen to the parent
-    // dimension for when data is added.
-    filterListeners.push(update);
-    dataListeners.push(add);
-
-    // For consistency; actually a no-op since resetNeeded is true.
-    add(data, 0, n);
-
-    // Incorporates the specified new values into this group.
-    function add(newData, n0, n1) {
-      var i;
-
-      if (resetNeeded) return;
-
-      // Add the added values.
-      for (i = n0; i < n; ++i) {
-        if (!filters[i]) {
-          reduceValue = reduceAdd(reduceValue, data[i]);
-        }
-      }
-    }
-
-    // Reduces the specified selected or deselected records.
-    function update(filterOne, added, removed) {
-      var i,
-          k,
-          n;
-
-      if (resetNeeded) return;
-
-      // Add the added values.
-      for (i = 0, n = added.length; i < n; ++i) {
-        if (!filters[k = added[i]]) {
-          reduceValue = reduceAdd(reduceValue, data[k]);
-        }
-      }
-
-      // Remove the removed values.
-      for (i = 0, n = removed.length; i < n; ++i) {
-        if (filters[k = removed[i]] === filterOne) {
-          reduceValue = reduceRemove(reduceValue, data[k]);
-        }
-      }
-    }
-
-    // Recomputes the group reduce value from scratch.
-    function reset() {
-      var i;
-
-      reduceValue = reduceInitial();
-
-      for (i = 0; i < n; ++i) {
-        if (!filters[i]) {
-          reduceValue = reduceAdd(reduceValue, data[i]);
-        }
-      }
-    }
-
-    // Sets the reduce behavior for this group to use the specified functions.
-    // This method lazily recomputes the reduce value, waiting until needed.
-    function reduce(add, remove, initial) {
-      reduceAdd = add;
-      reduceRemove = remove;
-      reduceInitial = initial;
-      resetNeeded = true;
-      return group;
-    }
-
-    // A convenience method for reducing by count.
-    function reduceCount() {
-      return reduce(crossfilter_reduceIncrement, crossfilter_reduceDecrement, crossfilter_zero);
-    }
-
-    // A convenience method for reducing by sum(value).
-    function reduceSum(value) {
-      return reduce(crossfilter_reduceAdd(value), crossfilter_reduceSubtract(value), crossfilter_zero);
-    }
-
-    // Returns the computed reduce value.
-    function value() {
-      if (resetNeeded) reset(), resetNeeded = false;
-      return reduceValue;
-    }
-
-    return reduceCount();
-  }
-
-  // Returns the number of records in this crossfilter, irrespective of any filters.
-  function size() {
-    return n;
-  }
-
-  return arguments.length
-      ? add(arguments[0])
-      : crossfilter;
-}
-
-// Returns an array of size n, big enough to store ids up to m.
-function crossfilter_index(n, m) {
-  return (m < 0x101
-      ? crossfilter_array8 : m < 0x10001
-      ? crossfilter_array16
-      : crossfilter_array32)(n);
-}
-
-// Constructs a new array of size n, with sequential values from 0 to n - 1.
-function crossfilter_range(n) {
-  var range = crossfilter_index(n, n);
-  for (var i = -1; ++i < n;) range[i] = i;
-  return range;
-}
-
-function crossfilter_capacity(w) {
-  return w === 8
-      ? 0x100 : w === 16
-      ? 0x10000
-      : 0x100000000;
-}
-})(this);
-(function(a){function b(a){return a}function c(a,b){for(var c=0,d=b.length,e=new Array(d);c<d;++c)e[c]=a[b[c]];return e}function e(a){function b(b,c,d,e){while(d<e){var f=d+e>>1;a(b[f])<c?d=f+1:e=f}return d}function c(b,c,d,e){while(d<e){var f=d+e>>1;c<a(b[f])?e=f:d=f+1}return d}return c.right=c,c.left=b,c}function h(a){function b(a,b,c){var e=c-b,f=(e>>>1)+1;while(--f>0)d(a,f,e,b);return a}function c(a,b,c){var e=c-b,f;while(--e>0)f=a[b],a[b]=a[b+e],a[b+e]=f,d(a,1,e,b);return a}function d(b,c,d,e){var f=b[--e+c],g=a(f),h;while((h=c<<1)<=d){h<d&&a(b[e+h])>a(b[e+h+1])&&h++;if(g<=a(b[e+h]))break;b[e+c]=b[e+h],c=h}b[e+c]=f}return b.sort=c,b}function j(a){function c(c,d,e,f){var g=new Array(f=Math.min(e-d,f)),h,i,j,k;for(i=0;i<f;++i)g[i]=c[d++];b(g,0,f);if(d<e){h=a(g[0]);do if(j=a(k=c[d])>h)g[0]=k,h=a(b(g,0,f)[0]);while(++d<e)}return g}var b=h(a);return c}function l(a){function b(b,c,d){for(var e=c+1;e<d;++e){for(var f=e,g=b[e],h=a(g);f>c&&a(b[f-1])>h;--f)b[f]=b[f-1];b[f]=g}return b}return b}function n(a){function c(a,c,e){return(e-c<o?b:d)(a,c,e)}function d(b,d,e){var f=(e-d)/6|0,g=d+f,h=e-1-f,i=d+e-1>>1,j=i-f,k=i+f,l=b[g],m=a(l),n=b[j],o=a(n),p=b[i],q=a(p),r=b[k],s=a(r),u=b[h],v=a(u);m>o&&(t=l,l=n,n=t,t=m,m=o,o=t),s>v&&(t=r,r=u,u=t,t=s,s=v,v=t),m>q&&(t=l,l=p,p=t,t=m,m=q,q=t),o>q&&(t=n,n=p,p=t,t=o,o=q,q=t),m>s&&(t=l,l=r,r=t,t=m,m=s,s=t),q>s&&(t=p,p=r,r=t,t=q,q=s,s=t),o>v&&(t=n,n=u,u=t,t=o,o=v,v=t),o>q&&(t=n,n=p,p=t,t=o,o=q,q=t),s>v&&(t=r,r=u,u=t,t=s,s=v,v=t);var w=n,x=o,y=r,z=s;b[g]=l,b[j]=b[d],b[i]=p,b[k]=b[e-1],b[h]=u;var A=d+1,B=e-2,C=x<=z&&x>=z;if(C)for(var D=A;D<=B;++D){var E=b[D],F=a(E);if(F<x)D!==A&&(b[D]=b[A],b[A]=E),++A;else if(F>x)for(;;){var G=a(b[B]);if(G>x){B--;continue}if(G<x){b[D]=b[A],b[A++]=b[B],b[B--]=E;break}b[D]=b[B],b[B--]=E;break}}else for(var D=A;D<=B;D++){var E=b[D],F=a(E);if(F<x)D!==A&&(b[D]=b[A],b[A]=E),++A;else if(F>z)for(;;){var G=a(b[B]);if(G>z){B--;if(B<D)break;continue}G<x?(b[D]=b[A],b[A++]=b[B],b[B--]=E):(b[D]=b[B],b[B--]=E);break}}b[d]=b[A-1],b[A-1]=w,b[e-1]=b[B+1],b[B+1]=y,c(b,d,A-1),c(b,B+2,e);if(C)return b;if(A<g&&B>h){var H,G;while((H=a(b[A]))<=x&&H>=x)++A;while((G=a(b[B]))<=z&&G>=z)--B;for(var D=A;D<=B;D++){var E=b[D],F=a(E);if(F<=x&&F>=x)D!==A&&(b[D]=b[A],b[A]=E),A++;else if(F<=z&&F>=z)for(;;){var G=a(b[B]);if(G<=z&&G>=z){B--;if(B<D)break;continue}G<x?(b[D]=b[A],b[A++]=b[B],b[B--]=E):(b[D]=b[B],b[B--]=E);break}}}return c(b,A,B+1)}var b=l(a);return c}function v(a){return new Array(a)}function w(a,b){return function(c){var d=c.length;return[a.left(c,b,0,d),a.right(c,b,0,d)]}}function x(a,b){var c=b[0],d=b[1];return function(b){var e=b.length;return[a.left(b,c,0,e),a.left(b,d,0,e)]}}function y(a){return[0,a.length]}function z(){return null}function A(){return 0}function B(a){return a+1}function C(a){return a-1}function D(a){return function(b,c){return b+ +a(c)}}function E(a){return function(b,c){return b-a(c)}}function F(){function q(b){var c=f,d=b.length;return d&&(e=e.concat(b),l=s(l,f+=d),o.forEach(function(a){a(b,c,d)})),a}function r(a){function Q(b,d,e){F=b.map(a),J=K(H(e),0,e),F=c(F,J);var g=L(F),h=g[0],i=g[1],j;for(j=0;j<h;++j)l[J[j]+d]|=q;for(j=i;j<e;++j)l[J[j]+d]|=q;if(!d){t=F,v=J,O=h,P=i;return}var k=t,m=v,n=0,o=0;t=new Array(f),v=G(f,f);for(j=0;n<d&&o<e;++j)k[n]<F[o]?(t[j]=k[n],v[j]=m[n++]):(t[j]=F[o],v[j]=J[o++]+d);for(;n<d;++n,++j)t[j]=k[n],v[j]=m[n];for(;o<e;++o,++j)t[j]=F[o],v[j]=J[o]+d;g=L(t),O=g[0],P=g[1]}function R(a,b,c){N.forEach(function(a){a(F,J,b,c)}),F=J=null}function S(a){var b,c,d,e=a[0],f=a[1],g=[],h=[];if(e<O)for(b=e,c=Math.min(O,f);b<c;++b)l[d=v[b]]^=q,g.push(d);else if(e>O)for(b=O,c=Math.min(e,P);b<c;++b)l[d=v[b]]^=q,h.push(d);if(f>P)for(b=Math.max(e,P),c=f;b<c;++b)l[d=v[b]]^=q,g.push(d);else if(f<P)for(b=Math.max(O,f),c=P;b<c;++b)l[d=v[b]]^=q,h.push(d);return O=e,P=f,m.forEach(function(a){a(q,g,h)}),p}function T(a){return a==null?W():Array.isArray(a)?V(a):U(a)}function U(a){return S((L=w(d,a))(t))}function V(a){return S((L=x(d,a))(t))}function W(){return S((L=y)(t))}function X(a){var b=[],c=P,d;while(--c>=O&&a>0)l[d=v[c]]||(b.push(e[d]),--a);return b}function Y(a){function L(b,c,g,h){function N(){++o===n&&(p=u(p,k<<=1),i=u(i,k),n=I(k))}var j=d,p=G(o,n),q=x,t=F,v=o,w=0,y=0,A,B,C,D,E,L;K&&(q=t=z),d=new Array(o),o=0,i=v>1?s(i,f):G(f,n),v&&(C=(B=j[0]).key);while(y<h&&!((D=a(b[y]))>=D))++y;while(y<h){if(B&&C<=D){E=B,L=C,p[w]=o;if(B=j[++w])C=B.key}else E={key:D,value:t()},L=D;d[o]=E;while(!(D>L)){i[A=c[y]+g]=o,l[A]&r||(E.value=q(E.value,e[A]));if(++y>=h)break;D=a(b[y])}N()}while(w<v)d[p[w]=o]=j[w++],N();if(o>w)for(w=0;w<g;++w)i[w]=p[i[w]];A=m.indexOf(H),o>1?(H=M,J=P):(o===1?(H=O,J=Q):(H=z,J=z),i=null),m[A]=H}function M(a,b,c){if(a===q||K)return;var f,h,j;for(f=0,j=b.length;f<j;++f)l[h=b[f]]&r||(g=d[i[h]],g.value=x(g.value,e[h]));for(f=0,j=c.length;f<j;++f)(l[h=c[f]]&r)===a&&(g=d[i[h]],g.value=y(g.value,e[h]))}function O(a,b,c){if(a===q||K)return;var f,g,h,i=d[0];for(f=0,h=b.length;f<h;++f)l[g=b[f]]&r||(i.value=x(i.value,e[g]));for(f=0,h=c.length;f<h;++f)(l[g=c[f]]&r)===a&&(i.value=y(i.value,e[g]))}function P(){var a,b;for(a=0;a<o;++a)d[a].value=F();for(a=0;a<f;++a)l[a]&r||(b=d[i[a]],b.value=x(b.value,e[a]))}function Q(){var a,b=d[0];b.value=F();for(a=0;a<f;++a)l[a]&r||(b.value=x(b.value,e[a]))}function R(){return K&&(J(),K=!1),d}function S(a){var b=p(R(),0,d.length,a);return w.sort(b,0,b.length)}function T(a,b,d){return x=a,y=b,F=d,K=!0,c}function U(){return T(B,C,A)}function V(a){return T(D(a),E(a),A)}function W(a){function b(b){return a(b.value)}return p=j(b),w=h(b),c}function X(){return W(b)}function Y(){return o}var c={top:S,all:R,reduce:T,reduceCount:U,reduceSum:V,order:W,orderNatural:X,size:Y},d,i,k=8,n=I(k),o=0,p,w,x,y,F,H=z,J=z,K=!0;return arguments.length<1&&(a=b),m.push(H),N.push(L),L(t,v,0,f),U().orderNatural()}function Z(){var a=Y(z),b=a.all;return delete a.all,delete a.top,delete a.order,delete a.orderNatural,delete a.size,a.value=function(){return b()[0].value},a}var p={filter:T,filterExact:U,filterRange:V,filterAll:W,top:X,group:Y,groupAll:Z},q=1<<i++,r=~q,t,v,F,J,K=n(function(a){return F[a]}),L=y,N=[],O=0,P=0;return o.unshift(Q),o.push(R),i>k&&(l=u(l,k<<=1)),Q(e,0,f),R(e,0,f),p}function t(){function i(a,d,g){var i;if(h)return;for(i=d;i<f;++i)l[i]||(b=c(b,e[i]))}function j(a,f,g){var i,j,k;if(h)return;for(i=0,k=f.length;i<k;++i)l[j=f[i]]||(b=c(b,e[j]));for(i=0,k=g.length;i<k;++i)l[j=g[i]]===a&&(b=d(b,e[j]))}function k(){var a;b=g();for(a=0;a<f;++a)l[a]||(b=c(b,e[a]))}function n(b,e,f){return c=b,d=e,g=f,h=!0,a}function p(){return n(B,C,A)}function q(a){return n(D(a),E(a),A)}function r(){return h&&(k(),h=!1),b}var a={reduce:n,reduceCount:p,reduceSum:q,value:r},b,c,d,g,h=!0;return m.push(j),o.push(i),i(e,0,f),p()}function v(){return f}var a={add:q,dimension:r,groupAll:t,size:v},e=[],f=0,i=0,k=8,l=p(0),m=[],o=[];return arguments.length?q(arguments[0]):a}function G(a,b){return(b<257?p:b<65537?q:r)(a)}function H(a){var b=G(a,a);for(var c=-1;++c<a;)b[c]=c;return b}function I(a){return a===8?256:a===16?65536:4294967296}F.version="1.0.2",F.permute=c;var d=F.bisect=e(b);d.by=e;var f=F.heap=h(b);f.by=h;var i=F.heapselect=j(b);i.by=j;var k=F.insertionsort=l(b);k.by=l;var m=F.quicksort=n(b);m.by=n;var o=32,p=v,q=v,r=v,s=b,u=b;typeof Uint8Array!="undefined"&&(p=function(a){return new Uint8Array(a)},q=function(a){return new Uint16Array(a)},r=function(a){return new Uint32Array(a)},s=function(a,b){var c=new a.constructor(b);return c.set(a),c},u=function(a,b){var c;switch(b){case 16:c=q(a.length);break;case 32:c=r(a.length);break;default:throw new Error("invalid array width!")}return c.set(a),c}),a.crossfilter=F})(this);// ==ClosureCompiler==
+// ==ClosureCompiler==
 // @compilation_level SIMPLE_OPTIMIZATIONS
 
 /**
@@ -30113,6 +28936,21 @@ win.HighchartsAdapter = {
 };
 
 }());
+/*
+ Highstock JS v1.1.5 (2012-03-15)
+ Prototype adapter
+
+ @author Michael Nelson, Torstein H?nsi.
+
+ Feel free to use and modify this script.
+ Highcharts license: www.highcharts.com/license.
+*/
+var HighchartsAdapter=function(){var g=typeof Effect!=="undefined";return{init:function(c){if(g)Effect.HighchartsTransition=Class.create(Effect.Base,{initialize:function(a,b,d,e){var f;this.element=a;this.key=b;f=a.attr?a.attr(b):$(a).getStyle(b);if(b==="d")this.paths=c.init(a,a.d,d),this.toD=d,f=0,d=1;this.start(Object.extend(e||{},{from:f,to:d,attribute:b}))},setup:function(){HighchartsAdapter._extend(this.element);if(!this.element._highchart_animation)this.element._highchart_animation={};this.element._highchart_animation[this.key]=
+this},update:function(a){var b=this.paths,d=this.element;b&&(a=c.step(b[0],b[1],a,this.toD));d.attr?d.attr(this.options.attribute,a):(b={},b[this.options.attribute]=a,$(d).setStyle(b))},finish:function(){delete this.element._highchart_animation[this.key]}})},getScript:function(c,a){var b=$$("head")[0];b&&b.appendChild((new Element("script",{type:"text/javascript",src:c})).observe("load",a))},addNS:function(c){var a=/^(?:click|mouse(?:down|up|over|move|out))$/;return/^(?:load|unload|abort|error|select|change|submit|reset|focus|blur|resize|scroll)$/.test(c)||
+a.test(c)?c:"h:"+c},addEvent:function(c,a,b){c.addEventListener||c.attachEvent?Event.observe($(c),HighchartsAdapter.addNS(a),b):(HighchartsAdapter._extend(c),c._highcharts_observe(a,b))},animate:function(c,a,b){var d,b=b||{};b.delay=0;b.duration=(b.duration||500)/1E3;b.afterFinish=b.complete;if(g)for(d in a)new Effect.HighchartsTransition($(c),d,a[d],b);else{if(c.attr)for(d in a)c.attr(d,a[d]);b.complete&&b.complete()}c.attr||$(c).setStyle(a)},stop:function(c){var a;if(c._highcharts_extended&&c._highchart_animation)for(a in c._highchart_animation)c._highchart_animation[a].cancel()},
+each:function(c,a){$A(c).each(a)},offset:function(c){return $(c).cumulativeOffset()},fireEvent:function(c,a,b,d){c.fire?c.fire(HighchartsAdapter.addNS(a),b):c._highcharts_extended&&(b=b||{},c._highcharts_fire(a,b));b&&b.defaultPrevented&&(d=null);d&&d(b)},removeEvent:function(c,a,b){$(c).stopObserving&&(a&&(a=HighchartsAdapter.addNS(a)),$(c).stopObserving(a,b));window===c?Event.stopObserving(c,a,b):(HighchartsAdapter._extend(c),c._highcharts_stop_observing(a,b))},grep:function(c,a){return c.findAll(a)},
+map:function(c,a){return c.map(a)},merge:function(){function c(a,b){var d,e;for(e in b)d=b[e],a[e]=d&&typeof d==="object"&&d.constructor!==Array&&typeof d.nodeType!=="number"?c(a[e]||{},d):b[e];return a}return function(){var a=arguments,b,d={};for(b=0;b<a.length;b++)d=c(d,a[b]);return d}.apply(this,arguments)},_extend:function(c){c._highcharts_extended||Object.extend(c,{_highchart_events:{},_highchart_animation:null,_highcharts_extended:!0,_highcharts_observe:function(a,b){this._highchart_events[a]=
+[this._highchart_events[a],b].compact().flatten()},_highcharts_stop_observing:function(a,b){a?b?this._highchart_events[a]=[this._highchart_events[a]].compact().flatten().without(b):delete this._highchart_events[a]:this._highchart_events={}},_highcharts_fire:function(a,b){(this._highchart_events[a]||[]).each(function(a){if(!b.stopped)b.preventDefault=function(){b.defaultPrevented=!0},a.bind(this)(b)===!1&&b.preventDefault()}.bind(this))}})}}}();
 /**
  * Skies theme for Highcharts JS
  * @author Torstein Hønsi
@@ -30202,370 +29040,6 @@ Highcharts.theme = {
 
 // Apply the theme
 var highchartsOptions = Highcharts.setOptions(Highcharts.theme);
-/**
- * @license Highstock JS v1.1.5 (2012-03-15)
- * Prototype adapter
- *
- * @author Michael Nelson, Torstein Hønsi.
- *
- * Feel free to use and modify this script.
- * Highcharts license: www.highcharts.com/license.
- */
-
-// JSLint options:
-/*global Effect, Class, Event, Element, $, $$, $A */
-
-// Adapter interface between prototype and the Highcharts charting library
-var HighchartsAdapter = (function () {
-
-var hasEffect = typeof Effect !== 'undefined';
-
-return {
-
-	/**
-	 * Initialize the adapter. This is run once as Highcharts is first run.
-	 * @param {Object} pathAnim The helper object to do animations across adapters.
-	 */
-	init: function (pathAnim) {
-		if (hasEffect) {
-			/**
-			 * Animation for Highcharts SVG element wrappers only
-			 * @param {Object} element
-			 * @param {Object} attribute
-			 * @param {Object} to
-			 * @param {Object} options
-			 */
-			Effect.HighchartsTransition = Class.create(Effect.Base, {
-				initialize: function (element, attr, to, options) {
-					var from,
-						opts;
-
-					this.element = element;
-					this.key = attr;
-					from = element.attr ? element.attr(attr) : $(element).getStyle(attr);
-
-					// special treatment for paths
-					if (attr === 'd') {
-						this.paths = pathAnim.init(
-							element,
-							element.d,
-							to
-						);
-						this.toD = to;
-
-
-						// fake values in order to read relative position as a float in update
-						from = 0;
-						to = 1;
-					}
-
-					opts = Object.extend((options || {}), {
-						from: from,
-						to: to,
-						attribute: attr
-					});
-					this.start(opts);
-				},
-				setup: function () {
-					HighchartsAdapter._extend(this.element);
-					// If this is the first animation on this object, create the _highcharts_animation helper that
-					// contain pointers to the animation objects.
-					if (!this.element._highchart_animation) {
-						this.element._highchart_animation = {};
-					}
-
-					// Store a reference to this animation instance.
-					this.element._highchart_animation[this.key] = this;
-				},
-				update: function (position) {
-					var paths = this.paths,
-						element = this.element,
-						obj;
-
-					if (paths) {
-						position = pathAnim.step(paths[0], paths[1], position, this.toD);
-					}
-
-					if (element.attr) { // SVGElement
-						element.attr(this.options.attribute, position);
-					
-					} else { // HTML, #409
-						obj = {};
-						obj[this.options.attribute] = position;
-						$(element).setStyle(obj);
-					}
-					
-				},
-				finish: function () {
-					// Delete the property that holds this animation now that it is finished.
-					// Both canceled animations and complete ones gets a 'finish' call.
-					delete this.element._highchart_animation[this.key];
-				}
-			});
-		}
-	},
-
-	/**
-	 * Downloads a script and executes a callback when done.
-	 * @param {String} scriptLocation
-	 * @param {Function} callback
-	 */
-	getScript: function (scriptLocation, callback) {
-		var head = $$('head')[0]; // Returns an array, so pick the first element.
-		if (head) {
-			// Append a new 'script' element, set its type and src attributes, add a 'load' handler that calls the callback
-			head.appendChild(new Element('script', { type: 'text/javascript', src: scriptLocation}).observe('load', callback));
-		}
-	},
-
-	/**
-	 * Custom events in prototype needs to be namespaced. This method adds a namespace 'h:' in front of
-	 * events that are not recognized as native.
-	 */
-	addNS: function (eventName) {
-		var HTMLEvents = /^(?:load|unload|abort|error|select|change|submit|reset|focus|blur|resize|scroll)$/,
-			MouseEvents = /^(?:click|mouse(?:down|up|over|move|out))$/;
-		return (HTMLEvents.test(eventName) || MouseEvents.test(eventName)) ?
-			eventName :
-			'h:' + eventName;
-	},
-
-	// el needs an event to be attached. el is not necessarily a dom element
-	addEvent: function (el, event, fn) {
-		if (el.addEventListener || el.attachEvent) {
-			Event.observe($(el), HighchartsAdapter.addNS(event), fn);
-
-		} else {
-			HighchartsAdapter._extend(el);
-			el._highcharts_observe(event, fn);
-		}
-	},
-
-	// motion makes things pretty. use it if effects is loaded, if not... still get to the end result.
-	animate: function (el, params, options) {
-		var key,
-			fx;
-
-		// default options
-		options = options || {};
-		options.delay = 0;
-		options.duration = (options.duration || 500) / 1000;
-		options.afterFinish = options.complete;
-
-		// animate wrappers and DOM elements
-		if (hasEffect) {
-			for (key in params) {
-				// The fx variable is seemingly thrown away here, but the Effect.setup will add itself to the _highcharts_animation object
-				// on the element itself so its not really lost.
-				fx = new Effect.HighchartsTransition($(el), key, params[key], options);
-			}
-		} else {
-			if (el.attr) { // #409 without effects
-				for (key in params) {
-					el.attr(key, params[key]);
-				}
-			}
-			if (options.complete) {
-				options.complete();
-			}
-		}
-
-		if (!el.attr) { // HTML element, #409
-			$(el).setStyle(params);
-		}
-	},
-
-	// this only occurs in higcharts 2.0+
-	stop: function (el) {
-		var key;
-		if (el._highcharts_extended && el._highchart_animation) {
-			for (key in el._highchart_animation) {
-				// Cancel the animation
-				// The 'finish' function in the Effect object will remove the reference
-				el._highchart_animation[key].cancel();
-			}
-		}
-	},
-
-	// um.. each
-	each: function (arr, fn) {
-		$A(arr).each(fn);
-	},
-
-	/**
-	 * Get the cumulative offset relative to the top left of the page. This method, unlike its
-	 * jQuery and MooTools counterpart, still suffers from issue #208 regarding the position
-	 * of a chart within a fixed container.
-	 */
-	offset: function (el) {
-		return $(el).cumulativeOffset();
-	},
-
-	// fire an event based on an event name (event) and an object (el).
-	// again, el may not be a dom element
-	fireEvent: function (el, event, eventArguments, defaultFunction) {
-		if (el.fire) {
-			el.fire(HighchartsAdapter.addNS(event), eventArguments);
-		} else if (el._highcharts_extended) {
-			eventArguments = eventArguments || {};
-			el._highcharts_fire(event, eventArguments);
-		}
-
-		if (eventArguments && eventArguments.defaultPrevented) {
-			defaultFunction = null;
-		}
-
-		if (defaultFunction) {
-			defaultFunction(eventArguments);
-		}
-	},
-
-	removeEvent: function (el, event, handler) {
-		if ($(el).stopObserving) {
-			if (event) {
-				event = HighchartsAdapter.addNS(event);
-			}
-			$(el).stopObserving(event, handler);
-		} if (window === el) {
-			Event.stopObserving(el, event, handler);
-		} else {
-			HighchartsAdapter._extend(el);
-			el._highcharts_stop_observing(event, handler);
-		}
-	},
-
-	// um, grep
-	grep: function (arr, fn) {
-		return arr.findAll(fn);
-	},
-
-	// um, map
-	map: function (arr, fn) {
-		return arr.map(fn);
-	},
-
-	// deep merge. merge({a : 'a', b : {b1 : 'b1', b2 : 'b2'}}, {b : {b2 : 'b2_prime'}, c : 'c'}) => {a : 'a', b : {b1 : 'b1', b2 : 'b2_prime'}, c : 'c'}
-	/*merge: function(){
-		function doCopy(copy, original) {
-			var value,
-				key,
-				undef,
-				nil,
-				same,
-				obj,
-				arr,
-				node;
-
-			for (key in original) {
-				value = original[key];
-				undef = typeof(value) === 'undefined';
-				nil = value === null;
-				same = original === copy[key];
-
-				if (undef || nil || same) {
-					continue;
-				}
-
-				obj = typeof(value) === 'object';
-				arr = value && obj && value.constructor == Array;
-				node = !!value.nodeType;
-
-				if (obj && !arr && !node) {
-					copy[key] = doCopy(typeof copy[key] == 'object' ? copy[key] : {}, value);
-				}
-				else {
-					copy[key] = original[key];
-				}
-			}
-			return copy;
-		}
-
-		var args = arguments, retVal = {};
-
-		for (var i = 0; i < args.length; i++) {
-			retVal = doCopy(retVal, args[i]);
-		}
-
-		return retVal;
-	},*/
-	merge: function () { // the built-in prototype merge function doesn't do deep copy
-		function doCopy(copy, original) {
-			var value, key;
-
-			for (key in original) {
-				value = original[key];
-				if (value && typeof value === 'object' && value.constructor !== Array &&
-						typeof value.nodeType !== 'number') {
-					copy[key] = doCopy(copy[key] || {}, value); // copy
-
-				} else {
-					copy[key] = original[key];
-				}
-			}
-			return copy;
-		}
-
-		function merge() {
-			var args = arguments,
-				i,
-				retVal = {};
-
-			for (i = 0; i < args.length; i++) {
-				retVal = doCopy(retVal, args[i]);
-
-			}
-			return retVal;
-		}
-
-		return merge.apply(this, arguments);
-	},
-
-	// extend an object to handle highchart events (highchart objects, not svg elements).
-	// this is a very simple way of handling events but whatever, it works (i think)
-	_extend: function (object) {
-		if (!object._highcharts_extended) {
-			Object.extend(object, {
-				_highchart_events: {},
-				_highchart_animation: null,
-				_highcharts_extended: true,
-				_highcharts_observe: function (name, fn) {
-					this._highchart_events[name] = [this._highchart_events[name], fn].compact().flatten();
-				},
-				_highcharts_stop_observing: function (name, fn) {
-					if (name) {
-						if (fn) {
-							this._highchart_events[name] = [this._highchart_events[name]].compact().flatten().without(fn);
-						} else {
-							delete this._highchart_events[name];
-						}
-					} else {
-						this._highchart_events = {};
-					}
-				},
-				_highcharts_fire: function (name, args) {
-					(this._highchart_events[name] || []).each(function (fn) {
-						// args is never null here
-						if (args.stopped) {
-							return; // "throw $break" wasn't working. i think because of the scope of 'this'.
-						}
-
-						// Attach a simple preventDefault function to skip default handler if called
-						args.preventDefault = function () {
-							args.defaultPrevented = true;
-						};
-
-						// If the event handler return false, prevent the default handler from executing
-						if (fn.bind(this)(args) === false) {
-							args.preventDefault();
-						}
-					}
-.bind(this));
-				}
-			});
-		}
-	}
-};
-}());
 /*
  A class to parse color values
  @author Stoyan Stefanov <sstoo@gmail.com>
@@ -30699,6 +29173,29 @@ if(CanvasRenderingContext2D)CanvasRenderingContext2D.prototype.drawSvg=function(
 top:d},a);this.ttLine=g("div",null,m,e);this.ttDiv=g("div",null,m,e);this.ttTimer=void 0;this.hiddenSvg=a=g("div",{width:h,height:k},{visibility:"hidden",left:f,top:d},e);a.appendChild(this.box)},configure:function(b){var c=this,d=b.options.tooltip,g=d.borderWidth,h=c.ttDiv,m=d.style,s=c.ttLine,t=parseInt(m.padding,10),m=k(m,{padding:t+"px","background-color":d.backgroundColor,"border-style":"solid","border-width":g+"px","border-radius":d.borderRadius+"px"});d.shadow&&(m=k(m,{"box-shadow":"1px 1px 3px gray",
 "-webkit-box-shadow":"1px 1px 3px gray"}));a(h,m);a(s,{"border-left":"1px solid darkgray"});e(b,"tooltipRefresh",function(d){var e=b.container,g=e.offsetLeft,k=e.offsetTop;h.innerHTML=d.text;e=f(h.offsetWidth,h.offsetHeight,g,k,e.offsetWidth,e.offsetHeight,{x:d.x,y:d.y},12);a(h,{visibility:"visible",left:e.x+"px",top:e.y+"px","border-color":d.borderColor});a(s,{visibility:"visible",left:g+d.x+"px",top:k+b.plotTop+"px",height:b.plotHeight+"px"});c.ttTimer!==void 0&&clearTimeout(c.ttTimer);c.ttTimer=
 setTimeout(function(){a(h,{visibility:"hidden"});a(s,{visibility:"hidden"})},3E3)})},destroy:function(){h(this.canvas);this.ttTimer!==void 0&&clearTimeout(this.ttTimer);h(this.ttLine);h(this.ttDiv);h(this.hiddenSvg);return d.prototype.destroy.apply(this)},color:function(a,b,c){a&&a.linearGradient&&(a=a.stops[a.stops.length-1][1]);return d.prototype.color.call(this,a,b,c)},draw:function(){window.canvg(this.canvas,this.hiddenSvg.innerHTML)}})})(Highcharts);
+/*
+ Highstock JS v1.1.5 (2012-03-15)
+ Exporting module
+
+ (c) 2010-2011 Torstein H?nsi
+
+ License: www.highcharts.com/license
+*/
+(function(){function x(a){for(var b=a.length;b--;)typeof a[b]==="number"&&(a[b]=Math.round(a[b])-0.5);return a}var f=Highcharts,y=f.Chart,z=f.addEvent,B=f.removeEvent,r=f.createElement,u=f.discardElement,t=f.css,s=f.merge,k=f.each,n=f.extend,C=Math.max,h=document,D=window,A=h.documentElement.ontouchstart!==void 0,v=f.getOptions();n(v.lang,{downloadPNG:"Download PNG image",downloadJPEG:"Download JPEG image",downloadPDF:"Download PDF document",downloadSVG:"Download SVG vector image",exportButtonTitle:"Export to raster or vector image",
+printButtonTitle:"Print the chart"});v.navigation={menuStyle:{border:"1px solid #A0A0A0",background:"#FFFFFF"},menuItemStyle:{padding:"0 5px",background:"none",color:"#303030",fontSize:A?"14px":"11px"},menuItemHoverStyle:{background:"#4572A5",color:"#FFFFFF"},buttonOptions:{align:"right",backgroundColor:{linearGradient:[0,0,0,20],stops:[[0.4,"#F7F7F7"],[0.6,"#E3E3E3"]]},borderColor:"#B0B0B0",borderRadius:3,borderWidth:1,height:20,hoverBorderColor:"#909090",hoverSymbolFill:"#81A7CF",hoverSymbolStroke:"#4572A5",
+symbolFill:"#E0E0E0",symbolStroke:"#A0A0A0",symbolX:11.5,symbolY:10.5,verticalAlign:"top",width:24,y:10}};v.exporting={type:"image/png",url:"http://export.highcharts.com/",width:800,buttons:{exportButton:{symbol:"exportIcon",x:-10,symbolFill:"#A8BF77",hoverSymbolFill:"#768F3E",_id:"exportButton",_titleKey:"exportButtonTitle",menuItems:[{textKey:"downloadPNG",onclick:function(){this.exportChart()}},{textKey:"downloadJPEG",onclick:function(){this.exportChart({type:"image/jpeg"})}},{textKey:"downloadPDF",
+onclick:function(){this.exportChart({type:"application/pdf"})}},{textKey:"downloadSVG",onclick:function(){this.exportChart({type:"image/svg+xml"})}}]},printButton:{symbol:"printIcon",x:-36,symbolFill:"#B5C9DF",hoverSymbolFill:"#779ABF",_id:"printButton",_titleKey:"printButtonTitle",onclick:function(){this.print()}}}};n(y.prototype,{getSVG:function(a){var b=this,c,d,e,g=s(b.options,a);if(!h.createElementNS)h.createElementNS=function(a,b){var c=h.createElement(b);c.getBBox=function(){return f.Renderer.prototype.Element.prototype.getBBox.apply({element:c})};
+return c};a=r("div",null,{position:"absolute",top:"-9999em",width:b.chartWidth+"px",height:b.chartHeight+"px"},h.body);n(g.chart,{renderTo:a,forExport:!0});g.exporting.enabled=!1;g.chart.plotBackgroundImage=null;g.series=[];k(b.series,function(a){e=s(a.options,{animation:!1,showCheckbox:!1,visible:a.visible});if(!e.isInternal){if(e&&e.marker&&/^url\(/.test(e.marker.symbol))e.marker.symbol="circle";g.series.push(e)}});c=new Highcharts.Chart(g);k(["xAxis","yAxis"],function(a){k(b[a],function(b,d){var e=
+c[a][d],g=b.getExtremes(),f=g.userMin,g=g.userMax;(f!==void 0||g!==void 0)&&e.setExtremes(f,g,!0,!1)})});d=c.container.innerHTML;g=null;c.destroy();u(a);d=d.replace(/zIndex="[^"]+"/g,"").replace(/isShadow="[^"]+"/g,"").replace(/symbolName="[^"]+"/g,"").replace(/jQuery[0-9]+="[^"]+"/g,"").replace(/isTracker="[^"]+"/g,"").replace(/url\([^#]+#/g,"url(#").replace(/<svg /,'<svg xmlns:xlink="http://www.w3.org/1999/xlink" ').replace(/ href=/g," xlink:href=").replace(/&nbsp;/g,"\u00a0").replace(/&shy;/g,
+"\u00ad").replace(/<IMG /g,"<image ").replace(/height=([^" ]+)/g,'height="$1"').replace(/width=([^" ]+)/g,'width="$1"').replace(/hc-svg-href="([^"]+)">/g,'xlink:href="$1"/>').replace(/id=([^" >]+)/g,'id="$1"').replace(/class=([^" ]+)/g,'class="$1"').replace(/ transform /g," ").replace(/:(path|rect)/g,"$1").replace(/style="([^"]+)"/g,function(a){return a.toLowerCase()});d=d.replace(/(url\(#highcharts-[0-9]+)&quot;/g,"$1").replace(/&quot;/g,"'");d.match(/ xmlns="/g).length===2&&(d=d.replace(/xmlns="[^"]+"/,
+""));return d},exportChart:function(a,b){var c,d=this.getSVG(s(this.options.exporting.chartOptions,b)),a=s(this.options.exporting,a);c=r("form",{method:"post",action:a.url},{display:"none"},h.body);k(["filename","type","width","svg"],function(b){r("input",{type:"hidden",name:b,value:{filename:a.filename||"chart",type:a.type,width:a.width,svg:d}[b]},null,c)});c.submit();u(c)},print:function(){var a=this,b=a.container,c=[],d=b.parentNode,e=h.body,g=e.childNodes;if(!a.isPrinting)a.isPrinting=!0,k(g,
+function(a,b){if(a.nodeType===1)c[b]=a.style.display,a.style.display="none"}),e.appendChild(b),D.print(),setTimeout(function(){d.appendChild(b);k(g,function(a,b){if(a.nodeType===1)a.style.display=c[b]});a.isPrinting=!1},1E3)},contextMenu:function(a,b,c,d,e,g){var i=this,f=i.options.navigation,h=f.menuItemStyle,o=i.chartWidth,p=i.chartHeight,q="cache-"+a,j=i[q],l=C(e,g),m,w;if(!j)i[q]=j=r("div",{className:"highcharts-"+a},{position:"absolute",zIndex:1E3,padding:l+"px"},i.container),m=r("div",null,
+n({MozBoxShadow:"3px 3px 10px #888",WebkitBoxShadow:"3px 3px 10px #888",boxShadow:"3px 3px 10px #888"},f.menuStyle),j),w=function(){t(j,{display:"none"})},z(j,"mouseleave",w),k(b,function(a){if(a){var b=r("div",{onmouseover:function(){t(this,f.menuItemHoverStyle)},onmouseout:function(){t(this,h)},innerHTML:a.text||i.options.lang[a.textKey]},n({cursor:"pointer"},h),m);b[A?"ontouchstart":"onclick"]=function(){w();a.onclick.apply(i,arguments)};i.exportDivElements.push(b)}}),i.exportDivElements.push(m,
+j),i.exportMenuWidth=j.offsetWidth,i.exportMenuHeight=j.offsetHeight;a={display:"block"};c+i.exportMenuWidth>o?a.right=o-c-e-l+"px":a.left=c-l+"px";d+g+i.exportMenuHeight>p?a.bottom=p-d-l+"px":a.top=d+g-l+"px";t(j,a)},addButton:function(a){function b(){p.attr(l);o.attr(j)}var c=this,d=c.renderer,e=s(c.options.navigation.buttonOptions,a),g=e.onclick,f=e.menuItems,h=e.width,k=e.height,o,p,q,a=e.borderWidth,j={stroke:e.borderColor},l={stroke:e.symbolStroke,fill:e.symbolFill},m=e.symbolSize||12;if(!c.exportDivElements)c.exportDivElements=
+[],c.exportSVGElements=[];e.enabled!==!1&&(o=d.rect(0,0,h,k,e.borderRadius,a).align(e,!0).attr(n({fill:e.backgroundColor,"stroke-width":a,zIndex:19},j)).add(),q=d.rect(0,0,h,k,0).align(e).attr({id:e._id,fill:"rgba(255, 255, 255, 0.001)",title:c.options.lang[e._titleKey],zIndex:21}).css({cursor:"pointer"}).on("mouseover",function(){p.attr({stroke:e.hoverSymbolStroke,fill:e.hoverSymbolFill});o.attr({stroke:e.hoverBorderColor})}).on("mouseout",b).on("click",b).add(),f&&(g=function(){b();var a=q.getBBox();
+c.contextMenu("export-menu",f,a.x,a.y,h,k)}),q.on("click",function(){g.apply(c,arguments)}),p=d.symbol(e.symbol,e.symbolX-m/2,e.symbolY-m/2,m,m).align(e,!0).attr(n(l,{"stroke-width":e.symbolStrokeWidth||1,zIndex:20})).add(),c.exportSVGElements.push(o,q,p))},destroyExport:function(){var a,b;for(a=0;a<this.exportSVGElements.length;a++)b=this.exportSVGElements[a],b.onclick=b.ontouchstart=null,this.exportSVGElements[a]=b.destroy();for(a=0;a<this.exportDivElements.length;a++)b=this.exportDivElements[a],
+B(b,"mouseleave"),this.exportDivElements[a]=b.onmouseout=b.onmouseover=b.ontouchstart=b.onclick=null,u(b)}});f.Renderer.prototype.symbols.exportIcon=function(a,b,c,d){return x(["M",a,b+c,"L",a+c,b+d,a+c,b+d*0.8,a,b+d*0.8,"Z","M",a+c*0.5,b+d*0.8,"L",a+c*0.8,b+d*0.4,a+c*0.4,b+d*0.4,a+c*0.4,b,a+c*0.6,b,a+c*0.6,b+d*0.4,a+c*0.2,b+d*0.4,"Z"])};f.Renderer.prototype.symbols.printIcon=function(a,b,c,d){return x(["M",a,b+d*0.7,"L",a+c,b+d*0.7,a+c,b+d*0.4,a,b+d*0.4,"Z","M",a+c*0.2,b+d*0.4,"L",a+c*0.2,b,a+c*
+0.8,b,a+c*0.8,b+d*0.4,"Z","M",a+c*0.2,b+d*0.7,"L",a,b+d,a+c,b+d,a+c*0.8,b+d*0.7,"Z"])};y.prototype.callbacks.push(function(a){var b,c=a.options.exporting,d=c.buttons;if(c.enabled!==!1){for(b in d)a.addButton(d[b]);z(a,"destroy",a.destroyExport)}})})();
 /**
  * @license A class to parse color values
  * @author Stoyan Stefanov <sstoo@gmail.com>
@@ -33813,29 +32310,6 @@ if (CanvasRenderingContext2D) {
 		}
 	});
 }(Highcharts));
-/*
- Highstock JS v1.1.5 (2012-03-15)
- Exporting module
-
- (c) 2010-2011 Torstein H?nsi
-
- License: www.highcharts.com/license
-*/
-(function(){function x(a){for(var b=a.length;b--;)typeof a[b]==="number"&&(a[b]=Math.round(a[b])-0.5);return a}var f=Highcharts,y=f.Chart,z=f.addEvent,B=f.removeEvent,r=f.createElement,u=f.discardElement,t=f.css,s=f.merge,k=f.each,n=f.extend,C=Math.max,h=document,D=window,A=h.documentElement.ontouchstart!==void 0,v=f.getOptions();n(v.lang,{downloadPNG:"Download PNG image",downloadJPEG:"Download JPEG image",downloadPDF:"Download PDF document",downloadSVG:"Download SVG vector image",exportButtonTitle:"Export to raster or vector image",
-printButtonTitle:"Print the chart"});v.navigation={menuStyle:{border:"1px solid #A0A0A0",background:"#FFFFFF"},menuItemStyle:{padding:"0 5px",background:"none",color:"#303030",fontSize:A?"14px":"11px"},menuItemHoverStyle:{background:"#4572A5",color:"#FFFFFF"},buttonOptions:{align:"right",backgroundColor:{linearGradient:[0,0,0,20],stops:[[0.4,"#F7F7F7"],[0.6,"#E3E3E3"]]},borderColor:"#B0B0B0",borderRadius:3,borderWidth:1,height:20,hoverBorderColor:"#909090",hoverSymbolFill:"#81A7CF",hoverSymbolStroke:"#4572A5",
-symbolFill:"#E0E0E0",symbolStroke:"#A0A0A0",symbolX:11.5,symbolY:10.5,verticalAlign:"top",width:24,y:10}};v.exporting={type:"image/png",url:"http://export.highcharts.com/",width:800,buttons:{exportButton:{symbol:"exportIcon",x:-10,symbolFill:"#A8BF77",hoverSymbolFill:"#768F3E",_id:"exportButton",_titleKey:"exportButtonTitle",menuItems:[{textKey:"downloadPNG",onclick:function(){this.exportChart()}},{textKey:"downloadJPEG",onclick:function(){this.exportChart({type:"image/jpeg"})}},{textKey:"downloadPDF",
-onclick:function(){this.exportChart({type:"application/pdf"})}},{textKey:"downloadSVG",onclick:function(){this.exportChart({type:"image/svg+xml"})}}]},printButton:{symbol:"printIcon",x:-36,symbolFill:"#B5C9DF",hoverSymbolFill:"#779ABF",_id:"printButton",_titleKey:"printButtonTitle",onclick:function(){this.print()}}}};n(y.prototype,{getSVG:function(a){var b=this,c,d,e,g=s(b.options,a);if(!h.createElementNS)h.createElementNS=function(a,b){var c=h.createElement(b);c.getBBox=function(){return f.Renderer.prototype.Element.prototype.getBBox.apply({element:c})};
-return c};a=r("div",null,{position:"absolute",top:"-9999em",width:b.chartWidth+"px",height:b.chartHeight+"px"},h.body);n(g.chart,{renderTo:a,forExport:!0});g.exporting.enabled=!1;g.chart.plotBackgroundImage=null;g.series=[];k(b.series,function(a){e=s(a.options,{animation:!1,showCheckbox:!1,visible:a.visible});if(!e.isInternal){if(e&&e.marker&&/^url\(/.test(e.marker.symbol))e.marker.symbol="circle";g.series.push(e)}});c=new Highcharts.Chart(g);k(["xAxis","yAxis"],function(a){k(b[a],function(b,d){var e=
-c[a][d],g=b.getExtremes(),f=g.userMin,g=g.userMax;(f!==void 0||g!==void 0)&&e.setExtremes(f,g,!0,!1)})});d=c.container.innerHTML;g=null;c.destroy();u(a);d=d.replace(/zIndex="[^"]+"/g,"").replace(/isShadow="[^"]+"/g,"").replace(/symbolName="[^"]+"/g,"").replace(/jQuery[0-9]+="[^"]+"/g,"").replace(/isTracker="[^"]+"/g,"").replace(/url\([^#]+#/g,"url(#").replace(/<svg /,'<svg xmlns:xlink="http://www.w3.org/1999/xlink" ').replace(/ href=/g," xlink:href=").replace(/&nbsp;/g,"\u00a0").replace(/&shy;/g,
-"\u00ad").replace(/<IMG /g,"<image ").replace(/height=([^" ]+)/g,'height="$1"').replace(/width=([^" ]+)/g,'width="$1"').replace(/hc-svg-href="([^"]+)">/g,'xlink:href="$1"/>').replace(/id=([^" >]+)/g,'id="$1"').replace(/class=([^" ]+)/g,'class="$1"').replace(/ transform /g," ").replace(/:(path|rect)/g,"$1").replace(/style="([^"]+)"/g,function(a){return a.toLowerCase()});d=d.replace(/(url\(#highcharts-[0-9]+)&quot;/g,"$1").replace(/&quot;/g,"'");d.match(/ xmlns="/g).length===2&&(d=d.replace(/xmlns="[^"]+"/,
-""));return d},exportChart:function(a,b){var c,d=this.getSVG(s(this.options.exporting.chartOptions,b)),a=s(this.options.exporting,a);c=r("form",{method:"post",action:a.url},{display:"none"},h.body);k(["filename","type","width","svg"],function(b){r("input",{type:"hidden",name:b,value:{filename:a.filename||"chart",type:a.type,width:a.width,svg:d}[b]},null,c)});c.submit();u(c)},print:function(){var a=this,b=a.container,c=[],d=b.parentNode,e=h.body,g=e.childNodes;if(!a.isPrinting)a.isPrinting=!0,k(g,
-function(a,b){if(a.nodeType===1)c[b]=a.style.display,a.style.display="none"}),e.appendChild(b),D.print(),setTimeout(function(){d.appendChild(b);k(g,function(a,b){if(a.nodeType===1)a.style.display=c[b]});a.isPrinting=!1},1E3)},contextMenu:function(a,b,c,d,e,g){var i=this,f=i.options.navigation,h=f.menuItemStyle,o=i.chartWidth,p=i.chartHeight,q="cache-"+a,j=i[q],l=C(e,g),m,w;if(!j)i[q]=j=r("div",{className:"highcharts-"+a},{position:"absolute",zIndex:1E3,padding:l+"px"},i.container),m=r("div",null,
-n({MozBoxShadow:"3px 3px 10px #888",WebkitBoxShadow:"3px 3px 10px #888",boxShadow:"3px 3px 10px #888"},f.menuStyle),j),w=function(){t(j,{display:"none"})},z(j,"mouseleave",w),k(b,function(a){if(a){var b=r("div",{onmouseover:function(){t(this,f.menuItemHoverStyle)},onmouseout:function(){t(this,h)},innerHTML:a.text||i.options.lang[a.textKey]},n({cursor:"pointer"},h),m);b[A?"ontouchstart":"onclick"]=function(){w();a.onclick.apply(i,arguments)};i.exportDivElements.push(b)}}),i.exportDivElements.push(m,
-j),i.exportMenuWidth=j.offsetWidth,i.exportMenuHeight=j.offsetHeight;a={display:"block"};c+i.exportMenuWidth>o?a.right=o-c-e-l+"px":a.left=c-l+"px";d+g+i.exportMenuHeight>p?a.bottom=p-d-l+"px":a.top=d+g-l+"px";t(j,a)},addButton:function(a){function b(){p.attr(l);o.attr(j)}var c=this,d=c.renderer,e=s(c.options.navigation.buttonOptions,a),g=e.onclick,f=e.menuItems,h=e.width,k=e.height,o,p,q,a=e.borderWidth,j={stroke:e.borderColor},l={stroke:e.symbolStroke,fill:e.symbolFill},m=e.symbolSize||12;if(!c.exportDivElements)c.exportDivElements=
-[],c.exportSVGElements=[];e.enabled!==!1&&(o=d.rect(0,0,h,k,e.borderRadius,a).align(e,!0).attr(n({fill:e.backgroundColor,"stroke-width":a,zIndex:19},j)).add(),q=d.rect(0,0,h,k,0).align(e).attr({id:e._id,fill:"rgba(255, 255, 255, 0.001)",title:c.options.lang[e._titleKey],zIndex:21}).css({cursor:"pointer"}).on("mouseover",function(){p.attr({stroke:e.hoverSymbolStroke,fill:e.hoverSymbolFill});o.attr({stroke:e.hoverBorderColor})}).on("mouseout",b).on("click",b).add(),f&&(g=function(){b();var a=q.getBBox();
-c.contextMenu("export-menu",f,a.x,a.y,h,k)}),q.on("click",function(){g.apply(c,arguments)}),p=d.symbol(e.symbol,e.symbolX-m/2,e.symbolY-m/2,m,m).align(e,!0).attr(n(l,{"stroke-width":e.symbolStrokeWidth||1,zIndex:20})).add(),c.exportSVGElements.push(o,q,p))},destroyExport:function(){var a,b;for(a=0;a<this.exportSVGElements.length;a++)b=this.exportSVGElements[a],b.onclick=b.ontouchstart=null,this.exportSVGElements[a]=b.destroy();for(a=0;a<this.exportDivElements.length;a++)b=this.exportDivElements[a],
-B(b,"mouseleave"),this.exportDivElements[a]=b.onmouseout=b.onmouseover=b.ontouchstart=b.onclick=null,u(b)}});f.Renderer.prototype.symbols.exportIcon=function(a,b,c,d){return x(["M",a,b+c,"L",a+c,b+d,a+c,b+d*0.8,a,b+d*0.8,"Z","M",a+c*0.5,b+d*0.8,"L",a+c*0.8,b+d*0.4,a+c*0.4,b+d*0.4,a+c*0.4,b,a+c*0.6,b,a+c*0.6,b+d*0.4,a+c*0.2,b+d*0.4,"Z"])};f.Renderer.prototype.symbols.printIcon=function(a,b,c,d){return x(["M",a,b+d*0.7,"L",a+c,b+d*0.7,a+c,b+d*0.4,a,b+d*0.4,"Z","M",a+c*0.2,b+d*0.4,"L",a+c*0.2,b,a+c*
-0.8,b,a+c*0.8,b+d*0.4,"Z","M",a+c*0.2,b+d*0.7,"L",a,b+d,a+c,b+d,a+c*0.8,b+d*0.7,"Z"])};y.prototype.callbacks.push(function(a){var b,c=a.options.exporting,d=c.buttons;if(c.enabled!==!1){for(b in d)a.addButton(d[b]);z(a,"destroy",a.destroyExport)}})})();
 /**
  * @license Highstock JS v1.1.5 (2012-03-15)
  * Exporting module
@@ -34585,7 +33059,7 @@ Highcharts.theme = {
 		backgroundColor: {
 			linearGradient: [0, 0, 250, 500],
 			stops: [
-				[0, 'rgb(48, 48, 96)'],
+				[0, 'rgb(48, 96, 48)'],
 				[1, 'rgb(0, 0, 0)']
 			]
 		},
@@ -34848,7 +33322,7 @@ Highcharts.theme = {
 		backgroundColor: {
 			linearGradient: [0, 0, 250, 500],
 			stops: [
-				[0, 'rgb(48, 96, 48)'],
+				[0, 'rgb(48, 48, 96)'],
 				[1, 'rgb(0, 0, 0)']
 			]
 		},
@@ -35456,18 +33930,367 @@ Highcharts.theme = {
 
 // Apply the theme
 var highchartsOptions = Highcharts.setOptions(Highcharts.theme);
-/*
- Highstock JS v1.1.5 (2012-03-15)
- Prototype adapter
+/**
+ * @license Highstock JS v1.1.5 (2012-03-15)
+ * Prototype adapter
+ *
+ * @author Michael Nelson, Torstein Hønsi.
+ *
+ * Feel free to use and modify this script.
+ * Highcharts license: www.highcharts.com/license.
+ */
 
- @author Michael Nelson, Torstein H?nsi.
+// JSLint options:
+/*global Effect, Class, Event, Element, $, $$, $A */
 
- Feel free to use and modify this script.
- Highcharts license: www.highcharts.com/license.
-*/
-var HighchartsAdapter=function(){var g=typeof Effect!=="undefined";return{init:function(c){if(g)Effect.HighchartsTransition=Class.create(Effect.Base,{initialize:function(a,b,d,e){var f;this.element=a;this.key=b;f=a.attr?a.attr(b):$(a).getStyle(b);if(b==="d")this.paths=c.init(a,a.d,d),this.toD=d,f=0,d=1;this.start(Object.extend(e||{},{from:f,to:d,attribute:b}))},setup:function(){HighchartsAdapter._extend(this.element);if(!this.element._highchart_animation)this.element._highchart_animation={};this.element._highchart_animation[this.key]=
-this},update:function(a){var b=this.paths,d=this.element;b&&(a=c.step(b[0],b[1],a,this.toD));d.attr?d.attr(this.options.attribute,a):(b={},b[this.options.attribute]=a,$(d).setStyle(b))},finish:function(){delete this.element._highchart_animation[this.key]}})},getScript:function(c,a){var b=$$("head")[0];b&&b.appendChild((new Element("script",{type:"text/javascript",src:c})).observe("load",a))},addNS:function(c){var a=/^(?:click|mouse(?:down|up|over|move|out))$/;return/^(?:load|unload|abort|error|select|change|submit|reset|focus|blur|resize|scroll)$/.test(c)||
-a.test(c)?c:"h:"+c},addEvent:function(c,a,b){c.addEventListener||c.attachEvent?Event.observe($(c),HighchartsAdapter.addNS(a),b):(HighchartsAdapter._extend(c),c._highcharts_observe(a,b))},animate:function(c,a,b){var d,b=b||{};b.delay=0;b.duration=(b.duration||500)/1E3;b.afterFinish=b.complete;if(g)for(d in a)new Effect.HighchartsTransition($(c),d,a[d],b);else{if(c.attr)for(d in a)c.attr(d,a[d]);b.complete&&b.complete()}c.attr||$(c).setStyle(a)},stop:function(c){var a;if(c._highcharts_extended&&c._highchart_animation)for(a in c._highchart_animation)c._highchart_animation[a].cancel()},
-each:function(c,a){$A(c).each(a)},offset:function(c){return $(c).cumulativeOffset()},fireEvent:function(c,a,b,d){c.fire?c.fire(HighchartsAdapter.addNS(a),b):c._highcharts_extended&&(b=b||{},c._highcharts_fire(a,b));b&&b.defaultPrevented&&(d=null);d&&d(b)},removeEvent:function(c,a,b){$(c).stopObserving&&(a&&(a=HighchartsAdapter.addNS(a)),$(c).stopObserving(a,b));window===c?Event.stopObserving(c,a,b):(HighchartsAdapter._extend(c),c._highcharts_stop_observing(a,b))},grep:function(c,a){return c.findAll(a)},
-map:function(c,a){return c.map(a)},merge:function(){function c(a,b){var d,e;for(e in b)d=b[e],a[e]=d&&typeof d==="object"&&d.constructor!==Array&&typeof d.nodeType!=="number"?c(a[e]||{},d):b[e];return a}return function(){var a=arguments,b,d={};for(b=0;b<a.length;b++)d=c(d,a[b]);return d}.apply(this,arguments)},_extend:function(c){c._highcharts_extended||Object.extend(c,{_highchart_events:{},_highchart_animation:null,_highcharts_extended:!0,_highcharts_observe:function(a,b){this._highchart_events[a]=
-[this._highchart_events[a],b].compact().flatten()},_highcharts_stop_observing:function(a,b){a?b?this._highchart_events[a]=[this._highchart_events[a]].compact().flatten().without(b):delete this._highchart_events[a]:this._highchart_events={}},_highcharts_fire:function(a,b){(this._highchart_events[a]||[]).each(function(a){if(!b.stopped)b.preventDefault=function(){b.defaultPrevented=!0},a.bind(this)(b)===!1&&b.preventDefault()}.bind(this))}})}}}();
+// Adapter interface between prototype and the Highcharts charting library
+var HighchartsAdapter = (function () {
+
+var hasEffect = typeof Effect !== 'undefined';
+
+return {
+
+	/**
+	 * Initialize the adapter. This is run once as Highcharts is first run.
+	 * @param {Object} pathAnim The helper object to do animations across adapters.
+	 */
+	init: function (pathAnim) {
+		if (hasEffect) {
+			/**
+			 * Animation for Highcharts SVG element wrappers only
+			 * @param {Object} element
+			 * @param {Object} attribute
+			 * @param {Object} to
+			 * @param {Object} options
+			 */
+			Effect.HighchartsTransition = Class.create(Effect.Base, {
+				initialize: function (element, attr, to, options) {
+					var from,
+						opts;
+
+					this.element = element;
+					this.key = attr;
+					from = element.attr ? element.attr(attr) : $(element).getStyle(attr);
+
+					// special treatment for paths
+					if (attr === 'd') {
+						this.paths = pathAnim.init(
+							element,
+							element.d,
+							to
+						);
+						this.toD = to;
+
+
+						// fake values in order to read relative position as a float in update
+						from = 0;
+						to = 1;
+					}
+
+					opts = Object.extend((options || {}), {
+						from: from,
+						to: to,
+						attribute: attr
+					});
+					this.start(opts);
+				},
+				setup: function () {
+					HighchartsAdapter._extend(this.element);
+					// If this is the first animation on this object, create the _highcharts_animation helper that
+					// contain pointers to the animation objects.
+					if (!this.element._highchart_animation) {
+						this.element._highchart_animation = {};
+					}
+
+					// Store a reference to this animation instance.
+					this.element._highchart_animation[this.key] = this;
+				},
+				update: function (position) {
+					var paths = this.paths,
+						element = this.element,
+						obj;
+
+					if (paths) {
+						position = pathAnim.step(paths[0], paths[1], position, this.toD);
+					}
+
+					if (element.attr) { // SVGElement
+						element.attr(this.options.attribute, position);
+					
+					} else { // HTML, #409
+						obj = {};
+						obj[this.options.attribute] = position;
+						$(element).setStyle(obj);
+					}
+					
+				},
+				finish: function () {
+					// Delete the property that holds this animation now that it is finished.
+					// Both canceled animations and complete ones gets a 'finish' call.
+					delete this.element._highchart_animation[this.key];
+				}
+			});
+		}
+	},
+
+	/**
+	 * Downloads a script and executes a callback when done.
+	 * @param {String} scriptLocation
+	 * @param {Function} callback
+	 */
+	getScript: function (scriptLocation, callback) {
+		var head = $$('head')[0]; // Returns an array, so pick the first element.
+		if (head) {
+			// Append a new 'script' element, set its type and src attributes, add a 'load' handler that calls the callback
+			head.appendChild(new Element('script', { type: 'text/javascript', src: scriptLocation}).observe('load', callback));
+		}
+	},
+
+	/**
+	 * Custom events in prototype needs to be namespaced. This method adds a namespace 'h:' in front of
+	 * events that are not recognized as native.
+	 */
+	addNS: function (eventName) {
+		var HTMLEvents = /^(?:load|unload|abort|error|select|change|submit|reset|focus|blur|resize|scroll)$/,
+			MouseEvents = /^(?:click|mouse(?:down|up|over|move|out))$/;
+		return (HTMLEvents.test(eventName) || MouseEvents.test(eventName)) ?
+			eventName :
+			'h:' + eventName;
+	},
+
+	// el needs an event to be attached. el is not necessarily a dom element
+	addEvent: function (el, event, fn) {
+		if (el.addEventListener || el.attachEvent) {
+			Event.observe($(el), HighchartsAdapter.addNS(event), fn);
+
+		} else {
+			HighchartsAdapter._extend(el);
+			el._highcharts_observe(event, fn);
+		}
+	},
+
+	// motion makes things pretty. use it if effects is loaded, if not... still get to the end result.
+	animate: function (el, params, options) {
+		var key,
+			fx;
+
+		// default options
+		options = options || {};
+		options.delay = 0;
+		options.duration = (options.duration || 500) / 1000;
+		options.afterFinish = options.complete;
+
+		// animate wrappers and DOM elements
+		if (hasEffect) {
+			for (key in params) {
+				// The fx variable is seemingly thrown away here, but the Effect.setup will add itself to the _highcharts_animation object
+				// on the element itself so its not really lost.
+				fx = new Effect.HighchartsTransition($(el), key, params[key], options);
+			}
+		} else {
+			if (el.attr) { // #409 without effects
+				for (key in params) {
+					el.attr(key, params[key]);
+				}
+			}
+			if (options.complete) {
+				options.complete();
+			}
+		}
+
+		if (!el.attr) { // HTML element, #409
+			$(el).setStyle(params);
+		}
+	},
+
+	// this only occurs in higcharts 2.0+
+	stop: function (el) {
+		var key;
+		if (el._highcharts_extended && el._highchart_animation) {
+			for (key in el._highchart_animation) {
+				// Cancel the animation
+				// The 'finish' function in the Effect object will remove the reference
+				el._highchart_animation[key].cancel();
+			}
+		}
+	},
+
+	// um.. each
+	each: function (arr, fn) {
+		$A(arr).each(fn);
+	},
+
+	/**
+	 * Get the cumulative offset relative to the top left of the page. This method, unlike its
+	 * jQuery and MooTools counterpart, still suffers from issue #208 regarding the position
+	 * of a chart within a fixed container.
+	 */
+	offset: function (el) {
+		return $(el).cumulativeOffset();
+	},
+
+	// fire an event based on an event name (event) and an object (el).
+	// again, el may not be a dom element
+	fireEvent: function (el, event, eventArguments, defaultFunction) {
+		if (el.fire) {
+			el.fire(HighchartsAdapter.addNS(event), eventArguments);
+		} else if (el._highcharts_extended) {
+			eventArguments = eventArguments || {};
+			el._highcharts_fire(event, eventArguments);
+		}
+
+		if (eventArguments && eventArguments.defaultPrevented) {
+			defaultFunction = null;
+		}
+
+		if (defaultFunction) {
+			defaultFunction(eventArguments);
+		}
+	},
+
+	removeEvent: function (el, event, handler) {
+		if ($(el).stopObserving) {
+			if (event) {
+				event = HighchartsAdapter.addNS(event);
+			}
+			$(el).stopObserving(event, handler);
+		} if (window === el) {
+			Event.stopObserving(el, event, handler);
+		} else {
+			HighchartsAdapter._extend(el);
+			el._highcharts_stop_observing(event, handler);
+		}
+	},
+
+	// um, grep
+	grep: function (arr, fn) {
+		return arr.findAll(fn);
+	},
+
+	// um, map
+	map: function (arr, fn) {
+		return arr.map(fn);
+	},
+
+	// deep merge. merge({a : 'a', b : {b1 : 'b1', b2 : 'b2'}}, {b : {b2 : 'b2_prime'}, c : 'c'}) => {a : 'a', b : {b1 : 'b1', b2 : 'b2_prime'}, c : 'c'}
+	/*merge: function(){
+		function doCopy(copy, original) {
+			var value,
+				key,
+				undef,
+				nil,
+				same,
+				obj,
+				arr,
+				node;
+
+			for (key in original) {
+				value = original[key];
+				undef = typeof(value) === 'undefined';
+				nil = value === null;
+				same = original === copy[key];
+
+				if (undef || nil || same) {
+					continue;
+				}
+
+				obj = typeof(value) === 'object';
+				arr = value && obj && value.constructor == Array;
+				node = !!value.nodeType;
+
+				if (obj && !arr && !node) {
+					copy[key] = doCopy(typeof copy[key] == 'object' ? copy[key] : {}, value);
+				}
+				else {
+					copy[key] = original[key];
+				}
+			}
+			return copy;
+		}
+
+		var args = arguments, retVal = {};
+
+		for (var i = 0; i < args.length; i++) {
+			retVal = doCopy(retVal, args[i]);
+		}
+
+		return retVal;
+	},*/
+	merge: function () { // the built-in prototype merge function doesn't do deep copy
+		function doCopy(copy, original) {
+			var value, key;
+
+			for (key in original) {
+				value = original[key];
+				if (value && typeof value === 'object' && value.constructor !== Array &&
+						typeof value.nodeType !== 'number') {
+					copy[key] = doCopy(copy[key] || {}, value); // copy
+
+				} else {
+					copy[key] = original[key];
+				}
+			}
+			return copy;
+		}
+
+		function merge() {
+			var args = arguments,
+				i,
+				retVal = {};
+
+			for (i = 0; i < args.length; i++) {
+				retVal = doCopy(retVal, args[i]);
+
+			}
+			return retVal;
+		}
+
+		return merge.apply(this, arguments);
+	},
+
+	// extend an object to handle highchart events (highchart objects, not svg elements).
+	// this is a very simple way of handling events but whatever, it works (i think)
+	_extend: function (object) {
+		if (!object._highcharts_extended) {
+			Object.extend(object, {
+				_highchart_events: {},
+				_highchart_animation: null,
+				_highcharts_extended: true,
+				_highcharts_observe: function (name, fn) {
+					this._highchart_events[name] = [this._highchart_events[name], fn].compact().flatten();
+				},
+				_highcharts_stop_observing: function (name, fn) {
+					if (name) {
+						if (fn) {
+							this._highchart_events[name] = [this._highchart_events[name]].compact().flatten().without(fn);
+						} else {
+							delete this._highchart_events[name];
+						}
+					} else {
+						this._highchart_events = {};
+					}
+				},
+				_highcharts_fire: function (name, args) {
+					(this._highchart_events[name] || []).each(function (fn) {
+						// args is never null here
+						if (args.stopped) {
+							return; // "throw $break" wasn't working. i think because of the scope of 'this'.
+						}
+
+						// Attach a simple preventDefault function to skip default handler if called
+						args.preventDefault = function () {
+							args.defaultPrevented = true;
+						};
+
+						// If the event handler return false, prevent the default handler from executing
+						if (fn.bind(this)(args) === false) {
+							args.preventDefault();
+						}
+					}
+.bind(this));
+				}
+			});
+		}
+	}
+};
+}());

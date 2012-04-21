@@ -31,10 +31,7 @@ class SidebarView extends Backbone.View
       elem = $("[name='" + name +  "']" )
       [ opt, elem ]
       
-    console.log indicator_options
-    
-    unfilled = _.any(indicator_options, (p) -> _.isEmpty(p[1].val() ) )
-    
+    unfilled = _.any(indicator_options, (p) -> _.isEmpty(p[1].val() ) ) 
     
     if unfilled 
       $(target).closest('li').addClass('alert alert-error')
@@ -56,9 +53,7 @@ class SidebarView extends Backbone.View
         data: data
         success: (data) ->
           _.each data.records, (ts) ->
-            console.log ts.name
-            console.log ts.series
-            app.models.chart.addSeries ts.name, data.series,
+            app.models.chart.addSeries ts.name, ts.series,
               yAxis : 0
           
     else

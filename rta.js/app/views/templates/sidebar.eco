@@ -8,7 +8,7 @@
     <% if item.get('args').length: %>
       <form class='form-inline'>
         <% for option in item.get('args'): %>
-          <% if option == 'matype': %>
+          <% if option in ['matype', 'slowk_matype', 'slowd_matype', 'fastd_matype' ]: %>
             <select name="<%= item.get('id') %>[<%= option %>]" class='input-small'>
             <% matypes = [ 'MA_SMA', 'MA_EMA', 'MA_WMA', 'MA_DEMA', 'MA_TEMA', 'MA_TRIMA', 'MA_KAMA','MA_MAMA', 'MA_T3'] %>
             <% for ma in matypes: %>

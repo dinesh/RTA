@@ -527,7 +527,6 @@
         elem = $("[name='" + name + "']");
         return [opt, elem];
       });
-      console.log(indicator_options);
       unfilled = _.any(indicator_options, function(p) {
         return _.isEmpty(p[1].val());
       });
@@ -551,9 +550,7 @@
           data: data,
           success: function(data) {
             return _.each(data.records, function(ts) {
-              console.log(ts.name);
-              console.log(ts.series);
-              return app.models.chart.addSeries(ts.name, data.series, {
+              return app.models.chart.addSeries(ts.name, ts.series, {
                 yAxis: 0
               });
             });
@@ -1066,7 +1063,7 @@ function');
           for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
             option = _ref2[_j];
             __out.push('\n          ');
-            if (option === 'matype') {
+            if (option === 'matype' || option === 'slowk_matype' || option === 'slowd_matype' || option === 'fastd_matype') {
               __out.push('\n            <select name="');
               __out.push(__sanitize(item.get('id')));
               __out.push('[');

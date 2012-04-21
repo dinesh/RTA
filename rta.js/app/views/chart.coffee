@@ -72,6 +72,7 @@ class ChartView extends Backbone.View
     
     
     $.getJSON url + '&callback=?', (data) =>
+      
       @stockchart = new StockChart @el, @model.get('id'),
         series: [{
           name: 'OHLV', 

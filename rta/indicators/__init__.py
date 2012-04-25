@@ -1,27 +1,8 @@
-import sys, re
-# you may need to modify arguements based on indicators
-# TODO: add decorators for cached properties
-# TODO: use __all__ for dynamic imports
-
 # https://github.com/mrjbq7/ta-lib
 
-import sys, inspect
-import pandas, numpy
+import sys, re, inspect
 
-  
-def print_help_and_exit(msg):
-  help = """
-    Unable to load talib module.
-    Please go to rta/src/talib and follow steps.
-    1. make generate
-    2. python setup.py build_ext --inplace
-    3. to test
-      $] nosetests
-      
-  """
-  print help
-  
-  print "Program Exit bc/ " + msg
+import pandas, numpy
   
   
 try:
@@ -34,22 +15,24 @@ try:
     params = re.findall("([\w]+)=\?", definition) 
     desc = re.findall( "\(.*\)\n\n(.*)$", definition)
     LIST[ind] = dict({ 'args': params, 'desc': desc[0], 'id': ind } )
-    
-    
 except ImportError:
   raise
-  # print_help_and_exit(sys.exc_info[1])
 
 for ind in ALL_INDICATORS:
   globals()[ind] = getattr(talib, ind)
 
 I_ACCEPTS_ONE_VALUE = [ 'HT_TREANDLINE' ]  
+
 I_ACCEPTS_TWO_VALUE_AND_TIMEPERIOD = ['MINUS_DM', 'PLUS_DM']
+
 I_ACCEPTS_ONE_VALUE_AND_TIMEPERIOD = [ 'SMA', 'EMA', 'RSI', 'MAX', 'MIN', 'MIN', 'MOM' ]
+
 I_ACCEPTS_THREE_VALUE_AND_TIMEPERIOD = [ 'ADX', 'ADXR', 'CCI', 'DX', 'MINUS_DI', 'PLUS_DI', 'WILLR' ]
+
 I_ACCEPTS_FOUR_VALUE = [ 'AVGPRICE', 'CDL2CROWS', 'CDL3BLACKCROWS', 'CDL3WHITESOLDIERS', 'CDLDOJI', 'CDLDOJISTAR', 'CDLDRAGONFLYDOJI', 
                          'CDLGRAVESTONEDOJI', 'CDLENGULFING', 'CDLHAMMER', 'CDLHANGINGMAN', 'CDLHARAMI', 'CDLINVERTEDHAMMER', 'CDLPIERCING', 
                          'CDLSHOOTINGSTAR', 'CDLSPINNINGTOP', 'CDLHARAMICROSS'  ]
+
 I_ACCEPTS_FOUR_VALUE_AND_PENETRATION = [ 'CDLDARKCLOUDCOVER', 'CDLEVENINGSTAR', 'CDLEVENINGDOJISTAR', 'CDLMORNINGDOJISTAR', 'CDLMORNINGSTAR' ]
 
 
@@ -176,7 +159,7 @@ def calculate(series, ind_id, options):
     return [{ 
         'name': '%s-%sd' % ( ind_id, period ) , 
         'series' :  make_tseries( res, sindex) 
-      } ]
+      }]
     
   elif ind_id in I_ACCEPTS_FOUR_VALUE:
     pivot, res = getattr(talib, ind_id).__call__( o, h,l, c )  
@@ -208,7 +191,7 @@ def calculate(series, ind_id, options):
       } ]
   else:
     raise NotImplementedError("%s is not implmented yet." % ind_id)
-  
+    
 
 SUPPORTED_INDICATORS = [  'SMA', 'EMA', 'BBANDS', 'CDL2CROWS', 'MACD', 'MACDEXT'  ]
 

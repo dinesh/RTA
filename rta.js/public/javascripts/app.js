@@ -617,6 +617,7 @@
 
     HomeView.prototype.render = function() {
       $(this.el).html(require('./templates/home'));
+      $('#topbar').html(require('./templates/header'));
       this.subviews = [
         new SidebarView({
           'collection': app.Indicators,
@@ -940,7 +941,7 @@ function');
   (function() {
     (function() {
     
-      __out.push('\n<div class=\'navbar navbar-fixed-top\'>\n  <div class=\'navbar-inner\'>\n    <div class=\'container\'>\n      <div class=\'nav-collapse\'>\n        <ul class=\'nav\'>\n          <li class=\'active\'> <a href=\'/\'> Home </a> </li>\n          <li> <a href=\'/\'> Compare </a> </li>\n        </ul>\n      </div>\n    </div>\n  </div>\n</div>\n    ');
+      __out.push('\n<div class=\'navbar navbar-fixed-top\'>\n  <div class=\'navbar-inner\'>\n    <div class=\'container\'>\n      <div class=\'nav-collapse\'>\n        <ul class=\'nav\'>\n          <li class=\'active\'> <a href=\'/\'> DashBoard </a> </li>\n          <li> <a href=\'/\'> Compare </a> </li>\n        </ul>\n      </div>\n    </div>\n  </div>\n</div>\n    ');
     
     }).call(this);
     

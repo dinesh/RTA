@@ -54,7 +54,7 @@ class SidebarView extends Backbone.View
         success: (data) ->
           _.each data.records, (ts) ->
             app.models.chart.addSeries ts.name, ts.series,
-              yAxis : 0
+              yAxis : 0 
           
     else
       alert('No Symbol selected.')
@@ -83,6 +83,8 @@ class exports.HomeView extends Backbone.View
       
   render: =>
     $(@el).html require('./templates/home')
+    $('#topbar').html require('./templates/header')
+    
     @subviews = [
       new SidebarView( 'collection': app.Indicators, 'container': @.$('#sidebar') ) 
       app.ui.companyDp = new SymbolListView( 'collection': app.Symbols, 'container': @.$('#symbol-list') )
@@ -92,7 +94,6 @@ class exports.HomeView extends Backbone.View
   openChart: (ev) =>
     model = app.Symbols.get( @.$(ev.currentTarget).val() )
     @currentChart = new ChartView( 'model': model, 'el' : @.$('#chart').get(0) )
-    # app.ui.chartview = @currentChart
     @subviews.push( @currentChart.render() )
     @
       

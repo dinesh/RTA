@@ -11861,6 +11861,114 @@ i.sort(function(a,b){return a-b});c=i[La(e/2)];return e*c/(b-a)};d.postProcessTi
 k.max,o;o=b.hoverPoints;var r=d.closestPointRange,j=(j-a)/(d.translationSlope*(d.ordinalSlope||r)),u={ordinalPositions:d.getExtendedPositions()},v,r=d.lin2val,s=d.val2lin;if(u.ordinalPositions){if(Ga(j)>1)o&&q(o,function(a){a.setState()}),j<0?(o=u,u=d.ordinalPositions?d:u):o=d.ordinalPositions?d:u,v=u.ordinalPositions,i>v[v.length-1]&&v.push(i),o=r.apply(o,[s.apply(o,[m,!0])+j,!0]),j=r.apply(u,[s.apply(u,[l,!0])+j,!0]),o>wa(k.dataMin,m)&&j<O(i,l)&&d.setExtremes(o,j,!0,!1),b.mouseDownX=a,W(b.container,
 {cursor:"move"})}else h=!0}else h=!0;h&&e.apply(b,arguments)}}};C.getSegments=function(){var a=this,d,e=a.options.gapSize;b.apply(a);if(a.xAxis.options.ordinal&&e)d=a.segments,q(d,function(b,g){for(var h=b.length-1;h--;)b[h+1].x-b[h].x>a.xAxis.closestPointRange*e&&d.splice(g+1,0,b.splice(h+1,b.length-h))})}})();G(Highcharts,{Chart:ec,dateFormat:Bb,pathAnim:Xb,getOptions:function(){return ja},hasBidiBug:bd,numberFormat:Zb,Point:ab,Color:oa,Renderer:Sb,SVGRenderer:Eb,VMLRenderer:mb,CanVGRenderer:xc,
 seriesTypes:ma,setOptions:function(a){hc=I(hc,a.xAxis);tc=I(tc,a.yAxis);a.xAxis=a.yAxis=D;ja=I(ja,a);Gc();return ja},Series:ia,addEvent:X,removeEvent:ua,createElement:da,discardElement:Nb,css:W,each:q,extend:G,map:Kb,merge:I,pick:r,splat:zb,extendClass:ea,placeBox:Fc,product:"Highstock",version:"1.1.5"})})();
+/**
+ * Code for regression extracted from jqplot.trendline.js
+ *
+ * Version: 1.0.0a_r701
+ *
+ * Copyright (c) 2009-2011 Chris Leonello
+ * jqPlot is currently available for use in all personal or commercial projects
+ * under both the MIT (http://www.opensource.org/licenses/mit-license.php) and GPL
+ * version 2.0 (http://www.gnu.org/licenses/gpl-2.0.html) licenses. This means that you can
+ * choose the license that best suits your project and use it accordingly.
+ *
+ **/
+
+function regression(x, y, typ) {
+  var type = (typ == null) ? 'linear' : typ;
+  var N = x.length;
+  var slope;
+  var intercept;
+  var SX = 0;
+  var SY = 0;
+  var SXX = 0;
+  var SXY = 0;
+  var SYY = 0;
+  var Y = [];
+  var X = [];
+
+  if (type == 'linear') {
+    X = x;
+    Y = y;
+  }
+  else if (type == 'exp' || type == 'exponential') {
+    for (var i = 0; i < y.length; i++) {
+      // ignore points <= 0, log undefined.
+      if (y[i] <= 0) {
+        N--;
+      }
+      else {
+        X.push(x[i]);
+        Y.push(Math.log(y[i]));
+      }
+    }
+  }
+
+  for (var i = 0; i < N; i++) {
+    SX = SX + X[i];
+    SY = SY + Y[i];
+    SXY = SXY + X[i] * Y[i];
+    SXX = SXX + X[i] * X[i];
+    SYY = SYY + Y[i] * Y[i];
+  }
+
+  slope = (N * SXY - SX * SY) / (N * SXX - SX * SX);
+  intercept = (SY - slope * SX) / N;
+
+  return [slope, intercept];
+}
+
+function linearRegression(X, Y) {
+  var ret;
+  ret = regression(X, Y, 'linear');
+  return [ret[0], ret[1]];
+}
+
+function expRegression(X, Y) {
+  var ret;
+  var x = X;
+  var y = Y;
+  ret = regression(x, y, 'exp');
+  var base = Math.exp(ret[0]);
+  var coeff = Math.exp(ret[1]);
+  return [base, coeff];
+}
+
+function fitData(data, typ) {
+  var type = (typ == null) ? 'linear' : typ;
+  var ret;
+  var res;
+  var x = [];
+  var y = [];
+  var ypred = [];
+
+  for (i = 0; i < data.length; i++) {
+    if (data[i] != null && data[i][0] != null && data[i][1] != null) {
+      x.push(data[i][0]);
+      y.push(data[i][1]);
+    }
+  }
+
+  if (type == 'linear') {
+    ret = linearRegression(x, y);
+    for (var i = 0; i < x.length; i++) {
+      res = ret[0] * x[i] + ret[1];
+      ypred.push([x[i], res]);
+    }
+  }
+  else if (type == 'exp' || type == 'exponential') {
+    ret = expRegression(x, y);
+    for (var i = 0; i < x.length; i++) {
+      res = ret[1] * Math.pow(ret[0], x[i]);
+      ypred.push([x[i], res]);
+    }
+  }
+  return {
+    data: ypred,
+    slope: ret[0],
+    intercept: ret[1]
+  };
+}
 // ==ClosureCompiler==
 // @compilation_level SIMPLE_OPTIMIZATIONS
 
@@ -32311,6 +32419,269 @@ c.contextMenu("export-menu",f,a.x,a.y,h,k)}),q.on("click",function(){g.apply(c,a
 B(b,"mouseleave"),this.exportDivElements[a]=b.onmouseout=b.onmouseover=b.ontouchstart=b.onclick=null,u(b)}});f.Renderer.prototype.symbols.exportIcon=function(a,b,c,d){return x(["M",a,b+c,"L",a+c,b+d,a+c,b+d*0.8,a,b+d*0.8,"Z","M",a+c*0.5,b+d*0.8,"L",a+c*0.8,b+d*0.4,a+c*0.4,b+d*0.4,a+c*0.4,b,a+c*0.6,b,a+c*0.6,b+d*0.4,a+c*0.2,b+d*0.4,"Z"])};f.Renderer.prototype.symbols.printIcon=function(a,b,c,d){return x(["M",a,b+d*0.7,"L",a+c,b+d*0.7,a+c,b+d*0.4,a,b+d*0.4,"Z","M",a+c*0.2,b+d*0.4,"L",a+c*0.2,b,a+c*
 0.8,b,a+c*0.8,b+d*0.4,"Z","M",a+c*0.2,b+d*0.7,"L",a,b+d,a+c,b+d,a+c*0.8,b+d*0.7,"Z"])};y.prototype.callbacks.push(function(a){var b,c=a.options.exporting,d=c.buttons;if(c.enabled!==!1){for(b in d)a.addButton(d[b]);z(a,"destroy",a.destroyExport)}})})();
 /**
+ * Dark blue theme for Highcharts JS
+ * @author Torstein Hønsi
+ */
+
+Highcharts.theme = {
+	colors: ["#DDDF0D", "#55BF3B", "#DF5353", "#7798BF", "#aaeeee", "#ff0066", "#eeaaee",
+		"#55BF3B", "#DF5353", "#7798BF", "#aaeeee"],
+	chart: {
+		backgroundColor: {
+			linearGradient: [0, 0, 250, 500],
+			stops: [
+				[0, 'rgb(48, 48, 96)'],
+				[1, 'rgb(0, 0, 0)']
+			]
+		},
+		borderColor: '#000000',
+		borderWidth: 2,
+		className: 'dark-container',
+		plotBackgroundColor: 'rgba(255, 255, 255, .1)',
+		plotBorderColor: '#CCCCCC',
+		plotBorderWidth: 1
+	},
+	title: {
+		style: {
+			color: '#C0C0C0',
+			font: 'bold 16px "Trebuchet MS", Verdana, sans-serif'
+		}
+	},
+	subtitle: {
+		style: {
+			color: '#666666',
+			font: 'bold 12px "Trebuchet MS", Verdana, sans-serif'
+		}
+	},
+	xAxis: {
+		gridLineColor: '#333333',
+		gridLineWidth: 1,
+		labels: {
+			style: {
+				color: '#A0A0A0'
+			}
+		},
+		lineColor: '#A0A0A0',
+		tickColor: '#A0A0A0',
+		title: {
+			style: {
+				color: '#CCC',
+				fontWeight: 'bold',
+				fontSize: '12px',
+				fontFamily: 'Trebuchet MS, Verdana, sans-serif'
+
+			}
+		}
+	},
+	yAxis: {
+		gridLineColor: '#333333',
+		labels: {
+			style: {
+				color: '#A0A0A0'
+			}
+		},
+		lineColor: '#A0A0A0',
+		minorTickInterval: null,
+		tickColor: '#A0A0A0',
+		tickWidth: 1,
+		title: {
+			style: {
+				color: '#CCC',
+				fontWeight: 'bold',
+				fontSize: '12px',
+				fontFamily: 'Trebuchet MS, Verdana, sans-serif'
+			}
+		}
+	},
+	tooltip: {
+		backgroundColor: 'rgba(0, 0, 0, 0.75)',
+		style: {
+			color: '#F0F0F0'
+		}
+	},
+	toolbar: {
+		itemStyle: {
+			color: 'silver'
+		}
+	},
+	plotOptions: {
+		line: {
+			dataLabels: {
+				color: '#CCC'
+			},
+			marker: {
+				lineColor: '#333'
+			}
+		},
+		spline: {
+			marker: {
+				lineColor: '#333'
+			}
+		},
+		scatter: {
+			marker: {
+				lineColor: '#333'
+			}
+		},
+		candlestick: {
+			lineColor: 'white'
+		}
+	},
+	legend: {
+		itemStyle: {
+			font: '9pt Trebuchet MS, Verdana, sans-serif',
+			color: '#A0A0A0'
+		},
+		itemHoverStyle: {
+			color: '#FFF'
+		},
+		itemHiddenStyle: {
+			color: '#444'
+		}
+	},
+	credits: {
+		style: {
+			color: '#666'
+		}
+	},
+	labels: {
+		style: {
+			color: '#CCC'
+		}
+	},
+
+	navigation: {
+		buttonOptions: {
+			backgroundColor: {
+				linearGradient: [0, 0, 0, 20],
+				stops: [
+					[0.4, '#606060'],
+					[0.6, '#333333']
+				]
+			},
+			borderColor: '#000000',
+			symbolStroke: '#C0C0C0',
+			hoverSymbolStroke: '#FFFFFF'
+		}
+	},
+
+	exporting: {
+		buttons: {
+			exportButton: {
+				symbolFill: '#55BE3B'
+			},
+			printButton: {
+				symbolFill: '#7797BE'
+			}
+		}
+	},
+
+	// scroll charts
+	rangeSelector: {
+		buttonTheme: {
+			fill: {
+				linearGradient: [0, 0, 0, 20],
+				stops: [
+					[0.4, '#888'],
+					[0.6, '#555']
+				]
+			},
+			stroke: '#000000',
+			style: {
+				color: '#CCC',
+				fontWeight: 'bold'
+			},
+			states: {
+				hover: {
+					fill: {
+						linearGradient: [0, 0, 0, 20],
+						stops: [
+							[0.4, '#BBB'],
+							[0.6, '#888']
+						]
+					},
+					stroke: '#000000',
+					style: {
+						color: 'white'
+					}
+				},
+				select: {
+					fill: {
+						linearGradient: [0, 0, 0, 20],
+						stops: [
+							[0.1, '#000'],
+							[0.3, '#333']
+						]
+					},
+					stroke: '#000000',
+					style: {
+						color: 'yellow'
+					}
+				}
+			}
+		},
+		inputStyle: {
+			backgroundColor: '#333',
+			color: 'silver'
+		},
+		labelStyle: {
+			color: 'silver'
+		}
+	},
+
+	navigator: {
+		handles: {
+			backgroundColor: '#666',
+			borderColor: '#AAA'
+		},
+		outlineColor: '#CCC',
+		maskFill: 'rgba(16, 16, 16, 0.5)',
+		series: {
+			color: '#7798BF',
+			lineColor: '#A6C7ED'
+		}
+	},
+
+	scrollbar: {
+		barBackgroundColor: {
+				linearGradient: [0, 0, 0, 20],
+				stops: [
+					[0.4, '#888'],
+					[0.6, '#555']
+				]
+			},
+		barBorderColor: '#CCC',
+		buttonArrowColor: '#CCC',
+		buttonBackgroundColor: {
+				linearGradient: [0, 0, 0, 20],
+				stops: [
+					[0.4, '#888'],
+					[0.6, '#555']
+				]
+			},
+		buttonBorderColor: '#CCC',
+		rifleColor: '#FFF',
+		trackBackgroundColor: {
+			linearGradient: [0, 0, 0, 10],
+			stops: [
+				[0, '#000'],
+				[1, '#333']
+			]
+		},
+		trackBorderColor: '#666'
+	},
+
+	// special colors for some of the
+	legendBackgroundColor: 'rgba(0, 0, 0, 0.5)',
+	legendBackgroundColorSolid: 'rgb(35, 35, 70)',
+	dataLabelsColor: '#444',
+	textColor: '#C0C0C0',
+	maskColor: 'rgba(255,255,255,0.3)'
+};
+
+// Apply the theme
+var highchartsOptions = Highcharts.setOptions(Highcharts.theme);
+/**
  * @license Highstock JS v1.1.5 (2012-03-15)
  * Exporting module
  *
@@ -33060,269 +33431,6 @@ Highcharts.theme = {
 			linearGradient: [0, 0, 250, 500],
 			stops: [
 				[0, 'rgb(48, 96, 48)'],
-				[1, 'rgb(0, 0, 0)']
-			]
-		},
-		borderColor: '#000000',
-		borderWidth: 2,
-		className: 'dark-container',
-		plotBackgroundColor: 'rgba(255, 255, 255, .1)',
-		plotBorderColor: '#CCCCCC',
-		plotBorderWidth: 1
-	},
-	title: {
-		style: {
-			color: '#C0C0C0',
-			font: 'bold 16px "Trebuchet MS", Verdana, sans-serif'
-		}
-	},
-	subtitle: {
-		style: {
-			color: '#666666',
-			font: 'bold 12px "Trebuchet MS", Verdana, sans-serif'
-		}
-	},
-	xAxis: {
-		gridLineColor: '#333333',
-		gridLineWidth: 1,
-		labels: {
-			style: {
-				color: '#A0A0A0'
-			}
-		},
-		lineColor: '#A0A0A0',
-		tickColor: '#A0A0A0',
-		title: {
-			style: {
-				color: '#CCC',
-				fontWeight: 'bold',
-				fontSize: '12px',
-				fontFamily: 'Trebuchet MS, Verdana, sans-serif'
-
-			}
-		}
-	},
-	yAxis: {
-		gridLineColor: '#333333',
-		labels: {
-			style: {
-				color: '#A0A0A0'
-			}
-		},
-		lineColor: '#A0A0A0',
-		minorTickInterval: null,
-		tickColor: '#A0A0A0',
-		tickWidth: 1,
-		title: {
-			style: {
-				color: '#CCC',
-				fontWeight: 'bold',
-				fontSize: '12px',
-				fontFamily: 'Trebuchet MS, Verdana, sans-serif'
-			}
-		}
-	},
-	tooltip: {
-		backgroundColor: 'rgba(0, 0, 0, 0.75)',
-		style: {
-			color: '#F0F0F0'
-		}
-	},
-	toolbar: {
-		itemStyle: {
-			color: 'silver'
-		}
-	},
-	plotOptions: {
-		line: {
-			dataLabels: {
-				color: '#CCC'
-			},
-			marker: {
-				lineColor: '#333'
-			}
-		},
-		spline: {
-			marker: {
-				lineColor: '#333'
-			}
-		},
-		scatter: {
-			marker: {
-				lineColor: '#333'
-			}
-		},
-		candlestick: {
-			lineColor: 'white'
-		}
-	},
-	legend: {
-		itemStyle: {
-			font: '9pt Trebuchet MS, Verdana, sans-serif',
-			color: '#A0A0A0'
-		},
-		itemHoverStyle: {
-			color: '#FFF'
-		},
-		itemHiddenStyle: {
-			color: '#444'
-		}
-	},
-	credits: {
-		style: {
-			color: '#666'
-		}
-	},
-	labels: {
-		style: {
-			color: '#CCC'
-		}
-	},
-
-	navigation: {
-		buttonOptions: {
-			backgroundColor: {
-				linearGradient: [0, 0, 0, 20],
-				stops: [
-					[0.4, '#606060'],
-					[0.6, '#333333']
-				]
-			},
-			borderColor: '#000000',
-			symbolStroke: '#C0C0C0',
-			hoverSymbolStroke: '#FFFFFF'
-		}
-	},
-
-	exporting: {
-		buttons: {
-			exportButton: {
-				symbolFill: '#55BE3B'
-			},
-			printButton: {
-				symbolFill: '#7797BE'
-			}
-		}
-	},
-
-	// scroll charts
-	rangeSelector: {
-		buttonTheme: {
-			fill: {
-				linearGradient: [0, 0, 0, 20],
-				stops: [
-					[0.4, '#888'],
-					[0.6, '#555']
-				]
-			},
-			stroke: '#000000',
-			style: {
-				color: '#CCC',
-				fontWeight: 'bold'
-			},
-			states: {
-				hover: {
-					fill: {
-						linearGradient: [0, 0, 0, 20],
-						stops: [
-							[0.4, '#BBB'],
-							[0.6, '#888']
-						]
-					},
-					stroke: '#000000',
-					style: {
-						color: 'white'
-					}
-				},
-				select: {
-					fill: {
-						linearGradient: [0, 0, 0, 20],
-						stops: [
-							[0.1, '#000'],
-							[0.3, '#333']
-						]
-					},
-					stroke: '#000000',
-					style: {
-						color: 'yellow'
-					}
-				}
-			}
-		},
-		inputStyle: {
-			backgroundColor: '#333',
-			color: 'silver'
-		},
-		labelStyle: {
-			color: 'silver'
-		}
-	},
-
-	navigator: {
-		handles: {
-			backgroundColor: '#666',
-			borderColor: '#AAA'
-		},
-		outlineColor: '#CCC',
-		maskFill: 'rgba(16, 16, 16, 0.5)',
-		series: {
-			color: '#7798BF',
-			lineColor: '#A6C7ED'
-		}
-	},
-
-	scrollbar: {
-		barBackgroundColor: {
-				linearGradient: [0, 0, 0, 20],
-				stops: [
-					[0.4, '#888'],
-					[0.6, '#555']
-				]
-			},
-		barBorderColor: '#CCC',
-		buttonArrowColor: '#CCC',
-		buttonBackgroundColor: {
-				linearGradient: [0, 0, 0, 20],
-				stops: [
-					[0.4, '#888'],
-					[0.6, '#555']
-				]
-			},
-		buttonBorderColor: '#CCC',
-		rifleColor: '#FFF',
-		trackBackgroundColor: {
-			linearGradient: [0, 0, 0, 10],
-			stops: [
-				[0, '#000'],
-				[1, '#333']
-			]
-		},
-		trackBorderColor: '#666'
-	},
-
-	// special colors for some of the
-	legendBackgroundColor: 'rgba(0, 0, 0, 0.5)',
-	legendBackgroundColorSolid: 'rgb(35, 35, 70)',
-	dataLabelsColor: '#444',
-	textColor: '#C0C0C0',
-	maskColor: 'rgba(255,255,255,0.3)'
-};
-
-// Apply the theme
-var highchartsOptions = Highcharts.setOptions(Highcharts.theme);
-/**
- * Dark blue theme for Highcharts JS
- * @author Torstein Hønsi
- */
-
-Highcharts.theme = {
-	colors: ["#DDDF0D", "#55BF3B", "#DF5353", "#7798BF", "#aaeeee", "#ff0066", "#eeaaee",
-		"#55BF3B", "#DF5353", "#7798BF", "#aaeeee"],
-	chart: {
-		backgroundColor: {
-			linearGradient: [0, 0, 250, 500],
-			stops: [
-				[0, 'rgb(48, 48, 96)'],
 				[1, 'rgb(0, 0, 0)']
 			]
 		},

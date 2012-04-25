@@ -4033,7 +4033,7 @@ a.thumbnail:hover {
 }
 .invisible {
   visibility: hidden;
-}body{background:#91a2c0;padding-top:60px}
+}body{background:#91a2c0;padding-top:60px;font-family:"ff-scala-web-1","ff-scala-web-2","Georgia",sans-serif}
 ul{list-style-type:none}
 a,a:visited{color:#f95a5a;text-decoration:none}
 a:hover{color:#665248}
@@ -4054,3 +4054,4 @@ a{color:#f95a5a;text-decoration:none}
 ul,ol{margin:0 1.5em 1.5em 0;list-style-type:none}
 #content{width:605px;margin:0 auto;margin-top:40px;margin-bottom:60px}
 #props{position:relative;top:36px;font-size:18px;padding-left:373px;color:#eee;font-style:italic}
+input,button,select,textarea{font-family:"ff-scala-web-1","ff-scala-web-2","Georgia",sans-serif}

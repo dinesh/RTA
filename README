@@ -1,4 +1,11 @@
 
 talib function documentation: http://search.cpan.org/~kmx/Finance-TA-v0.4.0/TA.pod
 
+for python profiling http://packages.python.org/line_profiler/
+  - or http://fseoane.net/blog/2012/line-by-line-report-of-memory-usage/
+
+for treadline:
+  1. http://www.physics.csbsju.edu/stats/least_squares.html
+  2. http://www.physics.csbsju.edu/stats/fitting_lines.html
+  
 client side templating: http://icanhazjs.com/ 

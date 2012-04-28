@@ -6,7 +6,7 @@ MARGIN = HEIGHTS['margin']
 
 class StockChart
   constructor: (@el, @title, options) ->
-    $(@el).css({ 'min-height': '600px'})
+    $(@el).css({ 'min-height': '1000px'})
     
     @options = options || {}
     
@@ -37,20 +37,25 @@ class StockChart
         title:
           text: 'Volume'
         height: 100
-        top: 400
+        top: 800
         offset: 0,
+        }, {
+          title:
+            text: 'Indicator'
+          height: 300
+          top: 400
+          opposite: true
         }]
       
   addSeries: (name, series, options) =>
     position = options['position' ] || 'overlay'
     @items[position].push(name)
     
-    @handle.addSeries
-      name: name,
+    @handle.addSeries _.extend 
+      name: name
       data: series
-      type: options['type']
-      yAxis: options['yAxis'] || 0
-      
+    , options
+    
     if options['redraw']
       @handle.redraw()
       

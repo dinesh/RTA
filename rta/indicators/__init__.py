@@ -37,13 +37,23 @@ I_ACCEPTS_FOUR_VALUE_AND_PENETRATION = [ 'CDLDARKCLOUDCOVER', 'CDLEVENINGSTAR', 
 
 
 def make_tseries(res, index ):
-  # print res
-  pivot = index.shape[0] - res.shape[0]
-  return pandas.DataFrame( 
-      index = index,
-      data = numpy.concatenate( [ numpy.zeros(pivot, 'int'), res ] ), 
-  ).to_records().tolist()
+  return CoreApi.padNans(res, index).to_records().tolist()
+
+class IndicatorBase(object):
+  __slots__ = [ 'series', 'index' ]
   
+  def __init__(self, series, **kwgs):
+    self.series = series
+    self.index = series.index
+    self.options = kwgs.get('options', {})
+    
+  def as_json(self):
+    raise NotImplementedError("%s should implement as_json function")
+    
+  def calculate(self):
+    raise NotImplementedError("%s should implement calculate function")
+  
+
 def calculate(series, ind_id, options):
   indicator = LIST[ind_id]
   

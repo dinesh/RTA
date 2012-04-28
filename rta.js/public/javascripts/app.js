@@ -77,7 +77,7 @@
       this.dateRange = __bind(this.dateRange, this);
       this.addSeries = __bind(this.addSeries, this);
       $(this.el).css({
-        'min-height': '600px'
+        'min-height': '1000px'
       });
       this.options = options || {};
       this.items = {
@@ -113,8 +113,15 @@
               text: 'Volume'
             },
             height: 100,
-            top: 400,
+            top: 800,
             offset: 0
+          }, {
+            title: {
+              text: 'Indicator'
+            },
+            height: 300,
+            top: 400,
+            opposite: true
           }
         ]
       });
@@ -124,12 +131,10 @@
       var position;
       position = options['position'] || 'overlay';
       this.items[position].push(name);
-      this.handle.addSeries({
+      this.handle.addSeries(_.extend({
         name: name,
-        data: series,
-        type: options['type'],
-        yAxis: options['yAxis'] || 0
-      });
+        data: series
+      }, options));
       if (options['redraw']) this.handle.redraw();
       return this;
     };
@@ -550,9 +555,32 @@
           data: data,
           success: function(data) {
             return _.each(data.records, function(ts) {
-              return app.models.chart.addSeries(ts.name, ts.series, {
-                yAxis: 0
+              var params;
+              app.models.chart.addSeries(ts.name, ts.series, {
+                yAxis: 2,
+                id: ts.name
               });
+              if (ts.flags) {
+                params = {
+                  onSeries: ts.name,
+                  yAxis: 2,
+                  type: 'flags',
+                  width: 25,
+                  shape: 'circlepin'
+                };
+                app.models.chart.addSeries(ts.name + "-SFlags", _.map(ts.flags.sell, function(e) {
+                  return {
+                    x: e,
+                    title: 'SELL'
+                  };
+                }), params);
+                return app.models.chart.addSeries(ts.name + "-BFlags", _.map(ts.flags.buy, function(e) {
+                  return {
+                    x: e,
+                    title: 'Buy'
+                  };
+                }), params);
+              }
             });
           }
         });

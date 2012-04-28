@@ -2,46 +2,9 @@ from flask import *
 from flask.views import MethodView, View
 from functools import wraps
 import datetime, time, operator, calendar, random
-from pymongo.objectid import ObjectId
 import numpy as np
+import os
 
-json = None
-try:
-    import simplejson as json
-except ImportError:
-    try:
-        import json
-    except ImportError:
-        try:
-            # Google Appengine offers simplejson via django
-            from django.utils import simplejson as json
-        except ImportError:
-            json_available = False
-
-class JSONEncoder(json.JSONEncoder):
-    """Default implementation of :class:`json.JSONEncoder` which provides
-    serialization for :class:`datetime.datetime` objects (to ISO 8601 format).
-
-    .. versionadded:: 0.9
-
-    """
-
-    def default(self, obj):
-        """Provides serialization for :class:`datetime.datetime` objects (in
-        addition to the serialization provided by the default
-        :class:`json.JSONEncoder` implementation).
-
-        If `obj` is a :class:`datetime.datetime` object, this converts it into
-        the corresponding ISO 8601 string representation.
-
-        """
-        if isinstance(obj, datetime.datetime):
-            # this is for javascript series date utctime * 1000
-            return calendar.timegm( obj.utctimetuple() ) * 1000
-        if isinstance(obj, ObjectId):
-          return str(obj)
-          
-        return super(JSONEncoder, self).default(obj)
 
 def support_jsonp(f):
     """Wraps JSONified output for JSONP"""
@@ -55,7 +18,6 @@ def support_jsonp(f):
             return f(*args, **kwargs)
     return decorated_function
 
-import os
 current_dir = os.path.dirname( os.path.abspath(__name__))
 from rta import api as CoreApi
 
@@ -118,17 +80,10 @@ class Api:
     
     price  = CoreApi.Model.Quote.series(symbol, start = start, end = end )
     
-    pd = CoreApi.pandas
-    
     if price.shape[0] > 0:
-      res = CoreApi.Indicators.calculate(price, indicator, request.args)
-      return json.dumps({ 'records': res }, cls = JSONEncoder )
-      
-      return json.dumps({ 
-          'records': pd.DataFrame( data = np.concatenate( 
-            [ np.array( close[:pivot] ), series ] ), 
-            index = price.index).to_records().tolist()
-          }, cls = JSONEncoder)
+      res = getattr( CoreApi, indicator.lower() ).impl( price, request.args ).as_json()
+      return json.dumps({ 'records': res }, cls = CoreApi.JSONEncoder )
+
     else:
       return json.dumps({ 'records' : []})
     
@@ -145,11 +100,10 @@ class Api:
                 }, fields = fields + [ 'volume' ] 
                 ).limit(per_page).skip( (page -1) * per_page ).sort('tick')
                 
-      print cursor.count()
       return json.dumps(dict( { 
         'records' : [ [ x[key] for key in fields ] for x in cursor ],
         'volume'  : [ [ x['tick'] , x['volume'] ] for x in cursor.rewind() ]
-      }), cls = JSONEncoder)
+      }), cls = CoreApi.JSONEncoder)
       
     else:
       return "Bad Request: %s not found" % symbol, 404 

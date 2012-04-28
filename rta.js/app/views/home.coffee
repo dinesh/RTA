@@ -53,9 +53,19 @@ class SidebarView extends Backbone.View
         data: data
         success: (data) ->
           _.each data.records, (ts) ->
-            app.models.chart.addSeries ts.name, ts.series,
-              yAxis : 0 
-          
+            app.models.chart.addSeries ts.name, ts.series, { yAxis : 2, id: ts.name } 
+            
+            if ts.flags
+              params = 
+                onSeries: ts.name,
+                yAxis : 2,
+                type: 'flags'   
+                width: 25
+                shape: 'circlepin'
+                
+              app.models.chart.addSeries ts.name + "-SFlags", _.map(ts.flags.sell, (e) -> { x: e, title: 'SELL' }), params
+              app.models.chart.addSeries ts.name + "-BFlags", _.map(ts.flags.buy, (e) -> { x: e, title: 'Buy' }), params
+              
     else
       alert('No Symbol selected.')
        

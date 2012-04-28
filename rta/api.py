@@ -18,7 +18,7 @@ from rta import indicators as Indicators
 from rta.indicators import talib as TaLib
 from rta.indicators import ( LIST, 
       cci,
-      
+      macd,
       )
 
 

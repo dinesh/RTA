@@ -558,7 +558,8 @@
               var params;
               app.models.chart.addSeries(ts.name, ts.series, {
                 yAxis: 2,
-                id: ts.name
+                id: ts.name,
+                'type': ts.type || 'line'
               });
               if (ts.flags) {
                 params = {
@@ -571,7 +572,7 @@
                 app.models.chart.addSeries(ts.name + "-SFlags", _.map(ts.flags.sell, function(e) {
                   return {
                     x: e,
-                    title: 'SELL'
+                    title: 'Sell'
                   };
                 }), params);
                 return app.models.chart.addSeries(ts.name + "-BFlags", _.map(ts.flags.buy, function(e) {

@@ -53,7 +53,7 @@ class SidebarView extends Backbone.View
         data: data
         success: (data) ->
           _.each data.records, (ts) ->
-            app.models.chart.addSeries ts.name, ts.series, { yAxis : 2, id: ts.name } 
+            app.models.chart.addSeries ts.name, ts.series, { yAxis : 2, id: ts.name, 'type': ts.type || 'line' } 
             
             if ts.flags
               params = 
@@ -63,7 +63,7 @@ class SidebarView extends Backbone.View
                 width: 25
                 shape: 'circlepin'
                 
-              app.models.chart.addSeries ts.name + "-SFlags", _.map(ts.flags.sell, (e) -> { x: e, title: 'SELL' }), params
+              app.models.chart.addSeries ts.name + "-SFlags", _.map(ts.flags.sell, (e) -> { x: e, title: 'Sell' }), params
               app.models.chart.addSeries ts.name + "-BFlags", _.map(ts.flags.buy, (e) -> { x: e, title: 'Buy' }), params
               
     else

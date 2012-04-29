@@ -67,7 +67,9 @@ def padNans(res, index ):
 def pd2json(df):
   if isinstance(df, pandas.DataFrame):
     return df.to_records().tolist()
-  elif isinstance( df, pandas.Series ) or isinstance( pandas.TimeSeries ):
+  elif isinstance( df, pandas.Series ) or isinstance( df, pandas.TimeSeries ):
     return list( df.iteritems() )
+  elif isinstance(df, pandas.Index ):
+    return df.tolist()
   
 __all__ = [ 'batch', 'JSONEncoder', 'padNans', 'pd2json' ]

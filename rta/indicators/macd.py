@@ -68,10 +68,10 @@ class MACD(IndicatorBase):
     }, {
       'name'   : 'MACD',
       'series' : common.pd2json(ts1),
-      'flags'  : flags,
+      'flags'  : flags
     }, {
       'name'   : 'MACD-Signal',
-      'series' : common.pd2json(ts2),
+      'series' : common.pd2json(ts2)
     }]
   
   def cget(self, key ):

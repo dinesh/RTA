@@ -555,32 +555,29 @@
           data: data,
           success: function(data) {
             return _.each(data.records, function(ts) {
-              var params;
+              var params, yaxis;
+              yaxis = parseInt(_.isUndefined(ts.position) ? 2 : ts.position);
               app.models.chart.addSeries(ts.name, ts.series, {
-                yAxis: 2,
+                yAxis: yaxis,
                 id: ts.name,
                 'type': ts.type || 'line'
               });
               if (ts.flags) {
                 params = {
                   onSeries: ts.name,
-                  yAxis: 2,
+                  yAxis: yaxis,
                   type: 'flags',
                   width: 25,
                   shape: 'circlepin'
                 };
-                app.models.chart.addSeries(ts.name + "-SFlags", _.map(ts.flags.sell, function(e) {
-                  return {
-                    x: e,
-                    title: 'Sell'
-                  };
-                }), params);
-                return app.models.chart.addSeries(ts.name + "-BFlags", _.map(ts.flags.buy, function(e) {
-                  return {
-                    x: e,
-                    title: 'Buy'
-                  };
-                }), params);
+                return _.each(ts.flags, function(list, title) {
+                  return app.models.chart.addSeries(ts.name + ("-" + title), _.map(list, function(e) {
+                    return {
+                      x: e,
+                      title: title
+                    };
+                  }), params);
+                });
               }
             });
           }

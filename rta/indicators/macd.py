@@ -2,6 +2,7 @@
 
 from rta.api import Indicators
 from rta import common
+from rta import ts as TS
 
 from . import IndicatorBase
 import numpy as np
@@ -33,25 +34,12 @@ class MACD(IndicatorBase):
     _sell_list = []
     _buy_list  = []
     direction  = None
-    
-    for _prev, _current in common.batch( itertools.izip(ts1.iteritems(), ts2.iteritems()), 2):
-      
-      pmacd, psignal = _prev
-      cmacd, csignal = _current
-      
-      idx = cmacd[0]
-      
-      abovezero = cmacd[1] > 0 and pmacd > 0
-      belowzero = not abovezero
-      
-      # buy: when macd crosses signal from below
-      if pmacd[1] < psignal[1] and cmacd[1] > csignal[1] and belowzero:
-        _buy_list.append(idx)
-      
-      # sell : when macd crosses signal from above
-      elif pmacd[1] > psignal[1] and cmacd[1] < csignal[1] and abovezero:
-        _sell_list.append(idx)
-           
+    for i, direction in TS.roll_intersect(ts1, ts2):
+      if direction:
+        _buy_list.append( self.index[i] )
+      else:
+        _sell_list.append( self.index[i] )
+                   
     return dict( sell = _sell_list, buy = _buy_list )
     
   # should return the ouput as json format for web api

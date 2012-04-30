@@ -63,6 +63,8 @@ def padNans(res, index ):
       index = index,
       data = numpy.concatenate( [ numpy.zeros(pivot, 'int'), res ] ), 
   )
+  
+
 
 def pd2json(df):
   if isinstance(df, pandas.DataFrame):
@@ -71,5 +73,7 @@ def pd2json(df):
     return list( df.iteritems() )
   elif isinstance(df, pandas.Index ):
     return df.tolist()
+  else:
+    return df
   
 __all__ = [ 'batch', 'JSONEncoder', 'padNans', 'pd2json' ]

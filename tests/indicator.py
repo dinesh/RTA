@@ -16,6 +16,3 @@ l = prices['low'].values
 c = prices['close'].values
 
 
-print cci.impl(prices, dict( timeperiod = 5 ) ).as_json()
-
-

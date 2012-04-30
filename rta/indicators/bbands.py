@@ -2,6 +2,7 @@
 
 from rta.api import Indicators
 from rta import common
+from rta import ts as TS
 
 from . import IndicatorBase
 import numpy as np
@@ -32,12 +33,9 @@ class BBANDS(IndicatorBase):
     
     
   def applyFlags(self, ts1, ts2):
-    _oversold_list = []
-    _overbought_list  = []
-    
-    _oversold_list = ts1[ ts1 < self.series['close'] ].index  
-    _overbought_list = ts2[ ts2 > self.series['close'] ].index
-           
+    _overbought_list   = [ self.index[i] for (i, direction) in TS.roll_intersect(ts1, self.series['close']) if direction ] 
+    _oversold_list = [ self.index[i] for (i, direction) in TS.roll_intersect(ts2, self.series['close'] ) if not direction ]
+        
     return dict( oversold = _oversold_list, overbought = _overbought_list )
     
   # should return the ouput as json format for web api
@@ -45,11 +43,10 @@ class BBANDS(IndicatorBase):
     _, ts1, ts2, ts3 = self.calculate()
     
     flags = self.applyFlags(ts1, ts3)
-    
     return [{ 
       'name'   : 'BBANDS-UP',
       'series' : common.pd2json(ts1),
-      'flags'  : { 'overbought': common.pd2json( flags['oversold'] ) } ,
+      'flags'  : { 'overbought': common.pd2json( flags.get('overbought', []) ) } ,
       'position' : 0
     }, {
       'name'   : 'BBANDS-SMA',
@@ -58,7 +55,7 @@ class BBANDS(IndicatorBase):
     }, {
       'name'   : 'BBANDS-DW',
       'series' : common.pd2json(ts3),
-      'flags'  : { 'oversold': common.pd2json( flags['overbought'] ) },
+      'flags'  : { 'oversold': common.pd2json( flags.get('oversold', []) ) },
       'position' : 0
     }]
   

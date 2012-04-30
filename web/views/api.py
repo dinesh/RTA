@@ -5,7 +5,6 @@ import datetime, time, operator, calendar, random
 import numpy as np
 import os
 
-
 def support_jsonp(f):
     """Wraps JSONified output for JSONP"""
     @wraps(f)
@@ -100,9 +99,16 @@ class Api:
                 }, fields = fields + [ 'volume' ] 
                 ).limit(per_page).skip( (page -1) * per_page ).sort('tick')
                 
+      records = [ [ x[key] for key in fields ] for x in cursor ]
+      trend = []
+      if len(records) > 0:
+        trend = CoreApi.TS.roll_trendline( [ x[0] for x in records ], [ x[4] for x in records ] )
+      volume =  [ [ x['tick'] , x['volume'] ] for x in cursor.rewind() ]      
+      
       return json.dumps(dict( { 
-        'records' : [ [ x[key] for key in fields ] for x in cursor ],
-        'volume'  : [ [ x['tick'] , x['volume'] ] for x in cursor.rewind() ]
+        'records' : records,
+        'trendline': trend,
+        'volume'  : volume
       }), cls = CoreApi.JSONEncoder)
       
     else:

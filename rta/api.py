@@ -20,10 +20,12 @@ from rta.indicators import ( LIST,
       cci,
       macd,
       bbands,
+      rsi,
       )
 
 
 from rta import model as Model
+from rta import ts as TS
 from rta.configuration import Config
 from rta import configuration as Configuration
 from rta.dam import YahooDAM

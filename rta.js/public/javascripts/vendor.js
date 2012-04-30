@@ -28626,18 +28626,6 @@ extend(Highcharts, {
 	version: '1.1.5'
 });
 }());
-/*
- Highstock JS v1.1.5 (2012-03-15)
- MooTools adapter
-
- (c) 2010-2011 Torstein H?nsi
-
- License: www.highcharts.com/license
-*/
-(function(){var e=window,i=document,f=e.MooTools.version.substring(0,3),g=f==="1.2"||f==="1.1",j=g||f==="1.3",h=e.$extend||function(){return Object.append.apply(Object,arguments)};e.HighchartsAdapter={init:function(a){var b=Fx.prototype,c=b.start,d=Fx.Morph.prototype,e=d.compute;b.start=function(b,d){var e=this.element;if(b.d)this.paths=a.init(e,e.d,this.toD);c.apply(this,arguments);return this};d.compute=function(b,c,d){var f=this.paths;if(f)this.element.attr("d",a.step(f[0],f[1],d,this.toD));else return e.apply(this,
-arguments)}},getScript:function(a,b){var c=i.getElementsByTagName("head")[0],d=i.createElement("script");d.type="text/javascript";d.src=a;d.onload=b;c.appendChild(d)},animate:function(a,b,c){var d=a.attr,f=c&&c.complete;if(d&&!a.setStyle)a.getStyle=a.attr,a.setStyle=function(){var b=arguments;a.attr.call(a,b[0],b[1][0])},a.$family=function(){return!0};e.HighchartsAdapter.stop(a);c=new Fx.Morph(d?a:$(a),h({transition:Fx.Transitions.Quad.easeInOut},c));if(d)c.element=a;if(b.d)c.toD=b.d;f&&c.addEvent("complete",
-f);c.start(b);a.fx=c},each:function(a,b){return g?$each(a,b):Array.each(a,b)},map:function(a,b){return a.map(b)},grep:function(a,b){return a.filter(b)},merge:function(){var a=arguments,b=[{}],c=a.length;if(g)a=$merge.apply(null,a);else{for(;c--;)typeof a[c]!=="boolean"&&(b[c+1]=a[c]);a=Object.merge.apply(Object,b)}return a},offset:function(a){a=$(a).getOffsets();return{left:a.x,top:a.y}},extendWithEvents:function(a){a.addEvent||(a.nodeName?$(a):h(a,new Events))},addEvent:function(a,b,c){typeof b===
-"string"&&(b==="unload"&&(b="beforeunload"),e.HighchartsAdapter.extendWithEvents(a),a.addEvent(b,c))},removeEvent:function(a,b,c){typeof a!=="string"&&(e.HighchartsAdapter.extendWithEvents(a),b?(b==="unload"&&(b="beforeunload"),c?a.removeEvent(b,c):a.removeEvents(b)):a.removeEvents())},fireEvent:function(a,b,c,d){b={type:b,target:a};b=j?new Event(b):new DOMEvent(b);b=h(b,c);b.preventDefault=function(){d=null};a.fireEvent&&a.fireEvent(b.type,b);d&&d(b)},stop:function(a){a.fx&&a.fx.cancel()}}})();
 /**
  * @license Highstock JS v1.1.5 (2012-03-15)
  * MooTools adapter
@@ -28936,6 +28924,18 @@ win.HighchartsAdapter = {
 };
 
 }());
+/*
+ Highstock JS v1.1.5 (2012-03-15)
+ MooTools adapter
+
+ (c) 2010-2011 Torstein H?nsi
+
+ License: www.highcharts.com/license
+*/
+(function(){var e=window,i=document,f=e.MooTools.version.substring(0,3),g=f==="1.2"||f==="1.1",j=g||f==="1.3",h=e.$extend||function(){return Object.append.apply(Object,arguments)};e.HighchartsAdapter={init:function(a){var b=Fx.prototype,c=b.start,d=Fx.Morph.prototype,e=d.compute;b.start=function(b,d){var e=this.element;if(b.d)this.paths=a.init(e,e.d,this.toD);c.apply(this,arguments);return this};d.compute=function(b,c,d){var f=this.paths;if(f)this.element.attr("d",a.step(f[0],f[1],d,this.toD));else return e.apply(this,
+arguments)}},getScript:function(a,b){var c=i.getElementsByTagName("head")[0],d=i.createElement("script");d.type="text/javascript";d.src=a;d.onload=b;c.appendChild(d)},animate:function(a,b,c){var d=a.attr,f=c&&c.complete;if(d&&!a.setStyle)a.getStyle=a.attr,a.setStyle=function(){var b=arguments;a.attr.call(a,b[0],b[1][0])},a.$family=function(){return!0};e.HighchartsAdapter.stop(a);c=new Fx.Morph(d?a:$(a),h({transition:Fx.Transitions.Quad.easeInOut},c));if(d)c.element=a;if(b.d)c.toD=b.d;f&&c.addEvent("complete",
+f);c.start(b);a.fx=c},each:function(a,b){return g?$each(a,b):Array.each(a,b)},map:function(a,b){return a.map(b)},grep:function(a,b){return a.filter(b)},merge:function(){var a=arguments,b=[{}],c=a.length;if(g)a=$merge.apply(null,a);else{for(;c--;)typeof a[c]!=="boolean"&&(b[c+1]=a[c]);a=Object.merge.apply(Object,b)}return a},offset:function(a){a=$(a).getOffsets();return{left:a.x,top:a.y}},extendWithEvents:function(a){a.addEvent||(a.nodeName?$(a):h(a,new Events))},addEvent:function(a,b,c){typeof b===
+"string"&&(b==="unload"&&(b="beforeunload"),e.HighchartsAdapter.extendWithEvents(a),a.addEvent(b,c))},removeEvent:function(a,b,c){typeof a!=="string"&&(e.HighchartsAdapter.extendWithEvents(a),b?(b==="unload"&&(b="beforeunload"),c?a.removeEvent(b,c):a.removeEvents(b)):a.removeEvents())},fireEvent:function(a,b,c,d){b={type:b,target:a};b=j?new Event(b):new DOMEvent(b);b=h(b,c);b.preventDefault=function(){d=null};a.fireEvent&&a.fireEvent(b.type,b);d&&d(b)},stop:function(a){a.fx&&a.fx.cancel()}}})();
 /*
  Highstock JS v1.1.5 (2012-03-15)
  Prototype adapter
@@ -32311,6 +32311,269 @@ c.contextMenu("export-menu",f,a.x,a.y,h,k)}),q.on("click",function(){g.apply(c,a
 B(b,"mouseleave"),this.exportDivElements[a]=b.onmouseout=b.onmouseover=b.ontouchstart=b.onclick=null,u(b)}});f.Renderer.prototype.symbols.exportIcon=function(a,b,c,d){return x(["M",a,b+c,"L",a+c,b+d,a+c,b+d*0.8,a,b+d*0.8,"Z","M",a+c*0.5,b+d*0.8,"L",a+c*0.8,b+d*0.4,a+c*0.4,b+d*0.4,a+c*0.4,b,a+c*0.6,b,a+c*0.6,b+d*0.4,a+c*0.2,b+d*0.4,"Z"])};f.Renderer.prototype.symbols.printIcon=function(a,b,c,d){return x(["M",a,b+d*0.7,"L",a+c,b+d*0.7,a+c,b+d*0.4,a,b+d*0.4,"Z","M",a+c*0.2,b+d*0.4,"L",a+c*0.2,b,a+c*
 0.8,b,a+c*0.8,b+d*0.4,"Z","M",a+c*0.2,b+d*0.7,"L",a,b+d,a+c,b+d,a+c*0.8,b+d*0.7,"Z"])};y.prototype.callbacks.push(function(a){var b,c=a.options.exporting,d=c.buttons;if(c.enabled!==!1){for(b in d)a.addButton(d[b]);z(a,"destroy",a.destroyExport)}})})();
 /**
+ * Dark blue theme for Highcharts JS
+ * @author Torstein Hønsi
+ */
+
+Highcharts.theme = {
+	colors: ["#DDDF0D", "#55BF3B", "#DF5353", "#7798BF", "#aaeeee", "#ff0066", "#eeaaee",
+		"#55BF3B", "#DF5353", "#7798BF", "#aaeeee"],
+	chart: {
+		backgroundColor: {
+			linearGradient: [0, 0, 250, 500],
+			stops: [
+				[0, 'rgb(48, 48, 96)'],
+				[1, 'rgb(0, 0, 0)']
+			]
+		},
+		borderColor: '#000000',
+		borderWidth: 2,
+		className: 'dark-container',
+		plotBackgroundColor: 'rgba(255, 255, 255, .1)',
+		plotBorderColor: '#CCCCCC',
+		plotBorderWidth: 1
+	},
+	title: {
+		style: {
+			color: '#C0C0C0',
+			font: 'bold 16px "Trebuchet MS", Verdana, sans-serif'
+		}
+	},
+	subtitle: {
+		style: {
+			color: '#666666',
+			font: 'bold 12px "Trebuchet MS", Verdana, sans-serif'
+		}
+	},
+	xAxis: {
+		gridLineColor: '#333333',
+		gridLineWidth: 1,
+		labels: {
+			style: {
+				color: '#A0A0A0'
+			}
+		},
+		lineColor: '#A0A0A0',
+		tickColor: '#A0A0A0',
+		title: {
+			style: {
+				color: '#CCC',
+				fontWeight: 'bold',
+				fontSize: '12px',
+				fontFamily: 'Trebuchet MS, Verdana, sans-serif'
+
+			}
+		}
+	},
+	yAxis: {
+		gridLineColor: '#333333',
+		labels: {
+			style: {
+				color: '#A0A0A0'
+			}
+		},
+		lineColor: '#A0A0A0',
+		minorTickInterval: null,
+		tickColor: '#A0A0A0',
+		tickWidth: 1,
+		title: {
+			style: {
+				color: '#CCC',
+				fontWeight: 'bold',
+				fontSize: '12px',
+				fontFamily: 'Trebuchet MS, Verdana, sans-serif'
+			}
+		}
+	},
+	tooltip: {
+		backgroundColor: 'rgba(0, 0, 0, 0.75)',
+		style: {
+			color: '#F0F0F0'
+		}
+	},
+	toolbar: {
+		itemStyle: {
+			color: 'silver'
+		}
+	},
+	plotOptions: {
+		line: {
+			dataLabels: {
+				color: '#CCC'
+			},
+			marker: {
+				lineColor: '#333'
+			}
+		},
+		spline: {
+			marker: {
+				lineColor: '#333'
+			}
+		},
+		scatter: {
+			marker: {
+				lineColor: '#333'
+			}
+		},
+		candlestick: {
+			lineColor: 'white'
+		}
+	},
+	legend: {
+		itemStyle: {
+			font: '9pt Trebuchet MS, Verdana, sans-serif',
+			color: '#A0A0A0'
+		},
+		itemHoverStyle: {
+			color: '#FFF'
+		},
+		itemHiddenStyle: {
+			color: '#444'
+		}
+	},
+	credits: {
+		style: {
+			color: '#666'
+		}
+	},
+	labels: {
+		style: {
+			color: '#CCC'
+		}
+	},
+
+	navigation: {
+		buttonOptions: {
+			backgroundColor: {
+				linearGradient: [0, 0, 0, 20],
+				stops: [
+					[0.4, '#606060'],
+					[0.6, '#333333']
+				]
+			},
+			borderColor: '#000000',
+			symbolStroke: '#C0C0C0',
+			hoverSymbolStroke: '#FFFFFF'
+		}
+	},
+
+	exporting: {
+		buttons: {
+			exportButton: {
+				symbolFill: '#55BE3B'
+			},
+			printButton: {
+				symbolFill: '#7797BE'
+			}
+		}
+	},
+
+	// scroll charts
+	rangeSelector: {
+		buttonTheme: {
+			fill: {
+				linearGradient: [0, 0, 0, 20],
+				stops: [
+					[0.4, '#888'],
+					[0.6, '#555']
+				]
+			},
+			stroke: '#000000',
+			style: {
+				color: '#CCC',
+				fontWeight: 'bold'
+			},
+			states: {
+				hover: {
+					fill: {
+						linearGradient: [0, 0, 0, 20],
+						stops: [
+							[0.4, '#BBB'],
+							[0.6, '#888']
+						]
+					},
+					stroke: '#000000',
+					style: {
+						color: 'white'
+					}
+				},
+				select: {
+					fill: {
+						linearGradient: [0, 0, 0, 20],
+						stops: [
+							[0.1, '#000'],
+							[0.3, '#333']
+						]
+					},
+					stroke: '#000000',
+					style: {
+						color: 'yellow'
+					}
+				}
+			}
+		},
+		inputStyle: {
+			backgroundColor: '#333',
+			color: 'silver'
+		},
+		labelStyle: {
+			color: 'silver'
+		}
+	},
+
+	navigator: {
+		handles: {
+			backgroundColor: '#666',
+			borderColor: '#AAA'
+		},
+		outlineColor: '#CCC',
+		maskFill: 'rgba(16, 16, 16, 0.5)',
+		series: {
+			color: '#7798BF',
+			lineColor: '#A6C7ED'
+		}
+	},
+
+	scrollbar: {
+		barBackgroundColor: {
+				linearGradient: [0, 0, 0, 20],
+				stops: [
+					[0.4, '#888'],
+					[0.6, '#555']
+				]
+			},
+		barBorderColor: '#CCC',
+		buttonArrowColor: '#CCC',
+		buttonBackgroundColor: {
+				linearGradient: [0, 0, 0, 20],
+				stops: [
+					[0.4, '#888'],
+					[0.6, '#555']
+				]
+			},
+		buttonBorderColor: '#CCC',
+		rifleColor: '#FFF',
+		trackBackgroundColor: {
+			linearGradient: [0, 0, 0, 10],
+			stops: [
+				[0, '#000'],
+				[1, '#333']
+			]
+		},
+		trackBorderColor: '#666'
+	},
+
+	// special colors for some of the
+	legendBackgroundColor: 'rgba(0, 0, 0, 0.5)',
+	legendBackgroundColorSolid: 'rgb(35, 35, 70)',
+	dataLabelsColor: '#444',
+	textColor: '#C0C0C0',
+	maskColor: 'rgba(255,255,255,0.3)'
+};
+
+// Apply the theme
+var highchartsOptions = Highcharts.setOptions(Highcharts.theme);
+/**
  * @license Highstock JS v1.1.5 (2012-03-15)
  * Exporting module
  *
@@ -33047,269 +33310,6 @@ Chart.prototype.callbacks.push(function (chart) {
 
 
 }());
-/**
- * Dark blue theme for Highcharts JS
- * @author Torstein Hønsi
- */
-
-Highcharts.theme = {
-	colors: ["#DDDF0D", "#55BF3B", "#DF5353", "#7798BF", "#aaeeee", "#ff0066", "#eeaaee",
-		"#55BF3B", "#DF5353", "#7798BF", "#aaeeee"],
-	chart: {
-		backgroundColor: {
-			linearGradient: [0, 0, 250, 500],
-			stops: [
-				[0, 'rgb(48, 48, 96)'],
-				[1, 'rgb(0, 0, 0)']
-			]
-		},
-		borderColor: '#000000',
-		borderWidth: 2,
-		className: 'dark-container',
-		plotBackgroundColor: 'rgba(255, 255, 255, .1)',
-		plotBorderColor: '#CCCCCC',
-		plotBorderWidth: 1
-	},
-	title: {
-		style: {
-			color: '#C0C0C0',
-			font: 'bold 16px "Trebuchet MS", Verdana, sans-serif'
-		}
-	},
-	subtitle: {
-		style: {
-			color: '#666666',
-			font: 'bold 12px "Trebuchet MS", Verdana, sans-serif'
-		}
-	},
-	xAxis: {
-		gridLineColor: '#333333',
-		gridLineWidth: 1,
-		labels: {
-			style: {
-				color: '#A0A0A0'
-			}
-		},
-		lineColor: '#A0A0A0',
-		tickColor: '#A0A0A0',
-		title: {
-			style: {
-				color: '#CCC',
-				fontWeight: 'bold',
-				fontSize: '12px',
-				fontFamily: 'Trebuchet MS, Verdana, sans-serif'
-
-			}
-		}
-	},
-	yAxis: {
-		gridLineColor: '#333333',
-		labels: {
-			style: {
-				color: '#A0A0A0'
-			}
-		},
-		lineColor: '#A0A0A0',
-		minorTickInterval: null,
-		tickColor: '#A0A0A0',
-		tickWidth: 1,
-		title: {
-			style: {
-				color: '#CCC',
-				fontWeight: 'bold',
-				fontSize: '12px',
-				fontFamily: 'Trebuchet MS, Verdana, sans-serif'
-			}
-		}
-	},
-	tooltip: {
-		backgroundColor: 'rgba(0, 0, 0, 0.75)',
-		style: {
-			color: '#F0F0F0'
-		}
-	},
-	toolbar: {
-		itemStyle: {
-			color: 'silver'
-		}
-	},
-	plotOptions: {
-		line: {
-			dataLabels: {
-				color: '#CCC'
-			},
-			marker: {
-				lineColor: '#333'
-			}
-		},
-		spline: {
-			marker: {
-				lineColor: '#333'
-			}
-		},
-		scatter: {
-			marker: {
-				lineColor: '#333'
-			}
-		},
-		candlestick: {
-			lineColor: 'white'
-		}
-	},
-	legend: {
-		itemStyle: {
-			font: '9pt Trebuchet MS, Verdana, sans-serif',
-			color: '#A0A0A0'
-		},
-		itemHoverStyle: {
-			color: '#FFF'
-		},
-		itemHiddenStyle: {
-			color: '#444'
-		}
-	},
-	credits: {
-		style: {
-			color: '#666'
-		}
-	},
-	labels: {
-		style: {
-			color: '#CCC'
-		}
-	},
-
-	navigation: {
-		buttonOptions: {
-			backgroundColor: {
-				linearGradient: [0, 0, 0, 20],
-				stops: [
-					[0.4, '#606060'],
-					[0.6, '#333333']
-				]
-			},
-			borderColor: '#000000',
-			symbolStroke: '#C0C0C0',
-			hoverSymbolStroke: '#FFFFFF'
-		}
-	},
-
-	exporting: {
-		buttons: {
-			exportButton: {
-				symbolFill: '#55BE3B'
-			},
-			printButton: {
-				symbolFill: '#7797BE'
-			}
-		}
-	},
-
-	// scroll charts
-	rangeSelector: {
-		buttonTheme: {
-			fill: {
-				linearGradient: [0, 0, 0, 20],
-				stops: [
-					[0.4, '#888'],
-					[0.6, '#555']
-				]
-			},
-			stroke: '#000000',
-			style: {
-				color: '#CCC',
-				fontWeight: 'bold'
-			},
-			states: {
-				hover: {
-					fill: {
-						linearGradient: [0, 0, 0, 20],
-						stops: [
-							[0.4, '#BBB'],
-							[0.6, '#888']
-						]
-					},
-					stroke: '#000000',
-					style: {
-						color: 'white'
-					}
-				},
-				select: {
-					fill: {
-						linearGradient: [0, 0, 0, 20],
-						stops: [
-							[0.1, '#000'],
-							[0.3, '#333']
-						]
-					},
-					stroke: '#000000',
-					style: {
-						color: 'yellow'
-					}
-				}
-			}
-		},
-		inputStyle: {
-			backgroundColor: '#333',
-			color: 'silver'
-		},
-		labelStyle: {
-			color: 'silver'
-		}
-	},
-
-	navigator: {
-		handles: {
-			backgroundColor: '#666',
-			borderColor: '#AAA'
-		},
-		outlineColor: '#CCC',
-		maskFill: 'rgba(16, 16, 16, 0.5)',
-		series: {
-			color: '#7798BF',
-			lineColor: '#A6C7ED'
-		}
-	},
-
-	scrollbar: {
-		barBackgroundColor: {
-				linearGradient: [0, 0, 0, 20],
-				stops: [
-					[0.4, '#888'],
-					[0.6, '#555']
-				]
-			},
-		barBorderColor: '#CCC',
-		buttonArrowColor: '#CCC',
-		buttonBackgroundColor: {
-				linearGradient: [0, 0, 0, 20],
-				stops: [
-					[0.4, '#888'],
-					[0.6, '#555']
-				]
-			},
-		buttonBorderColor: '#CCC',
-		rifleColor: '#FFF',
-		trackBackgroundColor: {
-			linearGradient: [0, 0, 0, 10],
-			stops: [
-				[0, '#000'],
-				[1, '#333']
-			]
-		},
-		trackBorderColor: '#666'
-	},
-
-	// special colors for some of the
-	legendBackgroundColor: 'rgba(0, 0, 0, 0.5)',
-	legendBackgroundColorSolid: 'rgb(35, 35, 70)',
-	dataLabelsColor: '#444',
-	textColor: '#C0C0C0',
-	maskColor: 'rgba(255,255,255,0.3)'
-};
-
-// Apply the theme
-var highchartsOptions = Highcharts.setOptions(Highcharts.theme);
 /**
  * Dark blue theme for Highcharts JS
  * @author Torstein Hønsi

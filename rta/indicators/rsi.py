@@ -7,16 +7,13 @@ from . import IndicatorBase
 import numpy as np
 
 
-class CCI(IndicatorBase):
-  
-  # 1) should extract options, 2) call talib function 3) maketimeseries of output and return
+class RSI(IndicatorBase):
   
   def timeperiod(self):
     return int( self.cget('timeperiod') )
     
   def calculate(self):
-    pivot, s = Indicators.CCI( self.series['high'], self.series['low'], 
-                               self.series['close'], timeperiod = self.timeperiod() )
+    pivot, s = Indicators.RSI( self.series['close'], timeperiod = self.timeperiod() )
     return ( pivot, common.padNans(s, self.index) )
     
     
@@ -25,8 +22,8 @@ class CCI(IndicatorBase):
     _buy_list  = []
     direction  = None
     
-    _sell_list = [ ts.index[i] for (i, slope) in TS.roll_intersect(ts, -100) if not slope ]
-    _buy_list = [ ts.index[i] for (i, slope) in TS.roll_intersect(ts, 100) if slope ]
+    _sell_list = [ ts.index[i] for (i, slope) in TS.roll_intersect(ts, 70) if slope ]
+    _buy_list = [ ts.index[i] for (i, slope) in TS.roll_intersect(ts, 30) if not slope ]
     
     return dict( sell = _sell_list, buy = _buy_list )
     
@@ -35,9 +32,10 @@ class CCI(IndicatorBase):
     _, ts = self.calculate()
     flags = self.applyFlags(ts)
     return [{ 
-      'name'   : 'CCI-%d' % self.timeperiod(),
+      'name'   : 'RSI-%d' % self.timeperiod(),
       'series' : common.pd2json(ts),
       'flags'  : flags,
+      'position' : 2
     }]
   
   def cget(self, key ):
@@ -49,4 +47,4 @@ class CCI(IndicatorBase):
     return dict( defaults.items() + kwgs.items() )
     
 def impl(series, options):
-  return CCI(series, options = options)
+  return RSI(series, options = options)

@@ -1,13 +1,25 @@
 
-talib function documentation: http://search.cpan.org/~kmx/Finance-TA-v0.4.0/TA.pod
-
-for python profiling http://packages.python.org/line_profiler/
-  - or http://fseoane.net/blog/2012/line-by-line-report-of-memory-usage/
-
-for treadline:
-  1. http://www.physics.csbsju.edu/stats/least_squares.html
-  2. http://www.physics.csbsju.edu/stats/fitting_lines.html
+ ____ _____  _                 _    _                  _ _   _               
+|  _ \_   _|/ \               / \  | | __ _  ___  _ __(_) |_| |__  _ __ ___  
+| |_) || | / _ \    _____    / _ \ | |/ _` |/ _ \| '__| | __| '_ \| '_ ` _ \ 
+|  _ < | |/ ___ \  |_____|  / ___ \| | (_| | (_) | |  | | |_| | | | | | | | |
+|_| \_\|_/_/   \_\         /_/   \_\_|\__, |\___/|_|  |_|\__|_| |_|_| |_| |_|
+                                      |___/                                  
+ ---------------------------------------------------------------------------------------
+  Goals
+  ------------
+  This is an algorithm trading platform of professional traders. It providers technical analysis of 200+ popular indicators and trading signals. You can program your trading strategies and backtest them against historical data. 
+ 
+ Technology stack
+ ----------------
+ 1. Django/Flask for back-end api
+    Python is known for its speed, ease of use and best ecosystem in scientific and machine learning field. It really shines when u use Numpy, Pandas and Pytables for large computational work. I see python a perfect fit in financial world.
+    
+  2. client-side MVC: Backbone.js and Brunch
+     Node and client-side MVC are really popular over the recent years. so i though of giving it a try ( which is excellent till now. ). Brunch is used for automatic compiling coffeescript files and serve them in dev mode.
+     
+    
   
-client side templating: http://icanhazjs.com/ 
+  
+   
 
-High performance mongo query: https://bitbucket.org/djcbeach/monary/wiki/Home

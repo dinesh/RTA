@@ -15,6 +15,9 @@ try:
     params = re.findall("([\w]+)=\?", definition) 
     desc = re.findall( "\(.*\)\n\n(.*)$", definition)
     LIST[ind] = dict({ 'args': params, 'desc': desc[0], 'id': ind } )
+  
+  LIST['ZIGZAG'] = dict( args=['cutoff'], desc= 'ZigZag indicatpr', id='ZIGZAG' )
+  
 except ImportError:
   raise
 
@@ -52,7 +55,9 @@ class IndicatorBase(object):
     
   def calculate(self):
     raise NotImplementedError("%s should implement calculate function")
-  
+    
+  def config(self):
+    return self.__class__.options( self.options )  
 
 def calculate(series, ind_id, options):
   indicator = LIST[ind_id]

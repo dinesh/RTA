@@ -21,6 +21,8 @@ from rta.indicators import ( LIST,
       macd,
       bbands,
       rsi,
+      zigzag,
+      
       )
 
 

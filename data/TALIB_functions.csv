@@ -130,3 +130,4 @@ VAR,"TALIB(VAR, INPUT_ARRAY, PERIOD, DEVIATIONS)",Variance,"TALIB(VAR, Close, 5,
 WCLPRICE,TALIB(WCLPRICE),Weighted Close,TALIB(WCLPRICE),4,Indicator,Price Adjustment
 WILLR ,"TALIB(WILLR, PERIOD)",William's %R,"TALIB(WILLR, 14)",5,Indicator,Momentum Indicators
 WMA ,"TALIB(WMA, INPUT_ARRAY, PERIOD)",Weighted Moving Average,"TALIB(WMA, Close, 30) ",4,Indicator,Moving Average
+ZIGZAG, "",Zigzag indicator, "",5,Indicator, Momentum Indicators

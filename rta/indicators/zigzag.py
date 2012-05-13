@@ -1,6 +1,45 @@
 
 import numpy as np
+import pandas as pd
 
+from . import IndicatorBase
+from rta import common
+
+__all__ = [ 'impl', 'Zigzag' ] 
+
+def impl(series, options):
+  return Zigzag(series, options = options)
+  
+class Zigzag(IndicatorBase):
+  def cutoff(self):
+    return int( self.cget('cutoff') )
+    
+  def calculate(self):
+    idx = _zigzag( self.series['close'], cutoff = self.cutoff() )
+    return ( 0, common.padNans( self.series['close'][idx], index= self.index[idx] ) )
+    
+    
+  def applyFlags(self, ts):
+    pass
+    
+  # should return the ouput as json format for web api
+  def as_json(self):
+    _, ts = self.calculate()
+    return ( [{ 
+      'name'   : 'ZigZag-%d' % self.cutoff(),
+      'series' : common.pd2json(ts),
+      'position': 0,
+    }], self.config() )
+  
+  def cget(self, key ):
+    return self.__class__.options( self.options ).get(key)
+    
+  @classmethod
+  def options(_cls, kwgs):
+    defaults = dict({ 'cutoff' : 5 })
+    return dict( defaults.items() + kwgs.items() )
+  
+  
 def _delta( X, end, start ):
     return 100 * abs( 1.0 * ( X[end] - X[start] ) / X[start] )
     

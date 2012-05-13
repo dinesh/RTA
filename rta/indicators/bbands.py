@@ -57,7 +57,7 @@ class BBANDS(IndicatorBase):
       'series' : common.pd2json(ts3),
       'flags'  : { 'oversold': common.pd2json( flags.get('oversold', []) ) },
       'position' : 0
-    }], self.__class__.options( self.options ) )
+    }], self.config() )
   
   def cget(self, key ):
     return self.__class__.options( self.options ).get(key)

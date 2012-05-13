@@ -31,12 +31,12 @@ class RSI(IndicatorBase):
   def as_json(self):
     _, ts = self.calculate()
     flags = self.applyFlags(ts)
-    return [{ 
+    return ( [{ 
       'name'   : 'RSI-%d' % self.timeperiod(),
       'series' : common.pd2json(ts),
       'flags'  : flags,
       'position' : 2
-    }]
+    }], self.config() )
   
   def cget(self, key ):
     return self.__class__.options( self.options ).get(key)

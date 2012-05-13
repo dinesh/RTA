@@ -49,7 +49,7 @@ class MACD(IndicatorBase):
     flags = self.applyFlags(ts1, ts2)
     print flags
     
-    return [{ 
+    return ( [{ 
       'name'   : 'MACD-H%d' % self.signalperiod(),
       'series' : common.pd2json(ts3),
       'type'   : 'column'
@@ -60,7 +60,7 @@ class MACD(IndicatorBase):
     }, {
       'name'   : 'MACD-Signal',
       'series' : common.pd2json(ts2)
-    }]
+    }], self.config() )
   
   def cget(self, key ):
     return self.__class__.options( self.options ).get(key)

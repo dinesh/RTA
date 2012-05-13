@@ -51,7 +51,7 @@ class StockChart
     position = options['position' ] || 'overlay'
     @items[position].push(name)
     
-    @handle.addSeries _.extend 
+    s = @handle.addSeries _.extend 
       name: name
       data: series
     , options
@@ -59,7 +59,7 @@ class StockChart
     if options['redraw']
       @handle.redraw()
       
-    @
+    s
     
   dateRange: =>
 	  @handle.xAxis[0].getExtremes()
@@ -77,7 +77,6 @@ class ChartView extends Backbone.View
     
     
     $.getJSON url + '&callback=?', (data) =>
-      console.log data.trendline
       @stockchart = new StockChart @el, @model.get('id'),
         series: [{
           name: 'OHLV', 

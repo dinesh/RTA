@@ -1,0 +1,7 @@
+
+
+<select>
+  <% for item in @items: %>
+    <option value="<%= item.get('id') %>"> <%= item.get('id') %> - <%= item.get('desc') %> </option>
+  <% end %>
+</select>

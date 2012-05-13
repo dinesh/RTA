@@ -34,8 +34,8 @@ class Api:
     
     routes = [ 
           ( (self.app, self.prefix),
-                  ('/indicators', self.get_indicators ),
                   ('/indicators/<indicator>/<symbol>/series.json', self.get_indicator_series ),
+                  ('/indicators', self.get_indicators ),
                   ('/quotes/<symbol>.json', self.get_quotes),
                   ('/symbols.json', self.get_symbols),
           ),
@@ -56,7 +56,7 @@ class Api:
               self.app.add_url_rule( pattern, view_func=view)
           else:
             endpoint[0].add_url_rule(pattern, view_func=view)
-        
+       
   @support_jsonp  
   def get_indicators(self):
     __list, data = CoreApi.Indicators.LIST, list()
@@ -80,9 +80,8 @@ class Api:
     price  = CoreApi.Model.Quote.series(symbol, start = start, end = end )
     
     if price.shape[0] > 0:
-      res = getattr( CoreApi, indicator.lower() ).impl( price, request.args ).as_json()
-      return json.dumps({ 'records': res }, cls = CoreApi.JSONEncoder )
-
+      res, _config = getattr( CoreApi, indicator.lower() ).impl( price, request.args ).as_json()
+      return json.dumps({ 'records': res, 'settings': _config }, cls = CoreApi.JSONEncoder )
     else:
       return json.dumps({ 'records' : []})
     
@@ -100,14 +99,10 @@ class Api:
                 ).limit(per_page).skip( (page -1) * per_page ).sort('tick')
                 
       records = [ [ x[key] for key in fields ] for x in cursor ]
-      trend = []
-      if len(records) > 0:
-        trend = CoreApi.TS.roll_trendline( [ x[0] for x in records ], [ x[4] for x in records ] )
       volume =  [ [ x['tick'] , x['volume'] ] for x in cursor.rewind() ]      
       
       return json.dumps(dict( { 
         'records' : records,
-        'trendline': trend,
         'volume'  : volume
       }), cls = CoreApi.JSONEncoder)
       

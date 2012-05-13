@@ -1,72 +1,70 @@
 
-sidebarTmpl = require('views/templates/sidebar')
-symbolTmpl = require('views/templates/symbols')
+sidebarTmpl             = require('views/templates/sidebar')
+symbolTmpl              = require('views/templates/symbols')
+indicatorFormViewTempl  = require('views/templates/indicator_form')
 
 ChartView = require('views/chart')
 
-class SidebarView extends Backbone.View
-  tagName: 'ul'
-  id: 'side-inds-list'
-  className: 'list'
+class IndicatorFormView extends Backbone.View
+  tagName: 'li'
   
-  events:
-    'click .add' : 'addIndicator'
-    
   initialize: ->
     super()
-    @container = this.options.container
+    @model = this.options.model
+    
+  render: =>
+    $(@el).attr('data-id', "ind-#{@model.id}").html( indicatorFormViewTempl(item: @model ) )
+    @
+    
+class SidebarView extends Backbone.View
+  events:
+    'change select' : 'addIndicatorwithDefault'
+    'click input.edit': 'addIndicator'
+        
+  initialize: ->
+    super()
     @collection.bind('reset', @render).fetch()
     
   render: =>
-    $(@el).html( sidebarTmpl( 'items' : @collection.models ))
-    @container.html( @el )  
+    $(@el).html( sidebarTmpl('items' : @collection.models ) )
     @
   
+  addIndicatorwithDefault: (ev) =>
+    target = $(ev.currentTarget, @el)
+    indicator = @collection.get( target.val() )
+    if indicator
+      this._addIndicator(indicator, {})    
+    @
+      
   addIndicator: (ev) =>
-    target = this.$(ev.currentTarget)
-    indicator = @collection.get( target.data('id') )
+    target = $(ev.currentTarget, @el)
+    indicator = @collection.get( $(target).data('id') )
     
     indicator_options = _.map indicator.get('args'), (opt) ->
       name = "#{indicator.get('id')}[#{ opt }]"
       elem = $("[name='" + name +  "']" )
       [ opt, elem ]
       
-    unfilled = _.any(indicator_options, (p) -> _.isEmpty(p[1].val() ) ) 
+    unfilled = _.any(indicator_options, (p) -> _.isEmpty(p[1].val() ) )     
     
     if unfilled 
       $(target).closest('li').addClass('alert alert-error')
       return false
+    
+    this._addIndicator(indicator, indicator_options)
+    @
+    
+  _addIndicator: (indicator, inputs) =>  
+    that = this
+    callback = (params) ->
+      options = _.pick( params, that.collection.validKeys() )
+      indicator.settings = options
+      list = $('#side-inds-list', that.el )
+      if $("li[data-id='ind-#{indicator.id}']", list).length < 1
+        list.append( new IndicatorFormView( model: indicator ).render().el )
       
     if ( symbol = app.ui.companyDp.selectedValue() ) and app.models.chart
-      range = app.models.chart.dateRange()
-      url = [ api.url, indicator.url(), symbol, 'series.json' ].join('/')
-      
-      data = 
-        start: range.dataMin
-        end: range.dataMax
-      
-      _.each(indicator_options, (e) -> data[ e[0]] = e[1].val() )
-        
-      $.ajax 
-        url: url
-        dataType: 'jsonp',
-        data: data
-        success: (data) ->
-          _.each data.records, (ts) ->
-            yaxis = parseInt( if _.isUndefined(ts.position) then 2 else ts.position )
-            app.models.chart.addSeries ts.name, ts.series, { yAxis : yaxis, id: ts.name, 'type': ts.type || 'line' } 
-            
-            if ts.flags
-              params = 
-                onSeries: ts.name,
-                yAxis : yaxis,
-                type: 'flags'   
-                width: 25
-                shape: 'circlepin'
-                
-              _.each ts.flags, ( list, title ) ->
-                app.models.chart.addSeries ts.name + "-#{title}", _.map( list, (e) -> { x: e, title: title }), params
-                
+      indicator.addToChart( inputs, callback )
     else
       alert('No Symbol selected.')
        
@@ -85,7 +83,8 @@ class SymbolListView extends Backbone.View
   
   selectedValue: =>
     $(@el).val()
-    
+  
+  
 class exports.HomeView extends Backbone.View
   
   className: 'container'
@@ -97,7 +96,7 @@ class exports.HomeView extends Backbone.View
     $('#topbar').html require('./templates/header')
     
     @subviews = [
-      new SidebarView( 'collection': app.Indicators, 'container': @.$('#sidebar') ) 
+      new SidebarView( 'collection': app.Indicators, 'el': @.$('#sidebar') ) 
       app.ui.companyDp = new SymbolListView( 'collection': app.Symbols, 'container': @.$('#symbol-list') )
     ]
     @

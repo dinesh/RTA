@@ -48,6 +48,477 @@
     };
   }
 }).call(this);(this.require.define({
+  "views/home": function(exports, require, module) {
+    (function() {
+  var ChartView, IndicatorFormView, SidebarView, SymbolListView, indicatorFormViewTempl, sidebarTmpl, symbolTmpl,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  sidebarTmpl = require('views/templates/sidebar');
+
+  symbolTmpl = require('views/templates/symbols');
+
+  indicatorFormViewTempl = require('views/templates/indicator_form');
+
+  ChartView = require('views/chart');
+
+  IndicatorFormView = (function(_super) {
+
+    __extends(IndicatorFormView, _super);
+
+    function IndicatorFormView() {
+      this.render = __bind(this.render, this);
+      IndicatorFormView.__super__.constructor.apply(this, arguments);
+    }
+
+    IndicatorFormView.prototype.tagName = 'li';
+
+    IndicatorFormView.prototype.initialize = function() {
+      IndicatorFormView.__super__.initialize.call(this);
+      return this.model = this.options.model;
+    };
+
+    IndicatorFormView.prototype.render = function() {
+      $(this.el).attr('data-id', "ind-" + this.model.id).html(indicatorFormViewTempl({
+        item: this.model
+      }));
+      return this;
+    };
+
+    return IndicatorFormView;
+
+  })(Backbone.View);
+
+  SidebarView = (function(_super) {
+
+    __extends(SidebarView, _super);
+
+    function SidebarView() {
+      this._addIndicator = __bind(this._addIndicator, this);
+      this.addIndicator = __bind(this.addIndicator, this);
+      this.addIndicatorwithDefault = __bind(this.addIndicatorwithDefault, this);
+      this.render = __bind(this.render, this);
+      SidebarView.__super__.constructor.apply(this, arguments);
+    }
+
+    SidebarView.prototype.events = {
+      'change select': 'addIndicatorwithDefault',
+      'click input.edit': 'addIndicator'
+    };
+
+    SidebarView.prototype.initialize = function() {
+      SidebarView.__super__.initialize.call(this);
+      return this.collection.bind('reset', this.render).fetch();
+    };
+
+    SidebarView.prototype.render = function() {
+      $(this.el).html(sidebarTmpl({
+        'items': this.collection.models
+      }));
+      return this;
+    };
+
+    SidebarView.prototype.addIndicatorwithDefault = function(ev) {
+      var indicator, target;
+      target = $(ev.currentTarget, this.el);
+      indicator = this.collection.get(target.val());
+      if (indicator) this._addIndicator(indicator, {});
+      return this;
+    };
+
+    SidebarView.prototype.addIndicator = function(ev) {
+      var indicator, indicator_options, target, unfilled;
+      target = $(ev.currentTarget, this.el);
+      indicator = this.collection.get($(target).data('id'));
+      indicator_options = _.map(indicator.get('args'), function(opt) {
+        var elem, name;
+        name = "" + (indicator.get('id')) + "[" + opt + "]";
+        elem = $("[name='" + name + "']");
+        return [opt, elem];
+      });
+      unfilled = _.any(indicator_options, function(p) {
+        return _.isEmpty(p[1].val());
+      });
+      if (unfilled) {
+        $(target).closest('li').addClass('alert alert-error');
+        return false;
+      }
+      this._addIndicator(indicator, indicator_options);
+      return this;
+    };
+
+    SidebarView.prototype._addIndicator = function(indicator, inputs) {
+      var callback, symbol, that;
+      that = this;
+      callback = function(params) {
+        var list, options;
+        options = _.pick(params, that.collection.validKeys());
+        indicator.settings = options;
+        list = $('#side-inds-list', that.el);
+        if ($("li[data-id='ind-" + indicator.id + "']", list).length < 1) {
+          return list.append(new IndicatorFormView({
+            model: indicator
+          }).render().el);
+        }
+      };
+      if ((symbol = app.ui.companyDp.selectedValue()) && app.models.chart) {
+        return indicator.addToChart(inputs, callback);
+      } else {
+        return alert('No Symbol selected.');
+      }
+    };
+
+    return SidebarView;
+
+  })(Backbone.View);
+
+  SymbolListView = (function(_super) {
+
+    __extends(SymbolListView, _super);
+
+    function SymbolListView() {
+      this.selectedValue = __bind(this.selectedValue, this);
+      this.render = __bind(this.render, this);
+      SymbolListView.__super__.constructor.apply(this, arguments);
+    }
+
+    SymbolListView.prototype.tagName = 'select';
+
+    SymbolListView.prototype.initialize = function() {
+      SymbolListView.__super__.initialize.call(this);
+      this.container = this.options.container;
+      return this.collection.bind('reset', this.render).fetch();
+    };
+
+    SymbolListView.prototype.render = function() {
+      $(this.el).html(symbolTmpl({
+        'items': this.collection.models
+      }));
+      this.container.append(this.el);
+      return this;
+    };
+
+    SymbolListView.prototype.selectedValue = function() {
+      return $(this.el).val();
+    };
+
+    return SymbolListView;
+
+  })(Backbone.View);
+
+  exports.HomeView = (function(_super) {
+
+    __extends(HomeView, _super);
+
+    function HomeView() {
+      this.openChart = __bind(this.openChart, this);
+      this.render = __bind(this.render, this);
+      HomeView.__super__.constructor.apply(this, arguments);
+    }
+
+    HomeView.prototype.className = 'container';
+
+    HomeView.prototype.events = {
+      'change #symbol-list select': 'openChart'
+    };
+
+    HomeView.prototype.render = function() {
+      $(this.el).html(require('./templates/home'));
+      $('#topbar').html(require('./templates/header'));
+      this.subviews = [
+        new SidebarView({
+          'collection': app.Indicators,
+          'el': this.$('#sidebar')
+        }), app.ui.companyDp = new SymbolListView({
+          'collection': app.Symbols,
+          'container': this.$('#symbol-list')
+        })
+      ];
+      return this;
+    };
+
+    HomeView.prototype.openChart = function(ev) {
+      var model;
+      model = app.Symbols.get(this.$(ev.currentTarget).val());
+      this.currentChart = new ChartView({
+        'model': model,
+        'el': this.$('#chart').get(0)
+      });
+      this.subviews.push(this.currentChart.render());
+      return this;
+    };
+
+    return HomeView;
+
+  })(Backbone.View);
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "api": function(exports, require, module) {
+    (function() {
+  var API,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+  API = (function() {
+
+    function API(options) {
+      this.sync = __bind(this.sync, this);
+      this.setUrl = __bind(this.setUrl, this);      options || (options = {});
+      this.url = options['url'] || 'http://localhost:5000';
+    }
+
+    API.prototype.setUrl = function(url) {
+      return this.url = url;
+    };
+
+    API.prototype.sync = function(method, model, options) {
+      options.timeout = 10000;
+      options.dataType = "jsonp";
+      options.url = [this.url, options['url'] || model.url].join('/');
+      return Backbone.sync(method, model, options);
+    };
+
+    return API;
+
+  })();
+
+  module.exports = API;
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "helpers": function(exports, require, module) {
+    (function() {
+
+  exports.BrunchApplication = (function() {
+
+    function BrunchApplication() {
+      var _this = this;
+      $(function() {
+        _this.initialize(_this);
+        return Backbone.history.start();
+      });
+    }
+
+    BrunchApplication.prototype.initialize = function() {
+      return null;
+    };
+
+    return BrunchApplication;
+
+  })();
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "collections/indicators": function(exports, require, module) {
+    (function() {
+  var Indicator, Indicators,
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  Indicator = require('models/indicator');
+
+  Indicators = (function(_super) {
+
+    __extends(Indicators, _super);
+
+    function Indicators() {
+      Indicators.__super__.constructor.apply(this, arguments);
+    }
+
+    Indicators.prototype.url = 'api/indicators';
+
+    Indicators.prototype.sync = api.sync;
+
+    Indicators.prototype.model = Indicator;
+
+    Indicators.prototype.parse = function(json) {
+      return _.map(json.indicators, function(p) {
+        return p;
+      });
+    };
+
+    Indicators.prototype.validKeys = function() {
+      return ['timeperiod', 'matype', 'nbdevdn', 'nbdevup', 'matype', 'slowk_matype', 'slowd_matype', 'fastd_matype'];
+    };
+
+    return Indicators;
+
+  })(Backbone.Collection);
+
+  module.exports = Indicators;
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "models/indicator": function(exports, require, module) {
+    (function() {
+  var Indicator,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  Indicator = (function(_super) {
+
+    __extends(Indicator, _super);
+
+    function Indicator() {
+      this.addToChart = __bind(this.addToChart, this);
+      this.removeFromChart = __bind(this.removeFromChart, this);
+      this.fullname = __bind(this.fullname, this);
+      Indicator.__super__.constructor.apply(this, arguments);
+    }
+
+    Indicator.prototype.url = 'api/indicator';
+
+    Indicator.prototype.sync = api.sync;
+
+    Indicator.prototype.fullname = function() {
+      return "" + this.id + " - " + (this.get('desc'));
+    };
+
+    Indicator.prototype.removeFromChart = function() {
+      if (this.charts.length > 0) {
+        _.each(this.charts, function(series) {
+          return series.remove();
+        });
+        this.charts = [];
+      }
+      return this;
+    };
+
+    Indicator.prototype.addToChart = function(options, callback) {
+      var data, range, symbol, _url,
+        _this = this;
+      this.charts || (this.charts = []);
+      this.removeFromChart();
+      if ((symbol = app.ui.companyDp.selectedValue()) && app.models.chart) {
+        range = app.models.chart.dateRange();
+        _url = [api.url, this.collection.url, this.id, symbol, 'series.json'].join('/');
+        data = {
+          start: range.dataMin,
+          end: range.dataMax
+        };
+        _.each(options, function(e) {
+          return data[e[0]] = e[1].val();
+        });
+        return $.ajax({
+          url: _url,
+          dataType: 'jsonp',
+          data: data,
+          success: function(data) {
+            var settings, streams;
+            streams = data.records;
+            settings = data.settings;
+            _.each(streams, function(ts) {
+              var params, yaxis;
+              yaxis = parseInt(_.isUndefined(ts.position) ? 2 : ts.position);
+              _this.charts.push(app.models.chart.addSeries(ts.name, ts.series, {
+                yAxis: yaxis,
+                id: ts.name,
+                'type': ts.type || 'line'
+              }));
+              if (ts.flags) {
+                params = {
+                  onSeries: ts.name,
+                  yAxis: yaxis,
+                  type: 'flags',
+                  width: 25,
+                  shape: 'circlepin'
+                };
+                return _.each(ts.flags, function(list, title) {
+                  return _this.charts.push(app.models.chart.addSeries(ts.name + ("-" + title), _.map(list, function(e) {
+                    return {
+                      x: e,
+                      title: title
+                    };
+                  }), params));
+                });
+              }
+            });
+            if (callback) return callback(settings);
+          }
+        });
+      }
+    };
+
+    return Indicator;
+
+  })(Backbone.Model);
+
+  module.exports = Indicator;
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "models/Quoteset": function(exports, require, module) {
+    (function() {
+  var QuoteSet,
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  QuoteSet = (function(_super) {
+
+    __extends(QuoteSet, _super);
+
+    function QuoteSet() {
+      QuoteSet.__super__.constructor.apply(this, arguments);
+    }
+
+    return QuoteSet;
+
+  })(Backbone.Model);
+
+  module.exports = QuoteSet;
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "routers/main_router": function(exports, require, module) {
+    (function() {
+  var __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  exports.MainRouter = (function(_super) {
+
+    __extends(MainRouter, _super);
+
+    function MainRouter() {
+      MainRouter.__super__.constructor.apply(this, arguments);
+    }
+
+    MainRouter.prototype.routes = {
+      '': 'home'
+    };
+
+    MainRouter.prototype.home = function() {
+      return $('body #main').html((app.ui.homeview = app.homeView.render()).el);
+    };
+
+    return MainRouter;
+
+  })(Backbone.Router);
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
   "views/chart": function(exports, require, module) {
     (function() {
   var ChartView, HEIGHTS, MARGIN, OV_HEIGHT, PS_HEIGHT, StockChart,
@@ -128,15 +599,15 @@
     }
 
     StockChart.prototype.addSeries = function(name, series, options) {
-      var position;
+      var position, s;
       position = options['position'] || 'overlay';
       this.items[position].push(name);
-      this.handle.addSeries(_.extend({
+      s = this.handle.addSeries(_.extend({
         name: name,
         data: series
       }, options));
       if (options['redraw']) this.handle.redraw();
-      return this;
+      return s;
     };
 
     StockChart.prototype.dateRange = function() {
@@ -169,7 +640,6 @@
         _this = this;
       url = [api.url, 'api/quotes', this.model.get('id') + '.json?'].join('/');
       $.getJSON(url + '&callback=?', function(data) {
-        console.log(data.trendline);
         _this.stockchart = new StockChart(_this.el, _this.model.get('id'), {
           series: [
             {
@@ -199,192 +669,6 @@
   })(Backbone.View);
 
   module.exports = ChartView;
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
-  "api": function(exports, require, module) {
-    (function() {
-  var API,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-
-  API = (function() {
-
-    function API(options) {
-      this.sync = __bind(this.sync, this);
-      this.setUrl = __bind(this.setUrl, this);      options || (options = {});
-      this.url = options['url'] || 'http://localhost:5000';
-    }
-
-    API.prototype.setUrl = function(url) {
-      return this.url = url;
-    };
-
-    API.prototype.sync = function(method, model, options) {
-      options.timeout = 10000;
-      options.dataType = "jsonp";
-      options.url = [this.url, options['url'] || model.url].join('/');
-      return Backbone.sync(method, model, options);
-    };
-
-    return API;
-
-  })();
-
-  module.exports = API;
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
-  "helpers": function(exports, require, module) {
-    (function() {
-
-  exports.BrunchApplication = (function() {
-
-    function BrunchApplication() {
-      var _this = this;
-      $(function() {
-        _this.initialize(_this);
-        return Backbone.history.start();
-      });
-    }
-
-    BrunchApplication.prototype.initialize = function() {
-      return null;
-    };
-
-    return BrunchApplication;
-
-  })();
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
-  "collections/indicators": function(exports, require, module) {
-    (function() {
-  var Indicators,
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  Indicators = (function(_super) {
-
-    __extends(Indicators, _super);
-
-    function Indicators() {
-      Indicators.__super__.constructor.apply(this, arguments);
-    }
-
-    Indicators.prototype.url = 'api/indicators';
-
-    Indicators.prototype.sync = api.sync;
-
-    Indicators.prototype.parse = function(json) {
-      return _.map(json.indicators, function(p) {
-        return p;
-      });
-    };
-
-    return Indicators;
-
-  })(Backbone.Collection);
-
-  module.exports = Indicators;
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
-  "models/indicator": function(exports, require, module) {
-    (function() {
-  var Indicator,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  Indicator = (function(_super) {
-
-    __extends(Indicator, _super);
-
-    function Indicator() {
-      this.fullname = __bind(this.fullname, this);
-      Indicator.__super__.constructor.apply(this, arguments);
-    }
-
-    Indicator.prototype.url = 'api/indicator';
-
-    Indicator.prototype.sync = api.sync;
-
-    Indicator.prototype.fullname = function() {
-      return "" + (get('id')) + " - " + (get('desc'));
-    };
-
-    return Indicator;
-
-  })(Backbone.Model);
-
-  module.exports = Indicator;
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
-  "models/Quoteset": function(exports, require, module) {
-    (function() {
-  var QuoteSet,
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  QuoteSet = (function(_super) {
-
-    __extends(QuoteSet, _super);
-
-    function QuoteSet() {
-      QuoteSet.__super__.constructor.apply(this, arguments);
-    }
-
-    return QuoteSet;
-
-  })(Backbone.Model);
-
-  module.exports = QuoteSet;
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
-  "routers/main_router": function(exports, require, module) {
-    (function() {
-  var __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  exports.MainRouter = (function(_super) {
-
-    __extends(MainRouter, _super);
-
-    function MainRouter() {
-      MainRouter.__super__.constructor.apply(this, arguments);
-    }
-
-    MainRouter.prototype.routes = {
-      '': 'home'
-    };
-
-    MainRouter.prototype.home = function() {
-      return $('body #main').html((app.ui.homeview = app.homeView.render()).el);
-    };
-
-    return MainRouter;
-
-  })(Backbone.Router);
 
 }).call(this);
 
@@ -475,207 +759,6 @@
   })(BrunchApplication);
 
   window.app = new exports.Application;
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
-  "views/home": function(exports, require, module) {
-    (function() {
-  var ChartView, SidebarView, SymbolListView, sidebarTmpl, symbolTmpl,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  sidebarTmpl = require('views/templates/sidebar');
-
-  symbolTmpl = require('views/templates/symbols');
-
-  ChartView = require('views/chart');
-
-  SidebarView = (function(_super) {
-
-    __extends(SidebarView, _super);
-
-    function SidebarView() {
-      this.addIndicator = __bind(this.addIndicator, this);
-      this.render = __bind(this.render, this);
-      SidebarView.__super__.constructor.apply(this, arguments);
-    }
-
-    SidebarView.prototype.tagName = 'ul';
-
-    SidebarView.prototype.id = 'side-inds-list';
-
-    SidebarView.prototype.className = 'list';
-
-    SidebarView.prototype.events = {
-      'click .add': 'addIndicator'
-    };
-
-    SidebarView.prototype.initialize = function() {
-      SidebarView.__super__.initialize.call(this);
-      this.container = this.options.container;
-      return this.collection.bind('reset', this.render).fetch();
-    };
-
-    SidebarView.prototype.render = function() {
-      $(this.el).html(sidebarTmpl({
-        'items': this.collection.models
-      }));
-      this.container.html(this.el);
-      return this;
-    };
-
-    SidebarView.prototype.addIndicator = function(ev) {
-      var data, indicator, indicator_options, range, symbol, target, unfilled, url;
-      target = this.$(ev.currentTarget);
-      indicator = this.collection.get(target.data('id'));
-      indicator_options = _.map(indicator.get('args'), function(opt) {
-        var elem, name;
-        name = "" + (indicator.get('id')) + "[" + opt + "]";
-        elem = $("[name='" + name + "']");
-        return [opt, elem];
-      });
-      unfilled = _.any(indicator_options, function(p) {
-        return _.isEmpty(p[1].val());
-      });
-      if (unfilled) {
-        $(target).closest('li').addClass('alert alert-error');
-        return false;
-      }
-      if ((symbol = app.ui.companyDp.selectedValue()) && app.models.chart) {
-        range = app.models.chart.dateRange();
-        url = [api.url, indicator.url(), symbol, 'series.json'].join('/');
-        data = {
-          start: range.dataMin,
-          end: range.dataMax
-        };
-        _.each(indicator_options, function(e) {
-          return data[e[0]] = e[1].val();
-        });
-        return $.ajax({
-          url: url,
-          dataType: 'jsonp',
-          data: data,
-          success: function(data) {
-            return _.each(data.records, function(ts) {
-              var params, yaxis;
-              yaxis = parseInt(_.isUndefined(ts.position) ? 2 : ts.position);
-              app.models.chart.addSeries(ts.name, ts.series, {
-                yAxis: yaxis,
-                id: ts.name,
-                'type': ts.type || 'line'
-              });
-              if (ts.flags) {
-                params = {
-                  onSeries: ts.name,
-                  yAxis: yaxis,
-                  type: 'flags',
-                  width: 25,
-                  shape: 'circlepin'
-                };
-                return _.each(ts.flags, function(list, title) {
-                  return app.models.chart.addSeries(ts.name + ("-" + title), _.map(list, function(e) {
-                    return {
-                      x: e,
-                      title: title
-                    };
-                  }), params);
-                });
-              }
-            });
-          }
-        });
-      } else {
-        return alert('No Symbol selected.');
-      }
-    };
-
-    return SidebarView;
-
-  })(Backbone.View);
-
-  SymbolListView = (function(_super) {
-
-    __extends(SymbolListView, _super);
-
-    function SymbolListView() {
-      this.selectedValue = __bind(this.selectedValue, this);
-      this.render = __bind(this.render, this);
-      SymbolListView.__super__.constructor.apply(this, arguments);
-    }
-
-    SymbolListView.prototype.tagName = 'select';
-
-    SymbolListView.prototype.initialize = function() {
-      SymbolListView.__super__.initialize.call(this);
-      this.container = this.options.container;
-      return this.collection.bind('reset', this.render).fetch();
-    };
-
-    SymbolListView.prototype.render = function() {
-      $(this.el).html(symbolTmpl({
-        'items': this.collection.models
-      }));
-      this.container.append(this.el);
-      return this;
-    };
-
-    SymbolListView.prototype.selectedValue = function() {
-      return $(this.el).val();
-    };
-
-    return SymbolListView;
-
-  })(Backbone.View);
-
-  exports.HomeView = (function(_super) {
-
-    __extends(HomeView, _super);
-
-    function HomeView() {
-      this.openChart = __bind(this.openChart, this);
-      this.render = __bind(this.render, this);
-      HomeView.__super__.constructor.apply(this, arguments);
-    }
-
-    HomeView.prototype.className = 'container';
-
-    HomeView.prototype.events = {
-      'change #symbol-list select': 'openChart'
-    };
-
-    HomeView.prototype.render = function() {
-      $(this.el).html(require('./templates/home'));
-      $('#topbar').html(require('./templates/header'));
-      this.subviews = [
-        new SidebarView({
-          'collection': app.Indicators,
-          'container': this.$('#sidebar')
-        }), app.ui.companyDp = new SymbolListView({
-          'collection': app.Symbols,
-          'container': this.$('#symbol-list')
-        })
-      ];
-      return this;
-    };
-
-    HomeView.prototype.openChart = function(ev) {
-      var model;
-      model = app.Symbols.get(this.$(ev.currentTarget).val());
-      this.currentChart = new ChartView({
-        'model': model,
-        'el': this.$('#chart').get(0)
-      });
-      this.subviews.push(this.currentChart.render());
-      return this;
-    };
-
-    return HomeView;
-
-  })(Backbone.View);
 
 }).call(this);
 
@@ -1036,6 +1119,116 @@ function');
   }
 }));
 (this.require.define({
+  "views/templates/indicator_form": function(exports, require, module) {
+    module.exports = function (__obj) {
+  if (!__obj) __obj = {};
+  var __out = [], __capture = function(callback) {
+    var out = __out, result;
+    __out = [];
+    callback.call(this);
+    result = __out.join('');
+    __out = out;
+    return __safe(result);
+  }, __sanitize = function(value) {
+    if (value && value.ecoSafe) {
+      return value;
+    } else if (typeof value !== 'undefined' && value != null) {
+      return __escape(value);
+    } else {
+      return '';
+    }
+  }, __safe, __objSafe = __obj.safe, __escape = __obj.escape;
+  __safe = __obj.safe = function(value) {
+    if (value && value.ecoSafe) {
+      return value;
+    } else {
+      if (!(typeof value !== 'undefined' && value != null)) value = '';
+      var result = new String(value);
+      result.ecoSafe = true;
+      return result;
+    }
+  };
+  if (!__escape) {
+    __escape = __obj.escape = function(value) {
+      return ('' + value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    };
+  }
+  (function() {
+    (function() {
+      var item, ma, matypes, option, _i, _j, _len, _len2, _ref;
+    
+      __out.push('\n');
+    
+      item = this.item;
+    
+      __out.push('\n\n<h4>\n  <a href="indicator/sidebar/');
+    
+      __out.push(__sanitize(item.id));
+    
+      __out.push('"> ');
+    
+      __out.push(__sanitize(item.fullname()));
+    
+      __out.push(' </a>\n</h4>\n\n');
+    
+      if (item.get('args').length) {
+        __out.push('\n  <form class=\'form-inline\'>\n    ');
+        _ref = item.get('args');
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          option = _ref[_i];
+          __out.push('\n      ');
+          if (option === 'matype' || option === 'slowk_matype' || option === 'slowd_matype' || option === 'fastd_matype') {
+            __out.push('\n        <select name="');
+            __out.push(__sanitize(item.get('id')));
+            __out.push('[');
+            __out.push(__sanitize(option));
+            __out.push(']" class=\'input-small\'>\n        ');
+            matypes = ['MA_SMA', 'MA_EMA', 'MA_WMA', 'MA_DEMA', 'MA_TEMA', 'MA_TRIMA', 'MA_KAMA', 'MA_MAMA', 'MA_T3'];
+            __out.push('\n        ');
+            for (_j = 0, _len2 = matypes.length; _j < _len2; _j++) {
+              ma = matypes[_j];
+              __out.push('\n          <option value="');
+              __out.push(__sanitize(_.indexOf(matypes, ma)));
+              __out.push('"> ');
+              __out.push(__sanitize(ma));
+              __out.push(' </option>\n        ');
+            }
+            __out.push('\n        </select>\n      ');
+          } else {
+            __out.push('\n            <input class=\'input-small\' placeholder=\'');
+            __out.push(__sanitize(option));
+            __out.push('\' type=\'text\' \n              name="');
+            __out.push(__sanitize(item.get('id')));
+            __out.push('[');
+            __out.push(__sanitize(option));
+            __out.push(']" value="');
+            __out.push(__sanitize(item.settings[option]));
+            __out.push('"/> \n      ');
+          }
+          __out.push('\n    ');
+        }
+        __out.push('\n  </form>\n');
+      }
+    
+      __out.push('\n\n<input type=\'button\' data-id="');
+    
+      __out.push(__sanitize(item.get('id')));
+    
+      __out.push('" class=\'edit btn btn-info\' value=\'Change\' />\n');
+    
+    }).call(this);
+    
+  }).call(__obj);
+  __obj.safe = __objSafe, __obj.escape = __escape;
+  return __out.join('');
+}
+  }
+}));
+(this.require.define({
   "views/templates/sidebar": function(exports, require, module) {
     module.exports = function (__obj) {
   if (!__obj) __obj = {};
@@ -1076,60 +1269,14 @@ function');
   }
   (function() {
     (function() {
-      var item, ma, matypes, option, _i, _j, _k, _len, _len2, _len3, _ref, _ref2;
     
       __out.push('\n');
     
-      _ref = this.items;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        item = _ref[_i];
-        __out.push('\n  <li>\n    <h4>\n      <a href="indicator/sidebar/');
-        __out.push(__sanitize(item.get('id')));
-        __out.push('"> ');
-        __out.push(__sanitize(item.get('id')));
-        __out.push(' - ');
-        __out.push(__sanitize(item.get('desc')));
-        __out.push(' </a>\n    </h4>\n    \n    ');
-        if (item.get('args').length) {
-          __out.push('\n      <form class=\'form-inline\'>\n        ');
-          _ref2 = item.get('args');
-          for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
-            option = _ref2[_j];
-            __out.push('\n          ');
-            if (option === 'matype' || option === 'slowk_matype' || option === 'slowd_matype' || option === 'fastd_matype') {
-              __out.push('\n            <select name="');
-              __out.push(__sanitize(item.get('id')));
-              __out.push('[');
-              __out.push(__sanitize(option));
-              __out.push(']" class=\'input-small\'>\n            ');
-              matypes = ['MA_SMA', 'MA_EMA', 'MA_WMA', 'MA_DEMA', 'MA_TEMA', 'MA_TRIMA', 'MA_KAMA', 'MA_MAMA', 'MA_T3'];
-              __out.push('\n            ');
-              for (_k = 0, _len3 = matypes.length; _k < _len3; _k++) {
-                ma = matypes[_k];
-                __out.push('\n              <option value="');
-                __out.push(__sanitize(_.indexOf(matypes, ma)));
-                __out.push('"> ');
-                __out.push(__sanitize(ma));
-                __out.push(' </option>\n            ');
-              }
-              __out.push('\n            </select>\n          ');
-            } else {
-              __out.push('\n                <input class=\'input-small\' placeholder=\'');
-              __out.push(__sanitize(option));
-              __out.push('\' type=\'text\' \n                  name="');
-              __out.push(__sanitize(item.get('id')));
-              __out.push('[');
-              __out.push(__sanitize(option));
-              __out.push(']" /> \n          ');
-            }
-            __out.push('\n        ');
-          }
-          __out.push('\n      </form>\n    ');
-        }
-        __out.push('\n    \n    <input type=\'button\' data-id="');
-        __out.push(__sanitize(item.get('id')));
-        __out.push('" class=\'add btn btn-info\' value=\'Add\' />\n    \n  </li>\n');
-      }
+      __out.push(__sanitize(this.safe(require('views/templates/selects/indicators')({
+        items: this.items
+      }))));
+    
+      __out.push('\n<ul id=\'side-inds-list\' class=\'list\'> </ul>');
     
     }).call(this);
     
@@ -1195,6 +1342,73 @@ function');
       }
     
       __out.push('\n</select>\n  ');
+    
+    }).call(this);
+    
+  }).call(__obj);
+  __obj.safe = __objSafe, __obj.escape = __escape;
+  return __out.join('');
+}
+  }
+}));
+(this.require.define({
+  "views/templates/selects/indicators": function(exports, require, module) {
+    module.exports = function (__obj) {
+  if (!__obj) __obj = {};
+  var __out = [], __capture = function(callback) {
+    var out = __out, result;
+    __out = [];
+    callback.call(this);
+    result = __out.join('');
+    __out = out;
+    return __safe(result);
+  }, __sanitize = function(value) {
+    if (value && value.ecoSafe) {
+      return value;
+    } else if (typeof value !== 'undefined' && value != null) {
+      return __escape(value);
+    } else {
+      return '';
+    }
+  }, __safe, __objSafe = __obj.safe, __escape = __obj.escape;
+  __safe = __obj.safe = function(value) {
+    if (value && value.ecoSafe) {
+      return value;
+    } else {
+      if (!(typeof value !== 'undefined' && value != null)) value = '';
+      var result = new String(value);
+      result.ecoSafe = true;
+      return result;
+    }
+  };
+  if (!__escape) {
+    __escape = __obj.escape = function(value) {
+      return ('' + value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    };
+  }
+  (function() {
+    (function() {
+      var item, _i, _len, _ref;
+    
+      __out.push('\n\n<select>\n  ');
+    
+      _ref = this.items;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        item = _ref[_i];
+        __out.push('\n    <option value="');
+        __out.push(__sanitize(item.get('id')));
+        __out.push('"> ');
+        __out.push(__sanitize(item.get('id')));
+        __out.push(' - ');
+        __out.push(__sanitize(item.get('desc')));
+        __out.push(' </option>\n  ');
+      }
+    
+      __out.push('\n</select>\n');
     
     }).call(this);
     

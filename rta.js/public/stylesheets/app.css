@@ -2005,6 +2005,14 @@ table .span24 {
   filter: alpha(opacity=40);
   cursor: pointer;
 }
+button.close {
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  -webkit-appearance: none;
+}
+
 .btn {
   display: inline-block;
   *display: inline;
@@ -4039,6 +4047,7 @@ a,a:visited{color:#f95a5a;text-decoration:none}
 a:hover{color:#665248}
 #main .container{width:90%;margin:20px auto;background:#fff;padding:20px;}
 #main .container #sidebar{width:20%;border-right:1px solid #eee;min-height:500px;}
+#main .container #sidebar > select{width:90%}
 #main .container #sidebar .list li{clear:both;border-bottom:1px #eee solid;padding:10px 0;}
 #main .container #sidebar .list li input[type='text']{margin:3px 0}
 #main .container #sidebar .list li .add{margin-left:80%}

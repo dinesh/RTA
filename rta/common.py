@@ -2,6 +2,7 @@
 from itertools import islice, chain, tee
 import datetime
 import calendar
+import inspect
 from pymongo.objectid import ObjectId
 import pandas
 import numpy
@@ -16,7 +17,11 @@ def batch(iterable, size):
         raise StopIteration
       yield chain([ batchiter.next()], batchiter)
 
-
+def filepath(cls):
+  return inspect.getfile(cls.__class__)
+  
+def getClassName(cls):
+  return cls.split('.')[-1:][0]
 
 json = None
 try:

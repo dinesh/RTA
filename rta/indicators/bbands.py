@@ -4,7 +4,7 @@ from rta.api import Indicators
 from rta import common
 from rta import ts as TS
 
-from . import IndicatorBase
+from . import IndicatorBase, IndicatorFactory
 import numpy as np
 import itertools
 
@@ -67,5 +67,4 @@ class BBANDS(IndicatorBase):
     defaults = dict({ 'timeperiod' : 20, 'nbdevdn': 2, 'nbdevup': 2, 'matype': 0, 'position': 'overlay' })
     return dict( defaults.items() + kwgs.items() )
     
-def impl(series, options):
-  return BBANDS(series, options = options)
+IndicatorFactory.register('BBANDS', BBANDS)

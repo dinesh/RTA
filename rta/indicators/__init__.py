@@ -1,10 +1,9 @@
 # https://github.com/mrjbq7/ta-lib
 
-import sys, re, inspect
-
+import sys, re, inspect, glob, os, imp
 import pandas, numpy
-  
-  
+from rta import common
+
 try:
   from rta.src.talib import talib 
   from rta.src.talib import functs
@@ -24,32 +23,55 @@ except ImportError:
 for ind in ALL_INDICATORS:
   globals()[ind] = getattr(talib, ind)
 
+__all__ = ['LIST', 'IndicatorFactory', 'IndicatorList' ]
+
 I_ACCEPTS_ONE_VALUE = [ 'HT_TREANDLINE' ]  
-
 I_ACCEPTS_TWO_VALUE_AND_TIMEPERIOD = ['MINUS_DM', 'PLUS_DM']
-
 I_ACCEPTS_ONE_VALUE_AND_TIMEPERIOD = [ 'SMA', 'EMA', 'RSI', 'MAX', 'MIN', 'MIN', 'MOM' ]
-
-I_ACCEPTS_THREE_VALUE_AND_TIMEPERIOD = [ 'ADX', 'ADXR', 'CCI', 'DX', 'MINUS_DI', 'PLUS_DI', 'WILLR' ]
-
-I_ACCEPTS_FOUR_VALUE = [ 'AVGPRICE', 'CDL2CROWS', 'CDL3BLACKCROWS', 'CDL3WHITESOLDIERS', 'CDLDOJI', 'CDLDOJISTAR', 'CDLDRAGONFLYDOJI', 
-                         'CDLGRAVESTONEDOJI', 'CDLENGULFING', 'CDLHAMMER', 'CDLHANGINGMAN', 'CDLHARAMI', 'CDLINVERTEDHAMMER', 'CDLPIERCING', 
-                         'CDLSHOOTINGSTAR', 'CDLSPINNINGTOP', 'CDLHARAMICROSS'  ]
-
 I_ACCEPTS_FOUR_VALUE_AND_PENETRATION = [ 'CDLDARKCLOUDCOVER', 'CDLEVENINGSTAR', 'CDLEVENINGDOJISTAR', 'CDLMORNINGDOJISTAR', 'CDLMORNINGSTAR' ]
 
 
 def make_tseries(res, index ):
   return CoreApi.padNans(res, index).to_records().tolist()
 
+def register_indicators():
+  try:
+    for pyfile in glob.glob( os.path.join( os.path.dirname(__file__), '*.py') ):
+      if not os.path.basename(pyfile) == '__init__.py':
+        __import__(pyfile)
+  except Exception:
+    raise
+      
+class IndicatorFactory(object):
+  __slots__ = []
+  __registery__ = {}
+  
+  @classmethod
+  def register(_cls, key, impl):
+    val = _cls.__registery__.get( key, None)
+    if val:
+      print "{func} is already registered from {module}!!! omg".format( func = key, module = val )
+    else:
+      print "\t >> {func} registerd from {module}: success".format( func = key, module = inspect.getfile(impl)  )
+      _cls.__registery__[ key ] = impl
+    
+  @classmethod
+  def run(_cls, func, series, options):
+    cls = _cls.__registery__.get(func, None)
+    if cls:
+     return cls( series, options= options, func=func )
+    else:
+      raise NotImplementedError(func)
+  
 class IndicatorBase(object):
-  __slots__ = [ 'series', 'index' ]
+  __slots__ = [ 'series', 'index', 'func', 'options' ]
   
   def __init__(self, series, **kwgs):
     self.series = series
     self.index = series.index
     self.options = kwgs.get('options', {})
-    
+    self.func = kwgs.get('func', None)
+
   def as_json(self):
     raise NotImplementedError("%s should implement as_json function")
     
@@ -58,7 +80,9 @@ class IndicatorBase(object):
     
   def config(self):
     return self.__class__.options( self.options )  
-
+    
+      
+    
 def calculate(series, ind_id, options):
   indicator = LIST[ind_id]
   
@@ -70,24 +94,7 @@ def calculate(series, ind_id, options):
                         series['close'].values, 
                         series.index )
                         
-  if ind_id == 'BBANDS':
-    nbdevup = float( options.get( 'nbdevup', 2.0) )
-    nbdevdn = float( options.get( 'nbdevdn', 2.0) )
-    matype = int( options.get('matype', 0) )
-    
-    pivot, s1, s2, s3 = getattr(talib, ind_id).__call__( c, period, nbdevup, nbdevdn, matype)  
-    
-    return [{ 
-        'name': 'BBAND_UPPER_%sx' % nbdevup , 
-        'series' :  make_tseries( s1, sindex) 
-      }, { 
-        'name': 'BBAND_SMA_%sd' % period, 
-        'series' : make_tseries(s2, sindex) 
-      }, { 
-        'name' : 'BBAND_LOWER_%sx' % nbdevdn, 
-        'series' : make_tseries( s3, sindex)
-      } ]
-  elif ind_id == 'HT_TRENDLINE':
+  if ind_id == 'HT_TRENDLINE':
     pivot, res = HT_TRENDLINE(c)
     return [{
       'name': 'HT_TRENDLINE',
@@ -145,22 +152,6 @@ def calculate(series, ind_id, options):
       'series': make_tseries( s2, sindex )
     }]
     
-  elif ind_id == 'MACD':
-    fastperied = int( options.get('fastperied', 12) )
-    slowperiod = int( options.get('slowperiod', 26 ) )
-    signalperiod = int( options.get('signaltime', 9) )
-    
-    pivot, s1, s2, s3 = MACD(c, fastperied, slowperiod, signalperiod)
-    return [{
-      'name': 'MACD',
-      'series': make_tseries( s1, sindex )
-    }, {
-      'name': 'signal_%sd' % signalperiod,
-      'series': make_tseries( s2, sindex )
-    }, {
-      'name': 'MACD_HIST',
-      'series': make_tseries(s3, sindex )
-    }]
   
   elif ind_id in I_ACCEPTS_ONE_VALUE:
     pivot, res = getattr(talib, ind_id).__call__( c )  
@@ -176,13 +167,6 @@ def calculate(series, ind_id, options):
         'series' :  make_tseries( res, sindex) 
       }]
     
-  elif ind_id in I_ACCEPTS_FOUR_VALUE:
-    pivot, res = getattr(talib, ind_id).__call__( o, h,l, c )  
-    return [{ 
-        'name': '%s-%sd' % ( ind_id, period ) , 
-        'series' :  make_tseries( res, sindex) 
-      } ]
-  
   
   elif ind_id in I_ACCEPTS_TWO_VALUE_AND_TIMEPERIOD:
     pivot, res = getattr(talib, ind_id).__call__( h, l, period )  

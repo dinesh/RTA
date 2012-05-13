@@ -16,15 +16,12 @@ import mongokit # mongokit is minimal ORM fast based on execellent pymongo
 # rta packages
 from rta import indicators as Indicators 
 from rta.indicators import talib as TaLib
-from rta.indicators import ( LIST, 
-      cci,
-      macd,
-      bbands,
-      rsi,
-      zigzag,
-      
+from rta.indicators import (
+        LIST, 
+        IndicatorBase, 
+        IndicatorFactory,
+        bbands, cci, macd, rsi, zigzag, accept_ohlc, accept_hlc_timeperiod, accept_ohlc_penetration
       )
-
 
 from rta import model as Model
 from rta import ts as TS
@@ -37,3 +34,6 @@ from .common import *
 # logger
 import logging
 LOG = logging.getLogger()
+
+# coul't able to make it work
+# Indicators.register_indicators()

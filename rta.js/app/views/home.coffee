@@ -13,14 +13,17 @@ class IndicatorFormView extends Backbone.View
     @model = this.options.model
     
   render: =>
-    $(@el).attr('data-id', "ind-#{@model.id}").html( indicatorFormViewTempl(item: @model ) )
+    $(@el).attr('data-id', "ind-#{@model.id}")
+          .data('id', @model.id)
+          .html( indicatorFormViewTempl(item: @model ) )
     @
     
 class SidebarView extends Backbone.View
   events:
     'change select' : 'addIndicatorwithDefault'
     'click input.edit': 'addIndicator'
-        
+    'click button.close': 'removeIndicator'
+       
   initialize: ->
     super()
     @collection.bind('reset', @render).fetch()
@@ -29,6 +32,14 @@ class SidebarView extends Backbone.View
     $(@el).html( sidebarTmpl('items' : @collection.models ) )
     @
   
+  removeIndicator: (ev) =>
+    target = $(ev.currentTarget, @el).closest('li')
+    indicator = @collection.get( target.data('id') )
+    if indicator
+      $(target).remove()
+      indicator.removeFromChart()
+    @
+    
   addIndicatorwithDefault: (ev) =>
     target = $(ev.currentTarget, @el)
     indicator = @collection.get( target.val() )

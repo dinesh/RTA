@@ -10,7 +10,11 @@ class Indicators extends Backbone.Collection
     _.map(json.indicators, (p) -> p )
   
   validKeys :() ->
-    ['timeperiod', 'matype', 'nbdevdn', 'nbdevup', 'matype', 'slowk_matype', 'slowd_matype', 'fastd_matype', 'cutoff' ]
+    # should get by api TODO
+    [ 'timeperiod', 'matype', 'nbdevdn', 'nbdevup', 'matype', 
+      'slowk_matype', 'slowd_matype', 'fastd_matype', 'cutoff', 
+      'fastperiod', 'slowperiod', 'signalperiod',
+     ]
     
 module.exports = Indicators  
   

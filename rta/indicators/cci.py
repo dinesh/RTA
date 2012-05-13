@@ -3,7 +3,7 @@ from rta.api import Indicators
 from rta import common
 from rta import ts as TS
 
-from . import IndicatorBase
+from . import IndicatorBase, IndicatorFactory
 import numpy as np
 
 
@@ -50,3 +50,5 @@ class CCI(IndicatorBase):
     
 def impl(series, options):
   return CCI(series, options = options)
+  
+IndicatorFactory.register('CCI', CCI)

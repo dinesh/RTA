@@ -15,4 +15,4 @@ h = prices['high'].values
 l = prices['low'].values
 c = prices['close'].values
 
-
+IndicatorFactory.run('CCI', )

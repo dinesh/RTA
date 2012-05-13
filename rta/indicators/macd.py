@@ -47,7 +47,6 @@ class MACD(IndicatorBase):
     _, ts1, ts2, ts3 = self.calculate()
     
     flags = self.applyFlags(ts1, ts2)
-    print flags
     
     return ( [{ 
       'name'   : 'MACD-H%d' % self.signalperiod(),

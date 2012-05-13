@@ -2,6 +2,7 @@
 <% item = @item %>
 
 <h4>
+  <button class='close'> x </button>
   <a href="indicator/sidebar/<%= item.id %>"> <%= item.fullname() %> </a>
 </h4>
 
@@ -21,6 +22,7 @@
       <% end %>
     <% end %>
   </form>
-<% end %>
+  
+  <input type='button' data-id="<%= item.get('id') %>" class='edit btn btn-info' value='Change' />
 
-<input type='button' data-id="<%= item.get('id') %>" class='edit btn btn-info' value='Change' />
+<% end %>

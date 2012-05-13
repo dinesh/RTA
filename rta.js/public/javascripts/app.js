@@ -80,7 +80,7 @@
     };
 
     IndicatorFormView.prototype.render = function() {
-      $(this.el).attr('data-id', "ind-" + this.model.id).html(indicatorFormViewTempl({
+      $(this.el).attr('data-id', "ind-" + this.model.id).data('id', this.model.id).html(indicatorFormViewTempl({
         item: this.model
       }));
       return this;
@@ -98,13 +98,15 @@
       this._addIndicator = __bind(this._addIndicator, this);
       this.addIndicator = __bind(this.addIndicator, this);
       this.addIndicatorwithDefault = __bind(this.addIndicatorwithDefault, this);
+      this.removeIndicator = __bind(this.removeIndicator, this);
       this.render = __bind(this.render, this);
       SidebarView.__super__.constructor.apply(this, arguments);
     }
 
     SidebarView.prototype.events = {
       'change select': 'addIndicatorwithDefault',
-      'click input.edit': 'addIndicator'
+      'click input.edit': 'addIndicator',
+      'click button.close': 'removeIndicator'
     };
 
     SidebarView.prototype.initialize = function() {
@@ -116,6 +118,17 @@
       $(this.el).html(sidebarTmpl({
         'items': this.collection.models
       }));
+      return this;
+    };
+
+    SidebarView.prototype.removeIndicator = function(ev) {
+      var indicator, target;
+      target = $(ev.currentTarget, this.el).closest('li');
+      indicator = this.collection.get(target.data('id'));
+      if (indicator) {
+        $(target).remove();
+        indicator.removeFromChart();
+      }
       return this;
     };
 
@@ -348,7 +361,7 @@
     };
 
     Indicators.prototype.validKeys = function() {
-      return ['timeperiod', 'matype', 'nbdevdn', 'nbdevup', 'matype', 'slowk_matype', 'slowd_matype', 'fastd_matype', 'cutoff'];
+      return ['timeperiod', 'matype', 'nbdevdn', 'nbdevup', 'matype', 'slowk_matype', 'slowd_matype', 'fastd_matype', 'cutoff', 'fastperiod', 'slowperiod', 'signalperiod'];
     };
 
     return Indicators;
@@ -1165,7 +1178,7 @@ function');
     
       item = this.item;
     
-      __out.push('\n\n<h4>\n  <a href="indicator/sidebar/');
+      __out.push('\n\n<h4>\n  <button class=\'close\'> x </button>\n  <a href="indicator/sidebar/');
     
       __out.push(__sanitize(item.id));
     
@@ -1211,14 +1224,12 @@ function');
           }
           __out.push('\n    ');
         }
-        __out.push('\n  </form>\n');
+        __out.push('\n  </form>\n  \n  <input type=\'button\' data-id="');
+        __out.push(__sanitize(item.get('id')));
+        __out.push('" class=\'edit btn btn-info\' value=\'Change\' />\n\n');
       }
     
-      __out.push('\n\n<input type=\'button\' data-id="');
-    
-      __out.push(__sanitize(item.get('id')));
-    
-      __out.push('" class=\'edit btn btn-info\' value=\'Change\' />\n');
+      __out.push('\n');
     
     }).call(this);
     

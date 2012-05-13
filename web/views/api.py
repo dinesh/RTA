@@ -80,7 +80,8 @@ class Api:
     price  = CoreApi.Model.Quote.series(symbol, start = start, end = end )
     
     if price.shape[0] > 0:
-      res, _config = getattr( CoreApi, indicator.lower() ).impl( price, request.args ).as_json()
+      # res, _config = getattr( CoreApi, indicator.lower() ).impl( price, request.args ).as_json()
+      res, _config = CoreApi.IndicatorFactory.run( indicator, price, request.args ).as_json()
       return json.dumps({ 'records': res, 'settings': _config }, cls = CoreApi.JSONEncoder )
     else:
       return json.dumps({ 'records' : []})

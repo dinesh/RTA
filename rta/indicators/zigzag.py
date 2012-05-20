@@ -2,21 +2,19 @@
 import numpy as np
 import pandas as pd
 
-from . import IndicatorBase
+from . import IndicatorBase, IndicatorFactory
 from rta import common
 
 __all__ = [ 'impl', 'Zigzag' ] 
 
-def impl(series, options):
-  return Zigzag(series, options = options)
-  
 class Zigzag(IndicatorBase):
   def cutoff(self):
     return int( self.cget('cutoff') )
     
   def calculate(self):
-    idx = _zigzag( self.series['close'], cutoff = self.cutoff() )
-    return ( 0, common.padNans( self.series['close'][idx], index= self.index[idx] ) )
+    sr = self.series['open']
+    idx = _zigzag( sr, cutoff = self.cutoff() )
+    return ( 0, common.padNans( sr[idx], index= self.index[idx] ) )
     
     
   def applyFlags(self, ts):
@@ -26,9 +24,9 @@ class Zigzag(IndicatorBase):
   def as_json(self):
     _, ts = self.calculate()
     return ( [{ 
-      'name'   : 'ZigZag-%d' % self.cutoff(),
-      'series' : common.pd2json(ts),
-      'position': 0,
+      'name'      : 'ZigZag(%d)' % self.cutoff(),
+      'series'    : common.pd2json(ts),
+      'position'  : 0,
     }], self.config() )
   
   def cget(self, key ):
@@ -44,6 +42,7 @@ def _delta( X, end, start ):
     return 100 * abs( 1.0 * ( X[end] - X[start] ) / X[start] )
     
 
+
 def _zigzag( X, cutoff = 5 ):
     idx, indices = 0, [0]
     base = (0, X[0] )
@@ -54,14 +53,16 @@ def _zigzag( X, cutoff = 5 ):
         bdelta = _delta( X, idx, base[0] )
         pdelta = _delta( X, idx, pivot[0] )
         
-        if pdelta > cutoff:
-           if abs( X[idx] - base[1] ) < abs( pivot[1] - base[1]):
+        if pdelta >= cutoff:
+           tolerance = ( idx - indices[-1] > 2) # the reversal takes sometime
+           if ( abs( X[idx] - base[1] ) < abs( pivot[1] - base[1]) ) or ( abs(X[idx] - pivot[1]) > abs( base[1] - pivot[1]) ):
                 indices.append( pivot[0])
                 base = pivot
                 pivot = ( idx, X[idx] )
                 idx -= 1
+                
         
-        if bdelta > cutoff:
+        if bdelta >= cutoff:
             if abs( X[idx] - base[1] ) > abs( pivot[1] - base[1]):
                 pivot = ( idx, X[idx] )
                
@@ -70,3 +71,5 @@ def _zigzag( X, cutoff = 5 ):
     indices.append( pivot[0] )
         
     return indices
+
+IndicatorFactory.register('ZIGZAG', Zigzag)

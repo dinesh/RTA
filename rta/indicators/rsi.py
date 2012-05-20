@@ -3,7 +3,7 @@ from rta.api import Indicators
 from rta import common
 from rta import ts as TS
 
-from . import IndicatorBase
+from . import IndicatorBase, IndicatorFactory
 import numpy as np
 
 
@@ -32,7 +32,7 @@ class RSI(IndicatorBase):
     _, ts = self.calculate()
     flags = self.applyFlags(ts)
     return ( [{ 
-      'name'   : 'RSI-%d' % self.timeperiod(),
+      'name'   : 'RSI(%d)' % self.timeperiod(),
       'series' : common.pd2json(ts),
       'flags'  : flags,
       'position' : 2
@@ -46,5 +46,4 @@ class RSI(IndicatorBase):
     defaults = dict({ 'timeperiod' : 14 })
     return dict( defaults.items() + kwgs.items() )
     
-def impl(series, options):
-  return RSI(series, options = options)
+IndicatorFactory.register('RSI', RSI)

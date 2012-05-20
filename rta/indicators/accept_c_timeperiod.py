@@ -8,29 +8,29 @@ from . import IndicatorBase, IndicatorFactory
 import numpy as np
 import itertools
 
-class AcceptOHLCTimeperiod(IndicatorBase):
+class AcceptCTimeperiod(IndicatorBase):
   
   @property
   def timeperiod(self):
-    return int(self.cget('timeperiod'))
-    
+    return int( self.cget('timeperiod') )
+  
   def calculate(self):
-    pivot, s1 = getattr(Indicators, self.func).__call__( self.series['high'], 
-                                                self.series['low'], 
-                                                self.series['close'], 
-                                                timeperiod = self.timeperiod )
+    pivot, s1 = getattr(Indicators, self.func).__call__(  self.series['close'], timeperiod = self.timeperiod )
                                 
     return ( pivot, common.padNans(s1, self.index) )
     
-        
+    
+  def applyFlags(self, ts1, ts2):
+    pass
+    
   # should return the ouput as json format for web api
   def as_json(self):
     _, ts1 = self.calculate()
     
     return ( [{ 
-      'name'   : "%s(%d)" % ( self.func, self.timeperiod ),
+      'name'   : self.func,
       'series' : common.pd2json(ts1),
-      'position' : 2
+      'position' : self.position,
      }], self.config() )
   
   def cget(self, key ):
@@ -40,6 +40,5 @@ class AcceptOHLCTimeperiod(IndicatorBase):
   def options(_cls, kwgs):
     defaults = dict({ 'timeperiod' : 14 })
     return dict( defaults.items() + kwgs.items() )
-    
 
-[ IndicatorFactory.register(x, AcceptOHLCTimeperiod) for x in  [ 'ADX', 'ADXR', 'DX', 'MINUS_DI', 'PLUS_DI', 'WILLR' ] ]
+[ IndicatorFactory.register(x, AcceptCTimeperiod) for x in [ 'SMA', 'EMA', 'MAX', 'MIN', 'MOM' ] ]

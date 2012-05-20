@@ -7,4 +7,11 @@ class exports.BrunchApplication
       Backbone.history.start()
 
   initialize: ->
-    null
+    
+    # Set the datepicker's date format
+    $.datepicker.setDefaults 
+        dateFormat: 'yy-mm-dd'
+        onSelect: (dateText) ->
+            this.onchange()
+            this.onblur()
+

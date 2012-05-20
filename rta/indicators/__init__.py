@@ -63,8 +63,9 @@ class IndicatorFactory(object):
     else:
       raise NotImplementedError(func)
   
+
 class IndicatorBase(object):
-  __slots__ = [ 'series', 'index', 'func', 'options' ]
+  __slots__ = [ 'series', 'index', 'func', 'options', 'property' ]
   
   def __init__(self, series, **kwgs):
     self.series = series
@@ -80,9 +81,14 @@ class IndicatorBase(object):
     
   def config(self):
     return self.__class__.options( self.options )  
+  
+  @property
+  def position(self):
+    _get_position(self.func)
     
-      
-    
+def _get_position(ind):
+  return 0
+  
 def calculate(series, ind_id, options):
   indicator = LIST[ind_id]
   

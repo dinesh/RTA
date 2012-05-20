@@ -61,7 +61,7 @@ class JSONEncoder(json.JSONEncoder):
 
         return super(JSONEncoder, self).default(obj)
 
-def padNans(res, index ):
+def padNans(res, index):
   # print res
   pivot = index.shape[0] - res.shape[0]
   return pandas.Series( 

@@ -12,26 +12,24 @@ class AcceptOHLC(IndicatorBase):
   
   def calculate(self):
     pivot, s1 = getattr(Indicators, self.func).__call__( self.series['open'], 
-                                                self.series['low'],  
-                                                self.series['high'], 
-                                                self.series['close'] )
+                                                         self.series['low'],  
+                                                         self.series['high'], 
+                                                         self.series['close'] )
                                 
     return ( pivot, common.padNans(s1, self.index) )
     
     
-  def applyFlags(self, ts1, ts2):
-    _overbought_list   = [ self.index[i] for (i, direction) in TS.roll_intersect(ts1, self.series['close']) if direction ] 
-    _oversold_list = [ self.index[i] for (i, direction) in TS.roll_intersect(ts2, self.series['close'] ) if not direction ]
-        
-    return dict( oversold = _oversold_list, overbought = _overbought_list )
+  def applyFlags(self, ts):
+    return ts[ts > 0]
     
   # should return the ouput as json format for web api
   def as_json(self):
     _, ts1 = self.calculate()
+    flags =  common.pd2json( self.applyFlags(ts1) )
     
     return ( [{ 
       'name'   : self.func,
-      'series' : common.pd2json(ts1),
+      'series' : flags,
       'position' : 0
      }], self.config() )
   

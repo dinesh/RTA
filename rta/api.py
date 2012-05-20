@@ -20,7 +20,8 @@ from rta.indicators import (
         LIST, 
         IndicatorBase, 
         IndicatorFactory,
-        bbands, cci, macd, rsi, zigzag, accept_ohlc, accept_hlc_timeperiod, accept_ohlc_penetration
+        bbands, cci, macd, rsi, zigzag, 
+        accept_ohlc, accept_hlc_timeperiod, accept_ohlc_penetration, accept_c_timeperiod
       )
 
 from rta import model as Model

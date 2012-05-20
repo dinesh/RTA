@@ -21,12 +21,12 @@ exports.config =
         before: [
           'vendor/scripts/console-helper.js',
           'vendor/scripts/jquery-1.7.1.js',
+          'vendor/scripts/date.js',
           'vendor/scripts/underscore-1.3.3.js',
           'vendor/scripts/backbone-0.9.1.js',
-          'vendor/scripts/highstock/highstock.js',
-          # 'vendor/scripts/highstock/theme/*.js',
-          # 'vendor/scripts/highstock/modules/*.js',
-          # 'vendor/scripts/crossfilter.js',
+          'vendor/scripts/highstock.js',
+          'vendor/scripts/bootstrap-datepicker.js',
+          
         ]
 
     stylesheets:
@@ -35,7 +35,7 @@ exports.config =
       order:
         before: ['vendor/styles/bootstrap.css']
         before: ['vendor/styles/helpers.css']
-
+        before: ['vendor/styles/datepicker.css']
     templates:
       defaultExtension: 'eco'
       joinTo: 'javascripts/app.js'

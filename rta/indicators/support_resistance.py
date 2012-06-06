@@ -72,23 +72,26 @@ def _support_resistance( X, cutoff = 5 ):
 
     int_indices = [int(i) for i in indices]
 
-    index, present = 0, False
+    index, present, dummy = 0, False, 0
     strength = []
     dummy_list = []
     for item in int_indices:
-        index, present = 0, False
+        index, present, dummy = 0, False, 0
         if item != 0:
             upper_limit = int(item * 1.02)
             lower_limit = int(item * 0.98)
             for dummy_item in dummy_list:
+                dummy = item
                 index += 1
                 if lower_limit <= dummy_item && upper_limit >= dummy_item:
+                    dummy = dummy_item
                     present = True 
                     break
         if present:
-            dummy_list.append(dummy_list[index] + 1)
+            dummy_list.append(dummy_list.count(dummy) + 1)
         else: 
             dummy_list.append(0)
+        dummy_list.append(dummy)
     
     return indices
 

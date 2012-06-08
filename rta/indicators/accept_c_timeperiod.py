@@ -41,4 +41,4 @@ class AcceptCTimeperiod(IndicatorBase):
     defaults = dict({ 'timeperiod' : 14 })
     return dict( defaults.items() + kwgs.items() )
 
-[ IndicatorFactory.register(x, AcceptCTimeperiod) for x in [ 'SMA', 'EMA', 'MAX', 'MIN', 'MOM' ] ]
+# [ IndicatorFactory.register(x, AcceptCTimeperiod) for x in [ 'SMA', 'EMA', 'MAX', 'MIN', 'MOM' ] ]

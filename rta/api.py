@@ -23,6 +23,8 @@ from rta.indicators import (
         bbands, cci, macd, rsi, zigzag, 
         accept_ohlc, accept_hlc_timeperiod, accept_ohlc_penetration, accept_c_timeperiod
       )
+      
+from rta import signals as Signals
 
 from rta import model as Model
 from rta import ts as TS

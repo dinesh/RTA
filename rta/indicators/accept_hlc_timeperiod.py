@@ -42,4 +42,4 @@ class AcceptOHLCTimeperiod(IndicatorBase):
     return dict( defaults.items() + kwgs.items() )
     
 
-[ IndicatorFactory.register(x, AcceptOHLCTimeperiod) for x in  [ 'ADX', 'ADXR', 'DX', 'MINUS_DI', 'PLUS_DI', 'WILLR' ] ]
+# [ IndicatorFactory.register(x, AcceptOHLCTimeperiod) for x in  [ 'ADX', 'ADXR', 'DX', 'MINUS_DI', 'PLUS_DI', 'WILLR' ] ]

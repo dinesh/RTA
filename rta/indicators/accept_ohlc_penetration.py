@@ -38,4 +38,4 @@ class AcceptOHLCPeneteration(IndicatorBase):
     return dict( defaults.items() + kwgs.items() )
     
 
-[ IndicatorFactory.register(x, AcceptOHLCPeneteration ) for x in  [ 'CDLDARKCLOUDCOVER', 'CDLEVENINGSTAR', 'CDLEVENINGDOJISTAR', 'CDLMORNINGDOJISTAR', 'CDLMORNINGSTAR' ] ]
+# [ IndicatorFactory.register(x, AcceptOHLCPeneteration ) for x in  [ 'CDLDARKCLOUDCOVER', 'CDLEVENINGSTAR', 'CDLEVENINGDOJISTAR', 'CDLMORNINGDOJISTAR', 'CDLMORNINGSTAR' ] ]

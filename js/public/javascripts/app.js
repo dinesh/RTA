@@ -367,7 +367,7 @@
     };
 
     Indicators.prototype.validKeys = function() {
-      return ['timeperiod', 'matype', 'nbdevdn', 'nbdevup', 'matype', 'slowk_matype', 'slowd_matype', 'fastd_matype', 'cutoff', 'fastperiod', 'slowperiod', 'signalperiod'];
+      return ['timeperiod', 'matype', 'nbdevdn', 'nbdevup', 'matype', 'slowk_matype', 'slowd_matype', 'fastd_matype', 'cutoff', 'fastperiod', 'slowperiod', 'signalperiod', 'numlines'];
     };
 
     return Indicators;
@@ -425,6 +425,7 @@
       if ((symbol = app.ui.companyDp.selectedValue()) && app.models.chart) {
         range = app.models.chart.dateRange();
         _url = [api.url, this.collection.url, this.id, symbol, 'series.json'].join('/');
+        console.log(_url);
         data = {
           start: range.dataMin,
           end: range.dataMax
@@ -441,28 +442,33 @@
             streams = data.records;
             settings = data.settings;
             _.each(streams, function(ts) {
-              var params, yaxis;
+              var onseries, params, yaxis;
               yaxis = parseInt(_.isUndefined(ts.position) ? 2 : ts.position);
-              _this.charts.push(app.models.chart.addSeries(ts.name, ts.series, {
-                yAxis: yaxis,
-                id: ts.name,
-                'type': ts.type || 'line'
-              }));
+              if (ts.series && ts.name) {
+                _this.charts.push(app.models.chart.addSeries(ts.name, ts.series, {
+                  yAxis: yaxis,
+                  id: ts.name,
+                  'type': ts.type || 'line'
+                }));
+                console.log("" + ts.name + " added to chart.");
+              }
               if (ts.flags) {
+                onseries = ts.name || 'OHLV';
                 params = {
-                  onSeries: ts.name,
+                  onSeries: onseries,
                   yAxis: yaxis,
                   type: 'flags',
                   width: 25,
                   shape: 'circlepin'
                 };
                 return _.each(ts.flags, function(list, title) {
-                  return _this.charts.push(app.models.chart.addSeries(ts.name + ("-" + title), _.map(list, function(e) {
+                  _this.charts.push(app.models.chart.addSeries(onseries + ("-" + title), _.map(list, function(e) {
                     return {
                       x: e,
                       title: title
                     };
                   }), params));
+                  return console.log("" + (onseries + '-' + title) + " added to chart..");
                 });
               }
             });
@@ -578,7 +584,7 @@
         'bottom': []
       };
       self = this;
-      this.handle = new Highcharts.StockChart({
+      app.chart = this.handle = new Highcharts.StockChart({
         chart: {
           alignTicks: false,
           renderTo: this.el
@@ -693,8 +699,9 @@
           series: [
             {
               name: 'OHLV',
+              id: 'OHLV',
               data: data.records,
-              type: 'candlestick'
+              type: 'line'
             }, {
               name: 'Volume',
               data: data.volume,

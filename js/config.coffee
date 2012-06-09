@@ -33,9 +33,11 @@ exports.config =
       defaultExtension: 'styl'
       joinTo: 'stylesheets/app.css'
       order:
-        before: ['vendor/styles/bootstrap.css']
-        before: ['vendor/styles/helpers.css']
-        before: ['vendor/styles/datepicker.css']
+        before: [
+          'vendor/styles/bootstrap.css', 
+          'vendor/styles/helpers.css',
+          'vendor/styles/datepicker.css'
+        ]
     templates:
       defaultExtension: 'eco'
       joinTo: 'javascripts/app.js'

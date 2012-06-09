@@ -21,5 +21,12 @@
     
   
   
+How to Run:
+ 1. start mongodb
+ 
+ 2.
+   $] cd js && brunch watch
+   $] python manage.py runserver 
+ 
+   $] open http://localhost:3000
    
-

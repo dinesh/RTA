@@ -15,7 +15,8 @@ try:
     desc = re.findall( "\(.*\)\n\n(.*)$", definition)
     LIST[ind] = dict({ 'args': params, 'desc': desc[0], 'id': ind } )
   
-  LIST['ZIGZAG'] = dict( args=['cutoff'], desc= 'ZigZag indicatpr', id='ZIGZAG' )
+  LIST['ZIGZAG'] = dict( args=['cutoff'], desc= 'ZigZag indicator', id='ZIGZAG' )
+  LIST['S-R'] = dict( args=['cutoff', 'numlines'], desc='Support and Resistance', id='S-R')
   
 except ImportError:
   raise

@@ -17,7 +17,7 @@ class StockChart
     
     self = this
     
-    @handle = new Highcharts.StockChart
+    app.chart = @handle = new Highcharts.StockChart
       chart:
         alignTicks : false
         renderTo : @el
@@ -105,9 +105,10 @@ class ChartView extends Backbone.View
     $.getJSON url + '&callback=?', (data) =>
       @stockchart = new StockChart @el, @model.get('id'),
         series: [{
-          name: 'OHLV', 
+          name: 'OHLV',
+          id: 'OHLV',
           data: data.records, 
-          type : 'candlestick',
+          type : 'line',
           }, {
           name: 'Volume', 
           data: data.volume

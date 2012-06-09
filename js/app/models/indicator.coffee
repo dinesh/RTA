@@ -21,7 +21,7 @@ class Indicator extends Backbone.Model
     if ( symbol = app.ui.companyDp.selectedValue() ) and app.models.chart
       range = app.models.chart.dateRange()
       _url = [ api.url, this.collection.url, this.id, symbol, 'series.json' ].join('/')
-      
+      console.log _url
       data = 
         start: range.dataMin
         end: range.dataMax
@@ -39,19 +39,24 @@ class Indicator extends Backbone.Model
           
           _.each streams, (ts) =>
             yaxis = parseInt( if _.isUndefined(ts.position) then 2 else ts.position )
-            @charts.push( app.models.chart.addSeries ts.name, ts.series, { yAxis : yaxis, id: ts.name, 'type': ts.type || 'line' } )
             
+            if ts.series and ts.name 
+              @charts.push( app.models.chart.addSeries ts.name, ts.series, { yAxis : yaxis, id: ts.name, 'type': ts.type || 'line' } )
+              console.log "#{ts.name} added to chart."
+              
             if ts.flags
+              onseries = ts.name || 'OHLV'
               params = 
-                onSeries: ts.name,
+                onSeries: onseries,
                 yAxis : yaxis,
                 type: 'flags'   
                 width: 25
                 shape: 'circlepin'
-
+              
               _.each ts.flags, ( list, title ) =>
-                @charts.push( app.models.chart.addSeries ts.name + "-#{title}", _.map( list, (e) -> { x: e, title: title }), params )
-
+                @charts.push( app.models.chart.addSeries onseries + "-#{title}", _.map( list, (e) -> { x: e, title: title }), params )
+                console.log "#{onseries + '-' + title} added to chart.."
+                
           callback(settings) if callback      
 
 module.exports = Indicator

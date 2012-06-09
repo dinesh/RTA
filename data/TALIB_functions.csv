@@ -131,3 +131,4 @@ WCLPRICE,TALIB(WCLPRICE),Weighted Close,TALIB(WCLPRICE),4,Indicator,Price Adjust
 WILLR ,"TALIB(WILLR, PERIOD)",William's %R,"TALIB(WILLR, 14)",5,Indicator,Momentum Indicators
 WMA ,"TALIB(WMA, INPUT_ARRAY, PERIOD)",Weighted Moving Average,"TALIB(WMA, Close, 30) ",4,Indicator,Moving Average
 ZIGZAG, "",Zigzag indicator, "",5,Indicator, Momentum Indicators
+S-R, "", Support & Resistance, "", 5, Indicators, General

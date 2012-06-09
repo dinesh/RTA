@@ -13,7 +13,7 @@ class Indicators extends Backbone.Collection
     # should get by api TODO
     [ 'timeperiod', 'matype', 'nbdevdn', 'nbdevup', 'matype', 
       'slowk_matype', 'slowd_matype', 'fastd_matype', 'cutoff', 
-      'fastperiod', 'slowperiod', 'signalperiod',
+      'fastperiod', 'slowperiod', 'signalperiod', 'numlines'
      ]
     
 module.exports = Indicators  

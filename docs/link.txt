@@ -1,0 +1,37 @@
+
+
+http://stocksiq.in
+
+http://www.tradervue.com/
+http://finviz.com
+
+
+zigzag = http://www.smartquant.com/forums/viewtopic.php?f=44&t=5825&hilit=zigzag
+min-max: http://stackoverflow.com/questions/7061071/finding-the-min-max-of-a-stock-chart
+
+Numpy Questions:
+============================
+
+- http://stackoverflow.com/questions/8914491/finding-the-nearest-value-and-return-the-index-of-array-in-python
+
+
+highstock helpers
+=================
+- ruby server side highchart generator
+  https://github.com/michelson/lazy_high_charts/tree/master/lib
+  
+1. http://jsfiddle.net/jgdreyes/q95kK/ - shading area
+
+
+talib function documentation: http://search.cpan.org/~kmx/Finance-TA-v0.4.0/TA.pod
+
+for python profiling http://packages.python.org/line_profiler/
+  - or http://fseoane.net/blog/2012/line-by-line-report-of-memory-usage/
+
+for treadline:
+  1. http://www.physics.csbsju.edu/stats/least_squares.html
+  2. http://www.physics.csbsju.edu/stats/fitting_lines.html
+  
+client side templating: http://icanhazjs.com/ 
+
+High performance mongo query: https://bitbucket.org/djcbeach/monary/wiki/Home

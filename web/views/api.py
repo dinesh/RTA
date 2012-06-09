@@ -5,6 +5,8 @@ import datetime, time, operator, calendar, random
 import numpy as np
 import os
 
+from rta import common
+
 def support_jsonp(f):
     """Wraps JSONified output for JSONP"""
     @wraps(f)
@@ -60,10 +62,9 @@ class Api:
   @support_jsonp  
   def get_indicators(self):
     __list, data = CoreApi.Indicators.LIST, list()
-    for func in CoreApi.Configuration.indicator_by_rating(5):
+    for func in CoreApi.Configuration.indicator_for_web():
       data.append( __list[func.strip()] )
-      
-    return json.dumps({ 'indicators': data })
+    return json.dumps({ 'indicators': data }, cls = CoreApi.JSONEncoder )
   
   @support_jsonp
   def get_indicator_series(self, indicator, symbol):

@@ -58,7 +58,6 @@ class JSONEncoder(json.JSONEncoder):
             return calendar.timegm( obj.utctimetuple() ) * 1000
         if isinstance(obj, ObjectId):
           return str(obj)
-
         return super(JSONEncoder, self).default(obj)
 
 def padNans(res, index):
@@ -73,12 +72,66 @@ def padNans(res, index):
 
 def pd2json(df):
   if isinstance(df, pandas.DataFrame):
-    return df.to_records().tolist()
+    df.to_records().tolist()          
   elif isinstance( df, pandas.Series ) or isinstance( df, pandas.TimeSeries ):
     return list( df.iteritems() )
   elif isinstance(df, pandas.Index ):
     return df.tolist()
   else:
     return df
-  
-__all__ = [ 'batch', 'JSONEncoder', 'padNans', 'pd2json' ]
+
+
+def _delta( X, end, start ):
+    return 100 * abs( 1.0 * ( X[end] - X[start] ) / X[start] )
+
+
+def _sr( X, cutoff = 5, delta = 2, lines = 5):
+    indices  = _zigzag(X, cutoff)
+    series   = X.take(indices)
+    strength = numpy.ones( series.shape, dtype = 'int')
+    
+    print series
+    print "\n\n"
+    for idx, item in enumerate(series):
+        upper_limit = item + ( item * delta) / 100
+        lower_limit = item - ( item * delta) / 100
+        for _idx, oneitem in enumerate(series):
+            if idx != _idx:
+              if lower_limit <= oneitem and upper_limit >= oneitem:
+                  strength[ _idx ] += 1
+    
+    topidx          = numpy.argsort( strength )[-lines:]
+    tkidx           = series.index[ topidx ]
+    return tkidx
+
+def _zigzag( X, cutoff = 5 ):
+    idx, indices = 0, [0]
+    base = (0, X[0] )
+    pivot = ( 0, X[0] )
+    idx = 0
+    pdelta = bdelta = None
+    while idx < X.size:
+        bdelta = _delta( X, idx, base[0] )
+        pdelta = _delta( X, idx, pivot[0] )
+
+        if pdelta >= cutoff:
+           tolerance = ( idx - indices[-1] > 2) # the reversal takes sometime
+           if ( abs( X[idx] - base[1] ) < abs( pivot[1] - base[1]) ) or \
+              ( abs(X[idx] - pivot[1])  > abs( base[1] - pivot[1]) ):
+                indices.append( pivot[0])
+                base = pivot
+                pivot = ( idx, X[idx] )
+                idx -= 1
+
+
+        if bdelta >= cutoff:
+            if abs( X[idx] - base[1] ) > abs( pivot[1] - base[1]):
+                pivot = ( idx, X[idx] )
+
+        idx += 1
+    
+    indices.append(pivot[0])
+
+    return numpy.unique(indices)
+    
+__all__ = [ 'batch', 'JSONEncoder', 'padNans', 'pd2json', '_zigzag', '_sr' ]

@@ -30,7 +30,7 @@ def indicator_for_web(key = 'webindicators'):
 def getConfig(baseConfig = {}):
   default = {}
   root = default['root'] = os.path.dirname( os.path.dirname( os.path.abspath(__file__) ) )
-  default['symbols'] = pandas.read_csv( os.path.join(root, 'data/companylist.csv') )['Symbol'].values
+  default['symbols'] = pandas.read_csv( os.path.join(root, 'data/companylist.csv') )['Symbol']
   
   indicator_csv = pandas.read_csv( os.path.join(root, 'data/TALIB_functions.csv') )
   default['talib_indicators'] = indicator_csv

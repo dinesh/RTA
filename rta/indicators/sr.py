@@ -43,8 +43,5 @@ class SupportResistance(IndicatorBase):
     return dict( defaults.items() + kwgs.items() )
   
   
-def _delta( X, end, start ):
-    return 100 * abs( 1.0 * ( X[end] - X[start] ) / X[start] )
-    
 
 IndicatorFactory.register('S-R', SupportResistance)

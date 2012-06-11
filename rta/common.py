@@ -88,10 +88,8 @@ def _delta( X, end, start ):
 def _sr( X, cutoff = 5, delta = 2, lines = 5):
     indices  = _zigzag(X, cutoff)
     series   = X.take(indices)
-    strength = numpy.ones( series.shape, dtype = 'int')
+    strength = numpy.zeros( series.shape, dtype = 'int')
     
-    print series
-    print "\n\n"
     for idx, item in enumerate(series):
         upper_limit = item + ( item * delta) / 100
         lower_limit = item - ( item * delta) / 100
@@ -102,6 +100,8 @@ def _sr( X, cutoff = 5, delta = 2, lines = 5):
     
     topidx          = numpy.argsort( strength )[-lines:]
     tkidx           = series.index[ topidx ]
+    print numpy.take( strength, topidx  )
+    print series[ tkidx ]
     return tkidx
 
 def _zigzag( X, cutoff = 5 ):

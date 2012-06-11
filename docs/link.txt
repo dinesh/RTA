@@ -19,9 +19,12 @@ highstock helpers
 =================
 - ruby server side highchart generator
   https://github.com/michelson/lazy_high_charts/tree/master/lib
+
+- server side graphs command line utility
+  http://cutycapt.sourceforge.net/
+  https://github.com/brynary/highcharts-server
   
 1. http://jsfiddle.net/jgdreyes/q95kK/ - shading area
-
 
 talib function documentation: http://search.cpan.org/~kmx/Finance-TA-v0.4.0/TA.pod
 

@@ -48,223 +48,29 @@
     };
   }
 }).call(this);(this.require.define({
-  "views/home": function(exports, require, module) {
+  "views/spinner": function(exports, require, module) {
     (function() {
-  var ChartView, IndicatorFormView, SidebarView, SymbolListView, indicatorFormViewTempl, sidebarTmpl, symbolTmpl,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
-  sidebarTmpl = require('views/templates/sidebar');
-
-  symbolTmpl = require('views/templates/symbols');
-
-  indicatorFormViewTempl = require('views/templates/indicator_form');
-
-  ChartView = require('views/chart');
-
-  IndicatorFormView = (function(_super) {
-
-    __extends(IndicatorFormView, _super);
-
-    function IndicatorFormView() {
-      this.render = __bind(this.render, this);
-      IndicatorFormView.__super__.constructor.apply(this, arguments);
-    }
-
-    IndicatorFormView.prototype.tagName = 'li';
-
-    IndicatorFormView.prototype.initialize = function() {
-      IndicatorFormView.__super__.initialize.call(this);
-      return this.model = this.options.model;
-    };
-
-    IndicatorFormView.prototype.render = function() {
-      $(this.el).attr('data-id', "ind-" + this.model.id).data('id', this.model.id).html(indicatorFormViewTempl({
-        item: this.model
-      }));
-      return this;
-    };
-
-    return IndicatorFormView;
-
-  })(Backbone.View);
-
-  SidebarView = (function(_super) {
-
-    __extends(SidebarView, _super);
-
-    function SidebarView() {
-      this._addIndicator = __bind(this._addIndicator, this);
-      this.addIndicator = __bind(this.addIndicator, this);
-      this.addIndicatorwithDefault = __bind(this.addIndicatorwithDefault, this);
-      this.removeIndicator = __bind(this.removeIndicator, this);
-      this.render = __bind(this.render, this);
-      SidebarView.__super__.constructor.apply(this, arguments);
-    }
-
-    SidebarView.prototype.events = {
-      'change select': 'addIndicatorwithDefault',
-      'click input.edit': 'addIndicator',
-      'click button.close': 'removeIndicator'
-    };
-
-    SidebarView.prototype.initialize = function() {
-      SidebarView.__super__.initialize.call(this);
-      return this.collection.bind('reset', this.render).fetch();
-    };
-
-    SidebarView.prototype.render = function() {
-      $(this.el).html(sidebarTmpl({
-        'items': this.collection.models
-      }));
-      return this;
-    };
-
-    SidebarView.prototype.removeIndicator = function(ev) {
-      var indicator, target;
-      target = $(ev.currentTarget, this.el).closest('li');
-      indicator = this.collection.get(target.data('id'));
-      if (indicator) {
-        $(target).remove();
-        indicator.removeFromChart();
-      }
-      return this;
-    };
-
-    SidebarView.prototype.addIndicatorwithDefault = function(ev) {
-      var indicator, target;
-      target = $(ev.currentTarget, this.el);
-      indicator = this.collection.get(target.val());
-      if (indicator) this._addIndicator(indicator, {});
-      return this;
-    };
-
-    SidebarView.prototype.addIndicator = function(ev) {
-      var indicator, indicator_options, target, unfilled;
-      target = $(ev.currentTarget, this.el);
-      indicator = this.collection.get($(target).data('id'));
-      indicator_options = _.map(indicator.get('args'), function(opt) {
-        var elem, name;
-        name = "" + (indicator.get('id')) + "[" + opt + "]";
-        elem = $("[name='" + name + "']");
-        return [opt, elem];
+  app.ui.spinner = {
+    show: function(message) {
+      this.ensureElement();
+      message = message || "Loading";
+      return this.el.stop(true, true).fadeIn('fast');
+    },
+    hide: function() {
+      this.ensureElement();
+      return this.el.stop(true, true).fadeOut('fast', function() {
+        return $(this).css({
+          display: 'none'
+        });
       });
-      unfilled = _.any(indicator_options, function(p) {
-        return _.isEmpty(p[1].val());
-      });
-      if (unfilled) {
-        $(target).closest('li').addClass('alert alert-error');
-        return false;
-      }
-      this._addIndicator(indicator, indicator_options);
-      return this;
-    };
-
-    SidebarView.prototype._addIndicator = function(indicator, inputs) {
-      var callback, symbol, that;
-      that = this;
-      callback = function(params) {
-        var list, options;
-        options = _.pick(params, that.collection.validKeys());
-        indicator.settings = options;
-        list = $('#side-inds-list', that.el);
-        if ($("li[data-id='ind-" + indicator.id + "']", list).length < 1) {
-          return list.append(new IndicatorFormView({
-            model: indicator
-          }).render().el);
-        }
-      };
-      if ((symbol = app.ui.companyDp.selectedValue()) && app.models.chart) {
-        return indicator.addToChart(inputs, callback);
-      } else {
-        return alert('No Symbol selected.');
-      }
-    };
-
-    return SidebarView;
-
-  })(Backbone.View);
-
-  SymbolListView = (function(_super) {
-
-    __extends(SymbolListView, _super);
-
-    function SymbolListView() {
-      this.selectedValue = __bind(this.selectedValue, this);
-      this.render = __bind(this.render, this);
-      SymbolListView.__super__.constructor.apply(this, arguments);
+    },
+    ensureElement: function() {
+      return this.el || (this.el = $('#spinner'));
     }
+  };
 
-    SymbolListView.prototype.tagName = 'select';
-
-    SymbolListView.prototype.initialize = function() {
-      SymbolListView.__super__.initialize.call(this);
-      this.container = this.options.container;
-      return this.collection.bind('reset', this.render).fetch();
-    };
-
-    SymbolListView.prototype.render = function() {
-      $(this.el).html(symbolTmpl({
-        'items': this.collection.models
-      }));
-      this.container.append(this.el);
-      return this;
-    };
-
-    SymbolListView.prototype.selectedValue = function() {
-      return $(this.el).val();
-    };
-
-    return SymbolListView;
-
-  })(Backbone.View);
-
-  exports.HomeView = (function(_super) {
-
-    __extends(HomeView, _super);
-
-    function HomeView() {
-      this.openChart = __bind(this.openChart, this);
-      this.render = __bind(this.render, this);
-      HomeView.__super__.constructor.apply(this, arguments);
-    }
-
-    HomeView.prototype.className = 'container';
-
-    HomeView.prototype.events = {
-      'change #symbol-list select': 'openChart'
-    };
-
-    HomeView.prototype.render = function() {
-      $(this.el).html(require('./templates/home'));
-      $('#topbar').html(require('./templates/header'));
-      this.subviews = [
-        new SidebarView({
-          'collection': app.Indicators,
-          'el': this.$('#sidebar')
-        }), app.ui.companyDp = new SymbolListView({
-          'collection': app.Symbols,
-          'container': this.$('#symbol-list')
-        })
-      ];
-      return this;
-    };
-
-    HomeView.prototype.openChart = function(ev) {
-      var model;
-      model = app.Symbols.get(this.$(ev.currentTarget).val());
-      this.currentChart = new ChartView({
-        'model': model,
-        'el': this.$('#chart').get(0)
-      });
-      this.subviews.push(this.currentChart.render());
-      return this;
-    };
-
-    return HomeView;
-
-  })(Backbone.View);
+  _.bindAll(app.ui.spinner, 'show', 'hide');
 
 }).call(this);
 
@@ -514,36 +320,6 @@
   }
 }));
 (this.require.define({
-  "routers/main_router": function(exports, require, module) {
-    (function() {
-  var __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  exports.MainRouter = (function(_super) {
-
-    __extends(MainRouter, _super);
-
-    function MainRouter() {
-      MainRouter.__super__.constructor.apply(this, arguments);
-    }
-
-    MainRouter.prototype.routes = {
-      '': 'home'
-    };
-
-    MainRouter.prototype.home = function() {
-      return $('body #main').html((app.ui.homeview = app.homeView.render()).el);
-    };
-
-    return MainRouter;
-
-  })(Backbone.Router);
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
   "views/chart": function(exports, require, module) {
     (function() {
   var ChartView, HEIGHTS, MARGIN, OV_HEIGHT, PS_HEIGHT, StockChart,
@@ -612,14 +388,14 @@
               text: 'Volume'
             },
             height: 150,
-            top: 700,
+            top: 600,
             offset: 0
           }, {
             title: {
               text: 'Indicator'
             },
-            height: 300,
-            top: 400,
+            height: 200,
+            top: 300,
             opposite: true
           }
         ]
@@ -636,6 +412,8 @@
       var position, s;
       position = options['position'] || 'overlay';
       this.items[position].push(name);
+      console.log(series);
+      console.log(options);
       s = this.handle.addSeries(_.extend({
         name: name,
         data: series
@@ -724,6 +502,229 @@
   })(Backbone.View);
 
   module.exports = ChartView;
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "views/home": function(exports, require, module) {
+    (function() {
+  var ChartView, IndicatorFormView, SidebarView, SymbolListView, indicatorFormViewTempl, sidebarTmpl, symbolTmpl,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  sidebarTmpl = require('views/templates/sidebar');
+
+  symbolTmpl = require('views/templates/symbols');
+
+  indicatorFormViewTempl = require('views/templates/indicator_form');
+
+  ChartView = require('views/chart');
+
+  IndicatorFormView = (function(_super) {
+
+    __extends(IndicatorFormView, _super);
+
+    function IndicatorFormView() {
+      this.render = __bind(this.render, this);
+      IndicatorFormView.__super__.constructor.apply(this, arguments);
+    }
+
+    IndicatorFormView.prototype.tagName = 'li';
+
+    IndicatorFormView.prototype.initialize = function() {
+      IndicatorFormView.__super__.initialize.call(this);
+      return this.model = this.options.model;
+    };
+
+    IndicatorFormView.prototype.render = function() {
+      $(this.el).attr('data-id', "ind-" + this.model.id).data('id', this.model.id).html(indicatorFormViewTempl({
+        item: this.model
+      }));
+      return this;
+    };
+
+    return IndicatorFormView;
+
+  })(Backbone.View);
+
+  SidebarView = (function(_super) {
+
+    __extends(SidebarView, _super);
+
+    function SidebarView() {
+      this._addIndicator = __bind(this._addIndicator, this);
+      this.addIndicator = __bind(this.addIndicator, this);
+      this.addIndicatorwithDefault = __bind(this.addIndicatorwithDefault, this);
+      this.removeIndicator = __bind(this.removeIndicator, this);
+      this.render = __bind(this.render, this);
+      SidebarView.__super__.constructor.apply(this, arguments);
+    }
+
+    SidebarView.prototype.events = {
+      'change select': 'addIndicatorwithDefault',
+      'click input.edit': 'addIndicator',
+      'click button.close': 'removeIndicator'
+    };
+
+    SidebarView.prototype.initialize = function() {
+      SidebarView.__super__.initialize.call(this);
+      return this.collection.bind('reset', this.render).fetch();
+    };
+
+    SidebarView.prototype.render = function() {
+      $(this.el).html(sidebarTmpl({
+        'items': this.collection.models
+      }));
+      return this;
+    };
+
+    SidebarView.prototype.removeIndicator = function(ev) {
+      var indicator, target;
+      target = $(ev.currentTarget, this.el).closest('li');
+      indicator = this.collection.get(target.data('id'));
+      if (indicator) {
+        $(target).remove();
+        indicator.removeFromChart();
+      }
+      return this;
+    };
+
+    SidebarView.prototype.addIndicatorwithDefault = function(ev) {
+      var indicator, target;
+      target = $(ev.currentTarget, this.el);
+      indicator = this.collection.get(target.val());
+      if (indicator) this._addIndicator(indicator, {});
+      return this;
+    };
+
+    SidebarView.prototype.addIndicator = function(ev) {
+      var indicator, indicator_options, target, unfilled;
+      target = $(ev.currentTarget, this.el);
+      indicator = this.collection.get($(target).data('id'));
+      indicator_options = _.map(indicator.get('args'), function(opt) {
+        var elem, name;
+        name = "" + (indicator.get('id')) + "[" + opt + "]";
+        elem = $("[name='" + name + "']");
+        return [opt, elem];
+      });
+      unfilled = _.any(indicator_options, function(p) {
+        return _.isEmpty(p[1].val());
+      });
+      if (unfilled) {
+        $(target).closest('li').addClass('alert alert-error');
+        return false;
+      }
+      this._addIndicator(indicator, indicator_options);
+      return this;
+    };
+
+    SidebarView.prototype._addIndicator = function(indicator, inputs) {
+      var callback, symbol, that;
+      that = this;
+      callback = function(params) {
+        var list, options;
+        options = _.pick(params, that.collection.validKeys());
+        indicator.settings = options;
+        list = $('#side-inds-list', that.el);
+        if ($("li[data-id='ind-" + indicator.id + "']", list).length < 1) {
+          return list.append(new IndicatorFormView({
+            model: indicator
+          }).render().el);
+        }
+      };
+      if ((symbol = app.ui.companyDp.selectedValue()) && app.models.chart) {
+        return indicator.addToChart(inputs, callback);
+      } else {
+        return alert('No Symbol selected.');
+      }
+    };
+
+    return SidebarView;
+
+  })(Backbone.View);
+
+  SymbolListView = (function(_super) {
+
+    __extends(SymbolListView, _super);
+
+    function SymbolListView() {
+      this.selectedValue = __bind(this.selectedValue, this);
+      this.render = __bind(this.render, this);
+      SymbolListView.__super__.constructor.apply(this, arguments);
+    }
+
+    SymbolListView.prototype.tagName = 'select';
+
+    SymbolListView.prototype.initialize = function() {
+      SymbolListView.__super__.initialize.call(this);
+      this.container = this.options.container;
+      return this.collection.bind('reset', this.render).fetch();
+    };
+
+    SymbolListView.prototype.render = function() {
+      $(this.el).html(symbolTmpl({
+        'items': this.collection.models
+      }));
+      this.container.append(this.el);
+      return this;
+    };
+
+    SymbolListView.prototype.selectedValue = function() {
+      return $(this.el).val();
+    };
+
+    return SymbolListView;
+
+  })(Backbone.View);
+
+  exports.HomeView = (function(_super) {
+
+    __extends(HomeView, _super);
+
+    function HomeView() {
+      this.openChart = __bind(this.openChart, this);
+      this.render = __bind(this.render, this);
+      HomeView.__super__.constructor.apply(this, arguments);
+    }
+
+    HomeView.prototype.className = 'container';
+
+    HomeView.prototype.events = {
+      'change #symbol-list select': 'openChart'
+    };
+
+    HomeView.prototype.render = function() {
+      $(this.el).html(require('./templates/home'));
+      $('#topbar').html(require('./templates/header'));
+      this.subviews = [
+        new SidebarView({
+          'collection': app.Indicators,
+          'el': this.$('#sidebar')
+        }), app.ui.companyDp = new SymbolListView({
+          'collection': app.Symbols,
+          'container': this.$('#symbol-list')
+        })
+      ];
+      return this;
+    };
+
+    HomeView.prototype.openChart = function(ev) {
+      var model;
+      model = app.Symbols.get(this.$(ev.currentTarget).val());
+      this.currentChart = new ChartView({
+        'model': model,
+        'el': this.$('#chart').get(0)
+      });
+      this.subviews.push(this.currentChart.render());
+      return this;
+    };
+
+    return HomeView;
+
+  })(Backbone.View);
 
 }).call(this);
 
@@ -820,29 +821,30 @@
   }
 }));
 (this.require.define({
-  "views/spinner": function(exports, require, module) {
+  "routers/main_router": function(exports, require, module) {
     (function() {
+  var __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
-  app.ui.spinner = {
-    show: function(message) {
-      this.ensureElement();
-      message = message || "Loading";
-      return this.el.stop(true, true).fadeIn('fast');
-    },
-    hide: function() {
-      this.ensureElement();
-      return this.el.stop(true, true).fadeOut('fast', function() {
-        return $(this).css({
-          display: 'none'
-        });
-      });
-    },
-    ensureElement: function() {
-      return this.el || (this.el = $('#spinner'));
+  exports.MainRouter = (function(_super) {
+
+    __extends(MainRouter, _super);
+
+    function MainRouter() {
+      MainRouter.__super__.constructor.apply(this, arguments);
     }
-  };
 
-  _.bindAll(app.ui.spinner, 'show', 'hide');
+    MainRouter.prototype.routes = {
+      '': 'home'
+    };
+
+    MainRouter.prototype.home = function() {
+      return $('body #main').html((app.ui.homeview = app.homeView.render()).el);
+    };
+
+    return MainRouter;
+
+  })(Backbone.Router);
 
 }).call(this);
 

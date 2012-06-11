@@ -59,10 +59,7 @@ class StockChart
       
   addSeries: (name, series, options) =>
     position = options['position' ] || 'overlay'
-    @items[position].push(name)
-    
-    console.log( options )
-    console.log( series )
+    @items[position].push(name)    
     s = @handle.addSeries _.extend 
       name: name
       data: series

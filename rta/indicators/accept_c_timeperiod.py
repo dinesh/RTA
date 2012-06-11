@@ -30,7 +30,7 @@ class AcceptCTimeperiod(IndicatorBase):
     return ( [{ 
       'name'   : self.func,
       'series' : common.pd2json(ts1),
-      'position' : self.position,
+      'position' : 0,
      }], self.config() )
   
   def cget(self, key ):

@@ -15,7 +15,8 @@ class AcceptOHLC(IndicatorBase):
                                                          self.series['low'],  
                                                          self.series['high'], 
                                                          self.series['close'] )
-                                
+    
+    print s1                           
     return ( pivot, common.padNans(s1, self.index) )
     
     
@@ -40,7 +41,7 @@ class AcceptOHLC(IndicatorBase):
   def options(_cls, kwgs):
     return dict()
 
-# [ IndicatorFactory.register(x, AcceptOHLC) for x in [ 'AVGPRICE', 'CDL2CROWS', 'CDL3BLACKCROWS', 'CDL3WHITESOLDIERS', 'CDLDOJI', 
-#   'CDLDOJISTAR', 'CDLDRAGONFLYDOJI', 'CDLGRAVESTONEDOJI', 'CDLENGULFING', 
-#   'CDLHAMMER', 'CDLHANGINGMAN', 'CDLHARAMI', 'CDLINVERTEDHAMMER', 
-#   'CDLPIERCING', 'CDLSHOOTINGSTAR', 'CDLSPINNINGTOP', 'CDLHARAMICROSS'  ] ]
+[ IndicatorFactory.register(x, AcceptOHLC) for x in [ 'AVGPRICE', 'CDL2CROWS', 'CDL3BLACKCROWS', 'CDL3WHITESOLDIERS', 'CDLDOJI', 
+  'CDLDOJISTAR', 'CDLDRAGONFLYDOJI', 'CDLGRAVESTONEDOJI', 'CDLENGULFING', 
+  'CDLHAMMER', 'CDLHANGINGMAN', 'CDLHARAMI', 'CDLINVERTEDHAMMER', 
+  'CDLPIERCING', 'CDLSHOOTINGSTAR', 'CDLSPINNINGTOP', 'CDLHARAMICROSS'  ] ]

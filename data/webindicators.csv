@@ -7,3 +7,5 @@ S-R,True
 MACD,True
 SMA,True
 EMA,True
+CDLDOJI,True
+ADX,True

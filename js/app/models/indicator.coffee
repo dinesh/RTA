@@ -41,7 +41,7 @@ class Indicator extends Backbone.Model
             yaxis = parseInt( if _.isUndefined(ts.position) then 2 else ts.position )
             
             if ts.series and ts.name 
-              @charts.push( app.models.chart.addSeries ts.name, ts.series, { yAxis : yaxis, id: ts.name, 'type': ts.type || 'line' } )
+              @charts.push( app.models.chart.addSeries ts.name, ts.series, { yAxis : yaxis, id: ts.name, 'type': ts.type || 'line' })
               console.log "#{ts.name} added to chart."
               
             if ts.flags

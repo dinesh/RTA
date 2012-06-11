@@ -20,7 +20,7 @@ from rta.indicators import (
         LIST, 
         IndicatorBase, 
         IndicatorFactory,
-        bbands, cci, macd, rsi, zigzag, sr
+        bbands, cci, macd, rsi, zigzag, sr, accept_c_timeperiod,
       )
       
 from rta import signals as Signals

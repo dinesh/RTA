@@ -53,7 +53,7 @@ class IndicatorFactory(object):
     if val:
       print "{func} is already registered from {module}!!! omg".format( func = key, module = val )
     else:
-      # print "\t >> {func} registerd from {module}: success".format( func = key, module = inspect.getfile(impl)  )
+      print "\t >> {func} registerd from {module}: success".format( func = key, module = inspect.getfile(impl)  )
       _cls.__registery__[ key ] = impl
     
   @classmethod

@@ -21,7 +21,7 @@ class Quote( mongokit.Document ):
         'adj': float,
         'open' : float,
         'low': float, 
-        'volume': int,
+        'volume': long,
     }
     
     required_fields = REQUIRED_QUOTE_FIELDS
@@ -139,8 +139,7 @@ class MongoDB(object):
              'volume': series['Volume']
           }
     doc = self.col.Quote( data )
-    print data
-    doc.save()
+    doc.save(validate=True)
     tp = namedtuple('quote_result', ['success', 'doc'] )
     if isinstance( doc['_id'], ObjectId ):
       return tp( True, doc)

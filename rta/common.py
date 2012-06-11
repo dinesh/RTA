@@ -96,9 +96,9 @@ def _sr( X, cutoff = 5, delta = 2, lines = 5):
         upper_limit = item + ( item * delta) / 100
         lower_limit = item - ( item * delta) / 100
         for _idx, oneitem in enumerate(series):
-            if idx != _idx:
+            if idx > _idx:
               if lower_limit <= oneitem and upper_limit >= oneitem:
-                  strength[ _idx ] += 1
+                  strength[ idx ] += 1
     
     topidx          = numpy.argsort( strength )[-lines:]
     tkidx           = series.index[ topidx ]

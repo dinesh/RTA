@@ -63,11 +63,12 @@ class YahooDAM(BaseDAM):
             LOG.debug('Symbol is None')
             return []
 
+        matfile = matplotlib_finance.fetch_historical_yahoo(self.symbol, start, end) 
+        print matfile      
         data = pandas.read_csv( 
-              matplotlib_finance.fetch_historical_yahoo(self.symbol, start, end), 
+              matfile,
               parse_dates=True, 
               converters= { 'Date': dateutil.parser.parse } ) 
-              
         return data
         
     def namespace(self, s):
@@ -96,6 +97,7 @@ class YahooDAM(BaseDAM):
         print "Importing {s} between {st} - {en}".format(s= symbol, st= start, en = end)
         try:
           for index, row in self.readQuotes(start, end).iterrows():
+            # print row
             result = importer.add( symbol, row )
             if result and result.success:
               count += 1 

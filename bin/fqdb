@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 
+import os , sys
 import optparse
 from datetime import date
 from dateutil import parser as dtparser
+
+sys.path.append( os.path.join( os.path.dirname( os.path.abspath(__file__) ), '..' ) )
 
 from rta import api
 
@@ -24,7 +27,7 @@ def main():
     print ftlist
   
   if options.symbol:
-    item = allitems[ allitems.map( lambda x: x.lower() == options.symbol.lower() ) ]
+    item = allitems[ allitems.map( lambda x: x == options.symbol ) ]
     if item.size < 1:
       parser.error("not able to find %s symbol in the database" % options.symbol)
     
@@ -32,7 +35,9 @@ def main():
       start_date = dtparser.parse( options.start_date )
     if options.end_date:
       end_date = dtparser.parse( options.end_date )
-    
-    
+    db = api.Model.MongoDB()
+    yahoodam = api.YahooDAM()
+    yahoodam.importQuotes(db, start_date, end_date, symbols = [ options.symbol ] )
+
 if __name__ == '__main__':
   main()

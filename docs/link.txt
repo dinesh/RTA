@@ -1,12 +1,9 @@
 
-
 http://stocksiq.in
-
 http://www.tradervue.com/
 http://finviz.com
 
 
-zigzag = http://www.smartquant.com/forums/viewtopic.php?f=44&t=5825&hilit=zigzag
 min-max: http://stackoverflow.com/questions/7061071/finding-the-min-max-of-a-stock-chart
 
 Numpy Questions:

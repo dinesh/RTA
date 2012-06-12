@@ -12,22 +12,26 @@ class BBANDS(IndicatorBase):
   
   # 1) should extract options, 2) call talib function 3) maketimeseries of output and return
   
+  @property
   def timeperiod(self):
     return int( self.cget('timeperiod') )
   
+  @property
   def nbdevup(self):
     return int( self.cget('nbdevup') )
-  
+
+  @property
   def nbdevdn(self):
     return int( self.cget('nbdevdn') )
-  
+    
+  @property
   def matype(self):
     return int( self.cget('matype') )
      
   def calculate(self):
     pivot, s1, s2, s3 = Indicators.BBANDS( self.series['close'], 
-                                self.timeperiod(),  
-                                self.nbdevup(), self.nbdevdn(), self.matype() )
+                                self.timeperiod,  
+                                self.nbdevup, self.nbdevdn, self.matype )
                                 
     return ( pivot, common.padNans(s1, self.index), common.padNans(s2, self.index), common.padNans(s3, self.index) )
     

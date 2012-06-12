@@ -25,8 +25,8 @@ class CCI(IndicatorBase):
     _buy_list  = []
     direction  = None
     
-    _sell_list = [ ts.index[i] for (i, slope) in TS.roll_intersect(ts, -100) if not slope ]
-    _buy_list = [ ts.index[i] for (i, slope) in TS.roll_intersect(ts, 100) if slope ]
+    _sell_list = [ ts.index[i] for (i, slope) in TS.roll_intersect(ts, -100) if slope ]
+    _buy_list = [ ts.index[i] for (i, slope) in TS.roll_intersect(ts, 100) if not slope ]
     
     return dict( sell = _sell_list, buy = _buy_list )
     

@@ -20,7 +20,8 @@ from rta.indicators import (
         LIST, 
         IndicatorBase, 
         IndicatorFactory,
-        bbands, cci, macd, rsi, zigzag, sr, accept_c_timeperiod, accept_ohlc, accept_hlc_timeperiod
+        bbands, cci, macd, rsi, zigzag, sr, accept_c_timeperiod, accept_ohlc, accept_hlc_timeperiod, 
+        slow_stochastic, fast_stochastic, stochastic_rsi
       )
       
 from rta import signals as Signals

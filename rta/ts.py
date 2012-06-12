@@ -9,7 +9,9 @@ def roll_intersect(x,y):
   diff = X > Y
   shifted_diff = np.insert( diff[:-1], 0, [False] )
   indices = np.nonzero( np.logical_xor( diff, shifted_diff ) )[0]
-  return [ (i, x[i] > x[i+1] ) for i in indices if i < x.shape[0] -1 ]
+  print indices
+
+  return [ (i, x[i] > x[i-1] ) for i in indices if i < x.shape[0] -1 ]
 
 def roll_trendline(x, y, *args):
   _x = np.arange( len(x) )

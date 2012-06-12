@@ -425,7 +425,6 @@
       if ((symbol = app.ui.companyDp.selectedValue()) && app.models.chart) {
         range = app.models.chart.dateRange();
         _url = [api.url, this.collection.url, this.id, symbol, 'series.json'].join('/');
-        console.log(_url);
         data = {
           start: range.dataMin,
           end: range.dataMax
@@ -779,7 +778,7 @@
     Symbols.prototype.parse = function(json) {
       return _.map(json.records, function(p) {
         return {
-          'name': '$' + p,
+          'name': p,
           'id': p
         };
       });

@@ -136,7 +136,7 @@ class MongoDB(object):
              'low': series['Low'],
              'adj': series['Adj Close'], 
              'close': series['Close'],
-             'volume': series['Volume']
+             'volume': long(series['Volume'])
           }
     doc = self.col.Quote( data )
     doc.save(validate=True)

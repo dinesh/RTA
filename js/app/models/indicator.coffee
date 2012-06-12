@@ -21,7 +21,6 @@ class Indicator extends Backbone.Model
     if ( symbol = app.ui.companyDp.selectedValue() ) and app.models.chart
       range = app.models.chart.dateRange()
       _url = [ api.url, this.collection.url, this.id, symbol, 'series.json' ].join('/')
-      console.log _url
       data = 
         start: range.dataMin
         end: range.dataMax

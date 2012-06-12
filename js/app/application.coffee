@@ -19,7 +19,7 @@ class Symbols extends Backbone.Collection
   sync: api.sync
   model: Symbol
   parse: (json) ->
-    _.map(json.records, (p) -> { 'name': '$' + p, 'id': p } )
+    _.map(json.records, (p) -> { 'name': p, 'id': p } )
     
 class exports.Application extends BrunchApplication
   # This callback would be executed on document ready event.

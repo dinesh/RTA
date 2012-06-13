@@ -12,7 +12,7 @@ class Zigzag(IndicatorBase):
     return int( self.cget('cutoff') )
     
   def calculate(self):
-    sr = self.series['open']
+    sr = self.series['close']
     idx = common._zigzag( sr, cutoff = self.cutoff() )
     return ( 0, common.padNans( sr[idx], index= self.index[idx] ) )
     

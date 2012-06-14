@@ -81,7 +81,6 @@ class Api:
     price  = CoreApi.Model.Quote.series(symbol, start = start, end = end )
     
     if price.shape[0] > 0:
-      # res, _config = getattr( CoreApi, indicator.lower() ).impl( price, request.args ).as_json()
       res, _config = CoreApi.IndicatorFactory.run( indicator, price, request.args ).as_json()
       return json.dumps({ 'records': res, 'settings': _config }, cls = CoreApi.JSONEncoder )
     else:
@@ -92,7 +91,7 @@ class Api:
     symbol   = symbol or request.args.get('symbol', False)
     fields   = request.args.get('fields', ['tick', 'open', 'high', 'low', 'close' ] )
     page     = request.args.get('page', 1)
-    per_page = request.args.get('per_page', 3 * 360)
+    per_page = request.args.get('per_page', 1 * 360)
     
     if symbol:
       cursor = CoreApi.Model.Quote.scope().find( { 

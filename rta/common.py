@@ -53,12 +53,15 @@ class JSONEncoder(json.JSONEncoder):
         the corresponding ISO 8601 string representation.
 
         """
-        if isinstance(obj, datetime.datetime):
+        if hasattr(obj, 'as_json'):
+            return obj.as_json()    
+        elif isinstance(obj, datetime.datetime):
             # this is for javascript series date utctime * 1000
             return calendar.timegm( obj.utctimetuple() ) * 1000
-        if isinstance(obj, ObjectId):
+        elif isinstance(obj, ObjectId):
           return str(obj)
-        return super(JSONEncoder, self).default(obj)
+        else:
+          return super(JSONEncoder, self).default(obj)
 
 def padNans(res, index):
   # print res

@@ -8,7 +8,6 @@ from web import app
 
 manager = Manager(app)
 
-
 class SyncDB(Command):
     """
     Initializes the database tables.

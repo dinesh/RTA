@@ -69,10 +69,10 @@ class IndicatorBase(object):
   __slots__ = [ 'series', 'index', 'func', 'options', 'property' ]
   
   def __init__(self, series, **kwgs):
-    self.series = series
-    self.index = series.index
+    self.series  = series
+    self.index   = series.index
     self.options = kwgs.get('options', {})
-    self.func = kwgs.get('func', None)
+    self.func    = kwgs.get('func', None)
 
   def as_json(self):
     raise NotImplementedError("%s should implement as_json function")
@@ -92,9 +92,7 @@ def _get_position(ind):
   
 def calculate(series, ind_id, options):
   indicator = LIST[ind_id]
-  
   period = int( options.get('timeperiod', 20) )
-  
   o, h, l ,c, sindex = ( series['open'].values, 
                         series['high'].values, 
                         series['low'].values, 

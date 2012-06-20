@@ -26,7 +26,6 @@ exports.config =
           'vendor/scripts/backbone-0.9.1.js',
           'vendor/scripts/highstock.js',
           'vendor/scripts/bootstrap-datepicker.js',
-          
         ]
 
     stylesheets:

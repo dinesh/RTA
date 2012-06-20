@@ -6,6 +6,7 @@ import inspect
 from pymongo.objectid import ObjectId
 import pandas
 import numpy
+import os
 
 def batch(iterable, size):
     sourceiter = iter(iterable)
@@ -58,6 +59,15 @@ class JSONEncoder(json.JSONEncoder):
         elif isinstance(obj, datetime.datetime):
             # this is for javascript series date utctime * 1000
             return calendar.timegm( obj.utctimetuple() ) * 1000
+        elif isinstance( obj, pandas.Series):
+            return obj.iteritems()
+        elif isinstance( obj, pandas.DataFrame):
+            return obj.iterrows()
+        elif isinstance(obj, (numpy.ndarray, numpy.float64, numpy.int64) ):
+            if len(obj.shape) == 0:
+                return float(obj)
+            else:
+                return [float(x) for x in obj]
         elif isinstance(obj, ObjectId):
           return str(obj)
         else:
@@ -83,7 +93,10 @@ def pd2json(df):
   else:
     return df
 
-
+def getuid():
+  import uuid
+  return uuid.uuid4()
+  
 def _delta( X, end, start ):
     return 100 * abs( 1.0 * ( X[end] - X[start] ) / X[start] )
 
@@ -136,5 +149,42 @@ def _zigzag( X, cutoff = 5 ):
     indices.append(pivot[0])
 
     return numpy.unique(indices)
+
+def web_not_found(error=None):
+    from flask import jsonify
+    message = {
+            'status': 404,
+            'message': 'Not Found: ' + request.url,
+    }
+    resp = jsonify(message)
+    resp.status_code = 404
+
+    return resp
+
+class DictStore(dict):
+
+    def __init__(self, filename, odict):
+        self.filename = filename
+        self.closed = False
+        super(DictStore, self).__init__(odict)
+
+    def require_group(self, key):
+        if not self.has_key(key):
+            self.__setitem__(key, dict())
+        return self.__getitem__(key)
+
+    @classmethod
+    def open(cls, filename):
+        data = {}
+        if os.path.exists(filename):
+            data = pickle.load(open(filename, 'rb'))
+        return cls(filename, data)
+
+    def close(self):
+        self.flush()
+        self.closed = True
+
+    def flush(self):
+        pickle.dump(self.items(), open(self.filename, 'wb+'), -1)
     
-__all__ = [ 'batch', 'JSONEncoder', 'padNans', 'pd2json', '_zigzag', '_sr' ]
+__all__ = [ 'batch', 'JSONEncoder', 'padNans', 'pd2json', '_zigzag', '_sr', 'DictStore' ]

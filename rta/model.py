@@ -45,9 +45,20 @@ class Quote( mongokit.Document ):
                            "volume": self.volume,
                            "symbol": self.symbol })
     
+    @classmethod 
+    def series(_cls, symbol, start=None, end=None, **kwgs):
+      cursor = Quote.scursor(symbol, start, end, **kwgs)
+      limit = kwgs.get('limit', None)
+      offset = kwgs.get('offset', 0)
+      
+      if limit:
+        cursor = cursor.limit(limit).skip(offset)
+        
+      return pandas.DataFrame( list(cursor), index = [ x['tick'] for x in cursor.rewind() ] )
+      
     # IMP: add caching behaviour some decorater stuff 
     @classmethod
-    def series(_cls, symbol, start=None, end=None, frame=True, **kwgs):
+    def scursor(_cls, symbol, start=None, end=None,  **kwgs):
       '''
         The function returns dataframe with all of the field ( _repr_ fields )
         You can have the series out of dataframe by 
@@ -55,20 +66,17 @@ class Quote( mongokit.Document ):
           >> Quote.series( symbol = '3MINDIA' )['close']
         
       '''
-      print start, end
-      
       try:
         mongo = MongoDB().collection()
         cursor = None
+        start = start or datetime.datetime(1980, 01, 01)
         if not end:
           end = datetime.datetime.today()
         
-        cursor = mongo.find( { 
-                  'symbol': symbol, 
-                  'tick': { '$gte' : start, '$lte' : end } 
-                 }, fields = REQUIRED_QUOTE_FIELDS ).sort('tick')
+        cursor = _cls.scope().find( { 'symbol': symbol, 'tick': { '$gte' : start, '$lte' : end } 
+                  }, fields = REQUIRED_QUOTE_FIELDS ).sort('tick')
         
-        return pandas.DataFrame( list(cursor), index = [ x['tick'] for x in cursor.rewind() ] ) 
+        return cursor  
           
       except:
         raise

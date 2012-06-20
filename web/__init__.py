@@ -6,6 +6,7 @@ from web import settings
 from .static import static_files
 from .url import setup_routes
 
+
 # setup application
 current_dir = os.path.dirname(__file__)
 app = Flask('rta', static_folder = os.path.join( current_dir, 'static') )

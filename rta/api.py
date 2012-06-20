@@ -1,9 +1,3 @@
-
-
-# this file would be used to interface this library with other system
-# import all things here and other can use it
-
-# site-packages
 import os, dateutil, sys, time
 from matplotlib import finance as matplotlib_finance
 import urllib2
@@ -38,5 +32,3 @@ from .common import *
 import logging
 LOG = logging.getLogger()
 
-# coul't able to make it work
-# Indicators.register_indicators()

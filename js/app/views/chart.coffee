@@ -98,27 +98,9 @@ class ChartView extends Backbone.View
   className: 'chart'
   
   render: =>
-    url = [ api.url, 'api/quotes',  @model.get('id') + '.json?' ].join('/')
-    
-    
+    url = [ api.url, 'api/quotes',  @model.get('id') + '.json?flush=true' ].join('/')
     $.getJSON url + '&callback=?', (data) =>
-      @stockchart = new StockChart @el, @model.get('id'),
-        series: [{
-          name: 'OHLV',
-          id: 'OHLV',
-          data: data.records, 
-          type : 'candlestick',
-          }, {
-          name: 'Volume', 
-          data: data.volume
-          type : 'column'
-          yAxis: 1 
-          }, {
-          name : 'Trendline',
-          data: data.trendline,
-          type: 'line'
-          }]
-    
+      @stockchart = new StockChart(@el, @model.get('id'), data.chartjson)
       app.models.chart = @stockchart
     		 
     @

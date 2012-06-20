@@ -21,15 +21,11 @@ class CCI(IndicatorBase):
     
     
   def applyFlags(self, ts):
-    _sell_list = []
-    _buy_list  = []
-    direction  = None
-    
     _sell_list = [ ts.index[i] for (i, slope) in TS.roll_intersect(ts, -100) if slope ]
     _buy_list = [ ts.index[i] for (i, slope) in TS.roll_intersect(ts, 100) if not slope ]
-    
     return dict( sell = _sell_list, buy = _buy_list )
-    
+  
+  
   # should return the ouput as json format for web api
   def as_json(self):
     _, ts = self.calculate()

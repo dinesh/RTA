@@ -1,4 +1,3 @@
-
  ____ _____  _                 _    _                  _ _   _               
 |  _ \_   _|/ \               / \  | | __ _  ___  _ __(_) |_| |__  _ __ ___  
 | |_) || | / _ \    _____    / _ \ | |/ _` |/ _ \| '__| | __| '_ \| '_ ` _ \ 
@@ -8,25 +7,25 @@
  ---------------------------------------------------------------------------------------
   Goals
   ------------
-  This is an algorithm trading platform of professional traders. It providers technical analysis of 200+ popular indicators and trading signals. You can program your trading strategies and backtest them against historical data. 
+  This is an algorithmic trading platform for professional traders. It providers technical analysis of 200+ popular indicators and trading signals. You can program your trading strategies and backtest them against historical data. 
  
  Technology stack
  ----------------
- 1. Django/Flask for back-end api
-    Python is known for its speed, ease of use and best ecosystem in scientific and machine learning field. It really shines when u use Numpy, Pandas and Pytables for large computational work. I see python a perfect fit in financial world.
+ 1. Flask for back-end api
+    Python is known for its ease of use and best ecosystem in scientific field. It really shines when u use Numpy, Pandas and Pytables for large computational work. I see python a perfect fit in financial world.
     
   2. client-side MVC: Backbone.js and Brunch
-     Node and client-side MVC are really popular over the recent years. so i though of giving it a try ( which is excellent till now. ). Brunch is used for automatic compiling coffeescript files and serve them in dev mode.
+     Node and client-side MVC framework have become popular over the recent years. so i thought of giving it a try ( which is excellent till now. ). Brunch is used for automatic compiling of coffeescript files and serve them in dev mode.
      
     
   
-  
-How to Run:
+##### How to Run:
  1. start mongodb
  
  2.
+ ```bash
    $] cd js && brunch watch
    $] python manage.py runserver 
  
    $] open http://localhost:3000
-   
+   ````
